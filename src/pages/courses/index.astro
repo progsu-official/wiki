@@ -1,34 +1,420 @@
 ---
-// Why this page doesn't use the shared Layout.astro:
-//
-// Layout.astro is built for content pages (guides, etc.) — it injects a Navbar,
-// Footer, and a cosmic star background. The course explorer is a full-page React
-// app that already has its own navbar and sets its own black background via CSS.
-// Keeping Layout here would cause two navbars to stack and the two backgrounds
-// to conflict, so we use a plain HTML shell instead and let the React component
-// own the entire page.
-import CourseExplorer from "./_course-explorer";
+import Layout from "../../layouts/Layout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import CourseCard from "../../components/CourseCard.astro";
+import CourseSearchBar from "../../components/CourseSearchBar.astro";
+import CoursesSubnav from "../../components/CoursesSubnav.astro";
+
+const courses = [
+  { code: "CSC 1010", title: "Computers and Applications", credits: 3, semesters: ["fall","spring","summer"] },
+  { code: "CSC 1301", title: "Principles of Computer Science I", credits: 4, semesters: ["fall","spring","summer"] },
+  { code: "CSC 1302", title: "Principles of Computer Science II", credits: 4, semesters: ["fall","spring"] },
+  { code: "CSC 2720", title: "Data Structures", credits: 4, semesters: ["fall","spring"] },
+  { code: "CSC 3210", title: "Computer Organization and Programming", credits: 4, semesters: ["fall","spring"] },
+  { code: "CSC 3320", title: "System-Level Programming", credits: 4, semesters: ["fall","spring"] },
+  { code: "CSC 4310", title: "Operating Systems", credits: 3, semesters: ["fall","spring"] },
+  { code: "CSC 4320", title: "Computer Networks", credits: 3, semesters: ["fall"] },
+  { code: "CSC 4330", title: "Programming Language Concepts", credits: 3, semesters: ["fall","spring"] },
+  { code: "CSC 4350", title: "Software Engineering", credits: 3, semesters: ["fall","spring"] },
+  { code: "CSC 4360", title: "Mobile Application Development", credits: 3, semesters: ["fall"] },
+  { code: "CSC 4720", title: "Human-Computer Interaction", credits: 3, semesters: ["fall","spring"] },
+  { code: "MATH 1111", title: "College Algebra", credits: 3, semesters: ["fall","spring","summer"] },
+  { code: "MATH 1113", title: "Precalculus", credits: 3, semesters: ["fall","spring","summer"] },
+  { code: "MATH 1220", title: "Survey of Calculus", credits: 3, semesters: ["fall","spring","summer"] },
+  { code: "MATH 1401", title: "Elementary Statistics", credits: 3, semesters: ["fall","spring","summer"] },
+  { code: "MATH 2211", title: "Calculus of One Variable I", credits: 4, semesters: ["fall","spring","summer"] },
+  { code: "MATH 2212", title: "Calculus of One Variable II", credits: 4, semesters: ["fall","spring"] },
+  { code: "MATH 2215", title: "Multivariate Calculus", credits: 4, semesters: ["fall","spring"] },
+  { code: "MATH 2420", title: "Discrete Mathematics", credits: 3, semesters: ["fall","spring"] },
+  { code: "MATH 2641", title: "Linear Algebra I", credits: 3, semesters: ["fall","spring"] },
+  { code: "MATH 2652", title: "Differential Equations", credits: 3, semesters: ["fall","spring"] },
+  { code: "MATH 3030", title: "Mathematical Models for Computer Science", credits: 3, semesters: ["fall"] },
+  { code: "MATH 3350", title: "Scientific Computing", credits: 3, semesters: ["fall","spring"] },
+];
+
+function deriveSubject(code: string) { return code.split(' ')[0]; }
+
+const SUBJECT_NAMES: Record<string, string> = {
+  CSC: "computer science",
+  MATH: "mathematics",
+};
+
+const subjectMap = new Map<string, typeof courses>();
+for (const c of courses) {
+  const subj = deriveSubject(c.code);
+  if (!subjectMap.has(subj)) subjectMap.set(subj, []);
+  subjectMap.get(subj)!.push(c);
+}
+const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 'CSC').sort()];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="GSU CS course explorer — every course, every path forward." />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Courses | ProGSU</title>
-  </head>
-  <body>
-    <!-- client:load tells Astro to hydrate this React component immediately on page load -->
-    <CourseExplorer client:load />
-  </body>
-</html>
+<Layout title="Courses">
+  <CoursesSubnav active="browse" />
+
+  <PageHeader
+    eyebrow="Courses"
+    headline="find your next<br>semester."
+    subline="GSU courses with notes from members who've taken them."
+  />
+
+  <div class="browse-center">
+    <CourseSearchBar />
+
+    <div class="semester-bar" role="group" aria-label="Semester filter">
+      <button class="semester-chip active" data-semester="fall" aria-pressed="true">fall</button>
+      <button class="semester-chip active" data-semester="spring" aria-pressed="true">spring</button>
+      <button class="semester-chip active" data-semester="summer" aria-pressed="true">summer</button>
+    </div>
+
+    <div id="subject-list">
+      {subjectOrder.map(subj => {
+        const group = subjectMap.get(subj) ?? [];
+        return (
+          <div class="subject-section" data-subject-section={subj}>
+            <div class="subject-label">
+              <span class="subject-label__name">{SUBJECT_NAMES[subj] ?? subj.toLowerCase()}</span>
+              <span class="subject-label__code">{subj}</span>
+            </div>
+            <div class="code-grid">
+              {group.map(c => (
+                <div
+                  data-course-wrap
+                  data-semesters={c.semesters.join(',')}
+                  data-code={c.code}
+                  data-title={c.title}
+                >
+                  <CourseCard code={c.code} title={c.title} credits={c.credits} variant="code-only" />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="filter-empty surface-glass" id="filter-empty" style="display:none">
+      <p class="filter-empty__text" id="filter-empty-text">no courses offered in the selected semesters.</p>
+    </div>
+  </div>
+</Layout>
 
 <style>
-  /* strip browser default margin so the React shell sits flush to the edges */
-  body {
+  .browse-center {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  /* ── Semester chips ── */
+  .semester-bar {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .semester-chip {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    letter-spacing: var(--tracking-wider);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    transition:
+      color var(--duration-fast) var(--ease),
+      border-color var(--duration-fast) var(--ease);
+  }
+  .semester-chip:hover {
+    color: var(--color-text-secondary);
+    border-color: var(--glass-border-hi);
+  }
+  .semester-chip.active {
+    color: var(--accent-text);
+    border-color: var(--accent-border);
+  }
+
+  /* ── Subject sections ── */
+  .subject-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+  .subject-section:last-child { margin-bottom: 0; }
+
+  .subject-label {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  .subject-label__name {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+  }
+
+  .subject-label__code {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    letter-spacing: var(--tracking-wider);
+  }
+
+  .code-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: var(--space-2);
+  }
+
+  /* ── Empty state ── */
+  .filter-empty {
+    text-align: center;
+    padding: var(--space-8);
+    border-radius: var(--radius-lg);
+  }
+  .filter-empty__text {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-base);
+    color: var(--color-text-tertiary);
     margin: 0;
-    padding: 0;
+  }
+
+  @media (max-width: 640px) {
+    .browse-center {
+      padding: 0 var(--space-4);
+    }
+    .subject-label {
+      justify-content: center;
+    }
+    .subject-section {
+      align-items: center;
+    }
+    .code-grid {
+      width: 100%;
+    }
   }
 </style>
+
+<script>
+  const list = document.getElementById('subject-list')!;
+  const chips = document.querySelectorAll<HTMLButtonElement>('.semester-chip');
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-subject-section]'));
+  const filterEmpty = document.getElementById('filter-empty')!;
+  const filterEmptyText = document.getElementById('filter-empty-text')!;
+
+  // ── Searchable index ────────────────────────────────────────────
+  interface Item {
+    el: HTMLElement;
+    section: HTMLElement;
+    grid: HTMLElement;
+    code: string;
+    codeNorm: string;          // lowercased, alphanumeric only
+    titleLower: string;
+    titleWords: string[];
+    semesters: string[];
+    originalIndex: number;
+  }
+
+  function normalize(s: string): string {
+    return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  const items: Item[] = Array.from(document.querySelectorAll<HTMLElement>('[data-course-wrap]')).map((el, i) => {
+    const section = el.closest('[data-subject-section]') as HTMLElement;
+    const code = el.dataset.code ?? '';
+    const title = el.dataset.title ?? '';
+    const titleLower = title.toLowerCase();
+    return {
+      el,
+      section,
+      grid: section.querySelector('.code-grid') as HTMLElement,
+      code,
+      codeNorm: normalize(code),
+      titleLower,
+      titleWords: titleLower.split(/\s+/).filter(Boolean),
+      semesters: (el.dataset.semesters ?? '').split(','),
+      originalIndex: i,
+    };
+  });
+
+  const originalSectionOrder = [...sections];
+
+  // ── Fuzzy scoring ───────────────────────────────────────────────
+  function levenshtein(a: string, b: string): number {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    let curr = new Array(b.length + 1).fill(0);
+    for (let i = 1; i <= a.length; i++) {
+      curr[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+      }
+      [prev, curr] = [curr, prev];
+    }
+    return prev[b.length];
+  }
+
+  function scoreToken(token: string, c: Item): number {
+    const t = token.toLowerCase();
+    const tNorm = normalize(t);
+    if (!tNorm) return 0;
+    const isDigits = /^\d+$/.test(tNorm);
+
+    if (c.codeNorm === tNorm) return 1000;
+    if (!isDigits && c.titleLower === t) return 950;
+    if (!isDigits && c.titleWords.includes(t)) return 800;
+    if (c.codeNorm.startsWith(tNorm)) return 700;
+    if (!isDigits && t.length >= 2 && c.titleWords.some(w => w.startsWith(t))) return 600;
+    if (!isDigits && t.length >= 3 && c.titleLower.includes(t)) return 400;
+    if (c.codeNorm.includes(tNorm)) return 350;
+
+    if (!isDigits && t.length >= 4) {
+      const threshold = t.length >= 7 ? 2 : 1;
+      let best = Infinity;
+      for (const w of c.titleWords) {
+        if (Math.abs(w.length - t.length) > threshold) continue;
+        const d = levenshtein(t, w);
+        if (d < best) best = d;
+      }
+      if (best <= threshold) return 200 - best * 30;
+    }
+    return 0;
+  }
+
+  function scoreCourse(query: string, c: Item): number {
+    const q = query.trim();
+    if (!q) return 1;
+
+    // Whole-query code match handles "csc2510", "CSC 2510", "csc-2510"
+    const qNorm = normalize(q);
+    if (qNorm.length >= 4 && c.codeNorm === qNorm) return 10000;
+    if (qNorm.length >= 3 && c.codeNorm.startsWith(qNorm)) return 5000;
+
+    const qLower = q.toLowerCase();
+    if (c.titleLower === qLower) return 9000;
+    if (qLower.length >= 3 && c.titleLower.startsWith(qLower)) return 4000;
+
+    const tokens = qLower.split(/\s+/).filter(Boolean);
+    let total = 0;
+    for (const t of tokens) {
+      const s = scoreToken(t, c);
+      if (s === 0) return 0;
+      total += s;
+    }
+    return total;
+  }
+
+  // ── State + apply ───────────────────────────────────────────────
+  let currentQuery = '';
+
+  function getActiveSemesters(): Set<string> {
+    const active = new Set<string>();
+    chips.forEach(c => { if (c.classList.contains('active')) active.add(c.dataset.semester!); });
+    return active;
+  }
+
+  function applyFilters() {
+    const active = getActiveSemesters();
+    const semesterShowAll = active.size === 0;
+    const q = currentQuery.trim();
+    const hasQuery = q.length > 0;
+
+    const scored = items.map(it => {
+      const passesSem = semesterShowAll || it.semesters.some(s => active.has(s));
+      const score = hasQuery ? scoreCourse(q, it) : 1;
+      return { it, passesSem, score };
+    });
+
+    let totalVisible = 0;
+    for (const s of scored) {
+      const visible = s.passesSem && s.score > 0;
+      s.it.el.style.display = visible ? '' : 'none';
+      if (visible) totalVisible++;
+    }
+
+    if (hasQuery) {
+      // Sort tiles within each section by score desc, original index asc
+      const bySection = new Map<HTMLElement, typeof scored>();
+      for (const s of scored) {
+        if (!s.passesSem || s.score === 0) continue;
+        const arr = bySection.get(s.it.section) ?? [];
+        arr.push(s);
+        bySection.set(s.it.section, arr);
+      }
+      bySection.forEach((arr, sec) => {
+        arr.sort((a, b) => b.score - a.score || a.it.originalIndex - b.it.originalIndex);
+        const grid = sec.querySelector('.code-grid')!;
+        for (const s of arr) grid.appendChild(s.it.el);
+      });
+
+      // Sort sections by their best match
+      const orderedSections = Array.from(bySection.entries())
+        .sort((a, b) => Math.max(...b[1].map(s => s.score)) - Math.max(...a[1].map(s => s.score)))
+        .map(([sec]) => sec);
+      for (const sec of orderedSections) list.appendChild(sec);
+    } else {
+      // Restore original order
+      for (const sec of originalSectionOrder) list.appendChild(sec);
+      const byOriginal = [...items].sort((a, b) => a.originalIndex - b.originalIndex);
+      for (const it of byOriginal) it.grid.appendChild(it.el);
+    }
+
+    // Section visibility (any visible tile within)
+    sections.forEach(sec => {
+      const tiles = sec.querySelectorAll<HTMLElement>('[data-course-wrap]');
+      let anyVisible = false;
+      tiles.forEach(t => { if (t.style.display !== 'none') anyVisible = true; });
+      sec.style.display = anyVisible ? '' : 'none';
+    });
+
+    if (totalVisible === 0) {
+      filterEmpty.style.display = '';
+      filterEmptyText.textContent = hasQuery
+        ? 'nothing matches that search yet.'
+        : 'no courses offered in the selected semesters.';
+    } else {
+      filterEmpty.style.display = 'none';
+    }
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      chip.setAttribute('aria-pressed', String(chip.classList.contains('active')));
+      applyFilters();
+    });
+  });
+
+  window.addEventListener('course-search', (e: Event) => {
+    currentQuery = (e as CustomEvent<{ query: string }>).detail.query ?? '';
+    applyFilters();
+  });
+
+  // Tile clicks navigate to detail page
+  document.getElementById('subject-list')!.addEventListener('click', (e) => {
+    const tile = (e.target as HTMLElement).closest('[data-course-tile]') as HTMLElement | null;
+    if (!tile) return;
+    const code = tile.dataset.courseTile!;
+    window.location.href = `/courses/${code.toLowerCase().replace(' ', '-')}`;
+  });
+  document.getElementById('subject-list')!.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const tile = (e.target as HTMLElement).closest('[data-course-tile]') as HTMLElement | null;
+    if (!tile) return;
+    e.preventDefault();
+    window.location.href = `/courses/${tile.dataset.courseTile!.toLowerCase().replace(' ', '-')}`;
+  });
+</script>
