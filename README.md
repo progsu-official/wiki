@@ -1,10 +1,10 @@
 # PROGSU Wiki
 
-The open wiki for breaking into tech built by ProgSU members for GSU students.
+The open wiki for breaking into tech built by Progsu members for GSU students.
 
 ## About
 
-ProgSU is Georgia State University's programming club. This wiki is our knowledge base: guides written by members who landed offers in quant, big tech, research, and beyond. Signed, dated, free.
+Progsu is Georgia State University's programming club. This wiki is our knowledge base: guides written by members who landed offers in quant, big tech, research, and beyond. Signed, dated, free.
 
 ### What's Inside
 
@@ -111,7 +111,7 @@ Guides are written in MDX and live in `src/pages/guides/`. To add one:
 
 ## Getting Help
 
-- Join the Progsu Discord for questions
+- Join the progsu Discord for questions
 - Open a GitHub issue for bugs or feature requests
 - Reach out to a club officer for write access
 
