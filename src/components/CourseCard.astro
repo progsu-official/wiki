@@ -30,7 +30,7 @@ const slug = code.toLowerCase().replace(' ', '-');
 </div>
 ) : variant === 'summary' ? (
 <div class:list={['cc', 'surface-glass', 'cc--summary']} data-course-tile={code} role="button" tabindex="0">
-  {pick && <span class="cc__pick">ProgSU pick</span>}
+  {pick && <span class="cc__pick">progsu pick</span>}
   <div class="cc__code-row">
     <span class="cc__code">{code}</span>
     <span class="cc__credits">{credits} cr</span>
@@ -44,7 +44,7 @@ const slug = code.toLowerCase().replace(' ', '-');
 <a href={`/courses/${slug}`} class:list={['cc', 'surface-glass', `cc--${variant}`]} data-cc-link>
 
   {pick && (
-    <span class="cc__pick">ProgSU pick</span>
+    <span class="cc__pick">progsu pick</span>
   )}
 
   <div class="cc__code-row">

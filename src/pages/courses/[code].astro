@@ -498,7 +498,7 @@ const relatedCourses = (course.related ?? [])
       <span class="hero__pill">{course.credits} credits</span>
       <span class="hero__pill">{course.level}-level</span>
       <span class="hero__pill">offered {(course.semesters ?? []).join(' · ')}</span>
-      {course.notes.length > 0 && <span class="hero__pill hero__pill--accent">ProgSU notes</span>}
+      {course.notes.length > 0 && <span class="hero__pill hero__pill--accent">progsu notes</span>}
     </div>
   </header>
 
@@ -625,7 +625,7 @@ const relatedCourses = (course.related ?? [])
   )}
   <footer class="course-footer">
     <span class="course-footer__text">missing a professor or note?</span>
-    <a href="https://github.com/ProgSU/wiki" class="course-footer__link">edit on github &rarr;</a>
+    <a href="https://github.com/progsu-official/wiki" class="course-footer__link">edit on github &rarr;</a>
   </footer>
 
   <PlanWiring />

@@ -1,6 +1,6 @@
-# ProgSU Wiki — working context
+# progsu Wiki — working context
 
-The site is the ProgSU (Georgia State University programming club) wiki. Everything here is built for GSU students breaking into the industry.
+The site is the progsu (Georgia State University programming club) wiki. Everything here is built for GSU students breaking into the industry.
 
 ## North star
 
