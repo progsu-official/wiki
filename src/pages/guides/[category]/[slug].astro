@@ -1,0 +1,40 @@
+---
+import { getCollection } from "astro:content";
+import ContentLayout from "../../../layouts/ContentLayout.astro";
+import PageHeader from "../../../components/PageHeader.astro";
+import { GUIDE_CATEGORIES } from "../../../consts";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("guides");
+  return entries.map((entry) => {
+    const [category, slug] = entry.slug.split("/");
+    return {
+      params: { category, slug },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+const categoryMeta = GUIDE_CATEGORIES[entry.data.category];
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Guides", href: "/guides" },
+  { label: categoryMeta.label, href: `/guides/${entry.data.category}` },
+  { label: entry.data.title },
+];
+---
+
+<ContentLayout title={entry.data.title} breadcrumbs={breadcrumbs} headings={headings} accent={categoryMeta.accent}>
+  <PageHeader
+    eyebrow={categoryMeta.label}
+    headline={entry.data.title}
+    subline={`${entry.data.readTime} · by ${entry.data.author.name} · updated ${entry.data.updated.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
+  />
+
+  <div class="prose">
+    <Content />
+  </div>
+</ContentLayout>

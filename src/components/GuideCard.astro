@@ -1,0 +1,101 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  readTime: string;
+  authorName: string;
+  tags: string[];
+}
+
+const { title, href, readTime, authorName, tags } = Astro.props;
+---
+
+<a href={href} class="guide-card surface-glass">
+  <div class="guide-card__head">
+    <span class="guide-card__title">{title}</span>
+    <span class="guide-card__meta">{readTime} · {authorName}</span>
+  </div>
+  {tags.length > 0 && (
+    <div class="guide-card__tags">
+      {tags.map((tag) => <span class="guide-card__tag">{tag}</span>)}
+    </div>
+  )}
+  <span class="guide-card__arrow" aria-hidden="true">&rarr;</span>
+</a>
+
+<style>
+  .guide-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition:
+      background var(--duration-normal) var(--ease),
+      border-color var(--duration-normal) var(--ease),
+      box-shadow var(--duration-normal) var(--ease);
+    align-items: start;
+    min-height: 44px;
+  }
+  .guide-card:hover {
+    background: var(--accent-faint);
+    border-color: var(--glass-border-hi);
+    box-shadow: var(--glass-shadow), var(--shadow-glow);
+  }
+
+  .guide-card__head {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .guide-card__title {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+  }
+
+  .guide-card__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .guide-card__tags {
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+  }
+
+  .guide-card__tag {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--accent-light);
+    opacity: 0.75;
+  }
+  .guide-card__tag::before {
+    content: "#";
+  }
+
+  .guide-card__arrow {
+    grid-row: 1;
+    grid-column: 2;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--accent-dim);
+    margin-top: var(--space-1);
+    transition:
+      color var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
+  }
+  .guide-card:hover .guide-card__arrow {
+    color: var(--accent-text);
+    transform: translateX(4px);
+  }
+</style>

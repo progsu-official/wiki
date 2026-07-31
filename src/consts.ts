@@ -8,3 +8,11 @@ export const NAV_LINKS = [
   { label: "progsu.com", href: "https://progsu.com" },
   { label: "Blog", href: "/blog" },
 ] as const;
+
+export const GUIDE_CATEGORIES = {
+  "zero-to-hero": { label: "Zero to Hero", accent: "purple" },
+  career: { label: "Career", accent: "purple" },
+  technical: { label: "Technical", accent: "purple" },
+  networking: { label: "Networking", accent: "cyan" },
+  misc: { label: "Misc", accent: "purple" },
+} as const;

@@ -1,7 +1,11 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import CategoryCard from "../../components/CategoryCard.astro";
+
+const allGuides = await getCollection("guides");
+const countFor = (category: string) => allGuides.filter((g) => g.data.category === category).length;
 ---
 
 <Layout title="Guides">
@@ -18,7 +22,7 @@ import CategoryCard from "../../components/CategoryCard.astro";
         title="zero to hero"
         href="/guides/zero-to-hero"
         description="Start here. CS fundamentals, math intuition, and the first principles that make everything else click."
-        count={8}
+        count={countFor("zero-to-hero")}
         variant="featured"
         eyebrow="Start here"
       />
@@ -30,13 +34,13 @@ import CategoryCard from "../../components/CategoryCard.astro";
         title="technical"
         href="/guides/technical"
         description="Leetcode, system design, and take-homes — how to actually prep for coding interviews."
-        count={9}
+        count={countFor("technical")}
       />
       <CategoryCard
         title="career"
         href="/guides/career"
         description="Resumes, timelines, offer negotiation, and how to navigate the hiring process."
-        count={12}
+        count={countFor("career")}
       />
     </div>
 
@@ -45,13 +49,13 @@ import CategoryCard from "../../components/CategoryCard.astro";
         title="networking"
         href="/guides/networking"
         description="Cold outreach, LinkedIn, warm intros, and building real relationships that lead somewhere."
-        count={6}
+        count={countFor("networking")}
       />
       <CategoryCard
         title="misc"
         href="/guides/misc"
         description="Tools, productivity, and everything else worth knowing."
-        count={4}
+        count={countFor("misc")}
       />
     </div>
   </section>
