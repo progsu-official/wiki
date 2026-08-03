@@ -5,7 +5,9 @@ import PageHeader from "../../../components/PageHeader.astro";
 import { GUIDE_CATEGORIES } from "../../../consts";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("guides");
+  // only top-level guides (category/slug), nested guides (e.g. zero-to-hero/roadmap-by-year/*)
+  // get their own dedicated routes so they don't collide with their container page
+  const entries = await getCollection("guides", (entry) => entry.slug.split("/").length === 2);
   return entries.map((entry) => {
     const [category, slug] = entry.slug.split("/");
     return {

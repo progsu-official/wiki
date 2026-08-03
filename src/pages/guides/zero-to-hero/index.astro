@@ -6,7 +6,13 @@ import PageHeader from "../../../components/PageHeader.astro";
 import Badge from "../../../components/Badge.astro";
 import GuideCard from "../../../components/GuideCard.astro";
 
-const guides = (await getCollection("guides", (entry) => entry.data.category === "zero-to-hero")).sort((a, b) => {
+const guides = (
+  await getCollection(
+    "guides",
+    // top-level only, nested entries (roadmap-by-year/*) live on their own container page
+    (entry) => entry.data.category === "zero-to-hero" && entry.slug.split("/").length === 2,
+  )
+).sort((a, b) => {
   const aSlug = a.slug.split("/")[1];
   const bSlug = b.slug.split("/")[1];
   if (aSlug === "getting-started") return -1;
