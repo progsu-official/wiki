@@ -44,7 +44,7 @@ function isActive(href: string): boolean {
           </a>
         );
       })}
-      <kbd class="nav__kbd surface-glass" aria-label="Press / to search">/</kbd>
+      <button class="nav__kbd surface-glass" id="nav-search-open" type="button" aria-label="Open search">/</button>
     </div>
   </nav>
 </header>
@@ -162,6 +162,7 @@ function isActive(href: string): boolean {
 
   .nav__kbd {
     display: none;
+    cursor: pointer;
   }
 
   /* ── Desktop ── */
@@ -241,4 +242,8 @@ function isActive(href: string): boolean {
       }
     });
   }
+
+  document.getElementById('nav-search-open')?.addEventListener('click', () => {
+    (window as any).openSiteSearch?.();
+  });
 </script>

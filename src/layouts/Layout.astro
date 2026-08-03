@@ -1,6 +1,7 @@
 ---
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import SiteSearch from "../components/SiteSearch.astro";
 import "../styles/global.css";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
@@ -37,6 +38,8 @@ const { title, description, wide = false, accent } = Astro.props;
     </main>
 
     <Footer />
+
+    <SiteSearch />
 
     <!-- Keyboard shortcuts modal -->
     <div class="kbd-modal-backdrop" id="kbd-modal-backdrop" role="dialog" aria-label="Keyboard shortcuts" aria-modal="true">

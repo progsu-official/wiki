@@ -1,0 +1,286 @@
+---
+---
+
+<div class="sitesearch-backdrop" id="sitesearch-backdrop" role="dialog" aria-label="Search" aria-modal="true">
+  <div class="sitesearch-panel surface-glass surface-glass--strong">
+    <div class="sitesearch-input-row">
+      <div class="sitesearch-icon" aria-hidden="true">
+        <div class="sitesearch-icon-handle"></div>
+      </div>
+      <input
+        id="sitesearch-input"
+        class="sitesearch-input"
+        type="text"
+        placeholder="search guides and categories..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd class="sitesearch-esc surface-glass">esc</kbd>
+    </div>
+    <ul class="sitesearch-results" id="sitesearch-results"></ul>
+  </div>
+</div>
+
+<style>
+  .sitesearch-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(2, 2, 8, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: 12vh var(--page-gutter, 1.5rem) var(--space-8, 2rem);
+    overflow-y: auto;
+  }
+  .sitesearch-backdrop.open {
+    display: block;
+  }
+
+  .sitesearch-panel {
+    max-width: 560px;
+    margin: 0 auto;
+    border-radius: var(--radius-lg, 0.75rem);
+    overflow: hidden;
+  }
+
+  .sitesearch-input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 0.75rem);
+    padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+    border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  }
+
+  .sitesearch-icon {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid rgba(216, 180, 254, 0.7);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .sitesearch-icon-handle {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 5px;
+    height: 1.5px;
+    background: rgba(216, 180, 254, 0.7);
+    transform: rotate(45deg);
+    border-radius: 1px;
+  }
+
+  .sitesearch-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-text-primary, #fff);
+    font-family: var(--font-mono, monospace);
+    font-size: var(--text-sm, 0.9rem);
+  }
+  .sitesearch-input::placeholder {
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+  }
+
+  .sitesearch-esc {
+    font-family: var(--font-mono, monospace);
+    font-size: var(--text-xs, 0.7rem);
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm, 0.25rem);
+    flex-shrink: 0;
+  }
+
+  .sitesearch-results {
+    list-style: none;
+    margin: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: var(--space-2, 0.5rem);
+  }
+
+  :global(.sitesearch-group-label) {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+    padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem) var(--space-1, 0.25rem);
+  }
+
+  :global(.sitesearch-item) {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3, 0.6rem);
+    padding: var(--space-3, 0.6rem) var(--space-3, 0.75rem);
+    border-radius: var(--radius-md, 0.4rem);
+    cursor: pointer;
+  }
+  :global(.sitesearch-item.active) {
+    background: var(--accent-faint, rgba(168, 85, 247, 0.15));
+  }
+
+  :global(.sitesearch-item-title) {
+    font-family: var(--font-heading, Georgia, serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--color-text-primary, #fff);
+    flex: 1;
+  }
+
+  :global(.sitesearch-item-meta) {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.65rem;
+    color: var(--color-text-tertiary, rgba(255, 255, 255, 0.45));
+    flex-shrink: 0;
+  }
+
+  :global(.sitesearch-empty) {
+    padding: var(--space-6, 1.5rem);
+    text-align: center;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8rem;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+  }
+</style>
+
+<script>
+  type Container = { type: "container"; title: string; href: string };
+  type Page = { type: "page"; title: string; href: string; category: string; tags: string[] };
+
+  let data: { containers: Container[]; pages: Page[] } | null = null;
+  let flat: (Container | Page)[] = [];
+  let activeIndex = 0;
+
+  const backdrop = document.getElementById("sitesearch-backdrop")!;
+  const input = document.getElementById("sitesearch-input") as HTMLInputElement;
+  const results = document.getElementById("sitesearch-results")!;
+
+  async function ensureData() {
+    if (data) return;
+    const res = await fetch("/search-index.json");
+    data = await res.json();
+  }
+
+  function includes(text: string, q: string) {
+    return text.toLowerCase().includes(q);
+  }
+
+  function render(query: string) {
+    if (!data) return;
+    const q = query.trim().toLowerCase();
+
+    const containerMatches = q ? data.containers.filter((c) => includes(c.title, q)) : data.containers;
+    const pageMatches = q
+      ? data.pages.filter((p) => includes(p.title, q) || includes(p.category, q) || p.tags.some((t) => includes(t, q)))
+      : data.pages;
+
+    // containers (checkpoints) rank first, guide pages after
+    flat = [...containerMatches, ...pageMatches];
+    activeIndex = 0;
+
+    if (flat.length === 0) {
+      results.innerHTML = `<li class="sitesearch-empty">no matches</li>`;
+      return;
+    }
+
+    let html = "";
+    if (containerMatches.length > 0) {
+      html += `<li class="sitesearch-group-label">CATEGORIES</li>`;
+      containerMatches.forEach((c, i) => (html += itemHtml(c, i)));
+    }
+    if (pageMatches.length > 0) {
+      html += `<li class="sitesearch-group-label">GUIDES</li>`;
+      pageMatches.forEach((p, i) => (html += itemHtml(p, containerMatches.length + i)));
+    }
+    results.innerHTML = html;
+
+    results.querySelectorAll<HTMLElement>(".sitesearch-item").forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        activeIndex = Number(el.dataset.index);
+        highlight();
+      });
+      el.addEventListener("click", () => {
+        window.location.href = el.dataset.href!;
+      });
+    });
+
+    highlight();
+  }
+
+  function itemHtml(entry: Container | Page, i: number) {
+    const meta = entry.type === "container" ? "category" : (entry as Page).category;
+    return `<li class="sitesearch-item" data-index="${i}" data-href="${entry.href}">
+      <span class="sitesearch-item-title">${entry.title}</span>
+      <span class="sitesearch-item-meta">${meta}</span>
+    </li>`;
+  }
+
+  function highlight() {
+    results.querySelectorAll<HTMLElement>(".sitesearch-item").forEach((el) => {
+      el.classList.toggle("active", Number(el.dataset.index) === activeIndex);
+    });
+    results.querySelector<HTMLElement>(".sitesearch-item.active")?.scrollIntoView({ block: "nearest" });
+  }
+
+  async function openSiteSearch() {
+    await ensureData();
+    backdrop.classList.add("open");
+    input.value = "";
+    render("");
+    input.focus();
+  }
+
+  function closeSiteSearch() {
+    backdrop.classList.remove("open");
+  }
+
+  (window as any).openSiteSearch = openSiteSearch;
+
+  input.addEventListener("input", () => render(input.value));
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, flat.length - 1);
+      highlight();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      highlight();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const target = flat[activeIndex];
+      if (target) window.location.href = target.href;
+    }
+  });
+
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) closeSiteSearch();
+  });
+
+  window.addEventListener("keydown", (e: KeyboardEvent) => {
+    const isOpen = backdrop.classList.contains("open");
+
+    if (e.key === "Escape" && isOpen) {
+      e.preventDefault();
+      closeSiteSearch();
+      return;
+    }
+    if (isOpen) return;
+
+    const tag = (document.activeElement as HTMLElement)?.tagName;
+    const inInput =
+      tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (document.activeElement as HTMLElement)?.isContentEditable;
+    if (inInput) return;
+
+    if (e.key === "/" && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      openSiteSearch();
+    } else if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      openSiteSearch();
+    }
+  });
+</script>
