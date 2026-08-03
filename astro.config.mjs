@@ -1,9 +1,13 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
+import { remarkWikilinks } from "./src/lib/remark-wikilinks.mjs";
 
 export default defineConfig({
   integrations: [tailwind(), mdx()],
+  markdown: {
+    remarkPlugins: [remarkWikilinks],
+  },
   vite: {
     resolve: {
       // src/content/guides/* are symlinks into the vault git submodule.

@@ -5,14 +5,18 @@ interface Props {
   readTime: string;
   authorName: string;
   tags: string[];
+  badge?: string;
 }
 
-const { title, href, readTime, authorName, tags } = Astro.props;
+const { title, href, readTime, authorName, tags, badge } = Astro.props;
 ---
 
 <a href={href} class="guide-card surface-glass">
   <div class="guide-card__head">
-    <span class="guide-card__title">{title}</span>
+    <div class="guide-card__title-row">
+      <span class="guide-card__title">{title}</span>
+      {badge && <span class="guide-card__badge">{badge}</span>}
+    </div>
     <span class="guide-card__meta">{readTime} · {authorName}</span>
   </div>
   {tags.length > 0 && (
@@ -51,11 +55,29 @@ const { title, href, readTime, authorName, tags } = Astro.props;
     gap: var(--space-1);
   }
 
+  .guide-card__title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
   .guide-card__title {
     font-family: var(--font-heading);
     font-style: italic;
     font-size: var(--text-lg);
     color: var(--color-text-primary);
+  }
+
+  .guide-card__badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-widest);
+    color: var(--accent-text);
+    border: 1px solid var(--glass-border-hi);
+    border-radius: var(--radius-md);
+    padding: var(--space-1) var(--space-3);
+    text-transform: uppercase;
   }
 
   .guide-card__meta {
