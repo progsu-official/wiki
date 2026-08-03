@@ -14,7 +14,6 @@ function isActive(href: string): boolean {
 <header class="site-header" role="banner">
   <nav class="nav" aria-label="Main">
     <a href="/" class="nav__logo">
-      <span class="nav__orb" aria-hidden="true"></span>
       <span class="nav__wordmark">progsu / wiki</span>
     </a>
 
@@ -76,20 +75,6 @@ function isActive(href: string): boolean {
     text-decoration: none;
     padding: var(--space-2) 0;
     min-height: 44px;
-  }
-
-  .nav__orb {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 30% 30%,
-      var(--color-purple-300) 0%,
-      var(--color-purple-500) 50%,
-      var(--color-purple-900) 100%
-    );
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
-    flex-shrink: 0;
   }
 
   .nav__wordmark {
