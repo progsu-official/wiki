@@ -6,8 +6,12 @@ import { GUIDE_CATEGORIES } from "../../../consts";
 
 export async function getStaticPaths() {
   // only top-level guides (category/slug), nested guides (e.g. zero-to-hero/roadmap-by-year/*)
-  // get their own dedicated routes so they don't collide with their container page
-  const entries = await getCollection("guides", (entry) => entry.slug.split("/").length === 2);
+  // get their own dedicated routes so they don't collide with their container page.
+  // roadmap-by-year itself is also excluded, it's a card-index page, not rendered markdown content.
+  const entries = await getCollection(
+    "guides",
+    (entry) => entry.slug.split("/").length === 2 && entry.slug !== "zero-to-hero/roadmap-by-year",
+  );
   return entries.map((entry) => {
     const [category, slug] = entry.slug.split("/");
     return {

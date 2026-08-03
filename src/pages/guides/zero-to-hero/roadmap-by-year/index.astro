@@ -1,0 +1,57 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../../layouts/Layout.astro";
+import Breadcrumb from "../../../../components/Breadcrumb.astro";
+import PageHeader from "../../../../components/PageHeader.astro";
+import Badge from "../../../../components/Badge.astro";
+import GuideCard from "../../../../components/GuideCard.astro";
+
+const YEAR_ORDER = ["freshman-year", "sophomore-year", "junior-year", "senior-year", "post-grad"];
+
+const years = (await getCollection("guides", (entry) => entry.slug.startsWith("zero-to-hero/roadmap-by-year/"))).sort(
+  (a, b) => {
+    const aSlug = a.slug.split("/")[2];
+    const bSlug = b.slug.split("/")[2];
+    return YEAR_ORDER.indexOf(aSlug) - YEAR_ORDER.indexOf(bSlug);
+  },
+);
+---
+
+<Layout title="Roadmap by year">
+  <Breadcrumb items={[
+    { label: "Home", href: "/" },
+    { label: "Guides", href: "/guides" },
+    { label: "Zero to Hero", href: "/guides/zero-to-hero" },
+    { label: "Roadmap by year" },
+  ]} />
+
+  <PageHeader
+    eyebrow="Zero to Hero"
+    headline="one year<br>at a time."
+    subline="The in-depth version of the roadmap: what to focus on, which classes to prioritize, and how to step it up each year."
+  />
+
+  {years.length > 0 ? (
+    <div class="guide-list">
+      {years.map((year) => (
+        <GuideCard
+          title={year.data.title}
+          href={`/guides/zero-to-hero/roadmap-by-year/${year.slug.split("/")[2]}`}
+          readTime={year.data.readTime}
+          authorName={year.data.author.name}
+          tags={year.data.tags}
+        />
+      ))}
+    </div>
+  ) : (
+    <Badge text="guides coming soon" />
+  )}
+</Layout>
+
+<style>
+  .guide-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+</style>
