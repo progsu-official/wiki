@@ -49,32 +49,8 @@ const { title, description, wide = false, accent } = Astro.props;
         <div class="kbd-modal__group">
           <h3 class="kbd-modal__group-label">navigation</h3>
           <div class="kbd-modal__row">
-            <span class="kbd-modal__action">go to courses</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">g</kbd><kbd class="kbd-modal__key">c</kbd></span>
-          </div>
-          <div class="kbd-modal__row">
-            <span class="kbd-modal__action">go to scheduler</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">g</kbd><kbd class="kbd-modal__key">s</kbd></span>
-          </div>
-          <div class="kbd-modal__row">
             <span class="kbd-modal__action">focus search</span>
             <span class="kbd-modal__keys"><kbd class="kbd-modal__key">/</kbd></span>
-          </div>
-        </div>
-
-        <div class="kbd-modal__group">
-          <h3 class="kbd-modal__group-label">scheduler</h3>
-          <div class="kbd-modal__row">
-            <span class="kbd-modal__action">open course block</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">Enter</kbd></span>
-          </div>
-          <div class="kbd-modal__row">
-            <span class="kbd-modal__action">remove course</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">Delete</kbd></span>
-          </div>
-          <div class="kbd-modal__row">
-            <span class="kbd-modal__action">close popover / panel</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">Esc</kbd></span>
           </div>
         </div>
 
@@ -93,7 +69,6 @@ const { title, description, wide = false, accent } = Astro.props;
     <script>
       const kbdBackdrop = document.getElementById('kbd-modal-backdrop')!;
       const kbdClose = document.getElementById('kbd-modal-close')!;
-      let gPending = false;
 
       function openKbdModal() {
         kbdBackdrop.classList.add('open');
@@ -119,24 +94,13 @@ const { title, description, wide = false, accent } = Astro.props;
           return;
         }
 
-        if (inInput) { gPending = false; return; }
+        if (inInput) return;
 
         if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
           e.preventDefault();
           if (kbdBackdrop.classList.contains('open')) closeKbdModal();
           else openKbdModal();
           return;
-        }
-
-        if (gPending) {
-          gPending = false;
-          if (e.key === 'c') { e.preventDefault(); window.location.href = '/courses'; return; }
-          if (e.key === 's') { e.preventDefault(); window.location.href = '/courses/scheduler'; return; }
-        }
-
-        if (e.key === 'g' && !e.ctrlKey && !e.metaKey) {
-          gPending = true;
-          setTimeout(() => { gPending = false; }, 800);
         }
       });
     </script>
