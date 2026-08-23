@@ -6,7 +6,7 @@ import PageHeader from "../../../../components/PageHeader.astro";
 import Badge from "../../../../components/Badge.astro";
 import GuideCard from "../../../../components/GuideCard.astro";
 
-const YEAR_ORDER = ["freshman-year", "sophomore-year", "junior-year", "senior-year", "post-grad"];
+const YEAR_ORDER = ["freshman-year", "sophomore-year", "junior-year", "senior-year"];
 
 const years = (await getCollection("guides", (entry) => entry.slug.startsWith("zero-to-hero/roadmap-by-year/"))).sort(
   (a, b) => {
