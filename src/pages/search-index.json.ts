@@ -21,6 +21,8 @@ export const GET: APIRoute = async () => {
     },
   ];
 
+  const categoryOrder = Object.keys(GUIDE_CATEGORIES);
+
   const entries = await getCollection("guides");
   const pages = entries
     .filter((entry) => !CONTAINER_ONLY_SLUGS.has(entry.slug))
@@ -32,8 +34,11 @@ export const GET: APIRoute = async () => {
         href: `/guides/${entry.slug}`,
         category: GUIDE_CATEGORIES[entry.data.category]?.label ?? category,
         tags: entry.data.tags,
+        _categorySlug: category,
       };
-    });
+    })
+    .sort((a, b) => categoryOrder.indexOf(a._categorySlug) - categoryOrder.indexOf(b._categorySlug))
+    .map(({ _categorySlug, ...page }) => page);
 
   return new Response(JSON.stringify({ containers, pages }), {
     headers: { "Content-Type": "application/json" },
