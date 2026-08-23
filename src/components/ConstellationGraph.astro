@@ -1,8 +1,18 @@
 ---
 // True 3D constellation graph — Three.js spheres, D3 force layout, CSS2D labels
+import { getCollection } from "astro:content";
+import { GUIDE_CATEGORIES } from "../consts";
+
+const allGuides = await getCollection("guides");
+const guideCounts = Object.fromEntries(
+  Object.keys(GUIDE_CATEGORIES).map((category) => [
+    category,
+    allGuides.filter((g) => g.data.category === category).length,
+  ]),
+);
 ---
 
-<div id="constellation-root">
+<div id="constellation-root" data-guide-counts={JSON.stringify(guideCounts)}>
   <!-- Parallax star layers (CSS, behind WebGL canvas) -->
   <div class="layer-nebula" id="layer-nebula"></div>
   <div class="layer-nebula--deep" id="layer-nebula-deep"></div>
@@ -532,12 +542,12 @@
 
   // ── node data ──────────────────────────────────────────────────
   const NODE_DEFS = [
-    { id: "wiki",        label: "progsu / wiki", desc: "",                                          central: true,  guides: 0,  color: 0xd8b4fe, emissive: 0xa855f7 },
-    { id: "zero-to-hero", label: "zero to hero",   desc: "CS theory, math, and first principles",     guides: 0,  route: "/guides/zero-to-hero", color: 0xbae6fd, emissive: 0x22d3ee },
-    { id: "career",      label: "career",         desc: "Recruiting, resumes, and offer strategy",  guides: 0,  route: "/guides/career",       color: 0xbbf7d0, emissive: 0x34d399 },
-    { id: "networking",  label: "networking",     desc: "Cold outreach, LinkedIn, and warm intros", guides: 0,  route: "/guides/networking",   color: 0xfecdd3, emissive: 0xfb7185 },
-    { id: "technical",   label: "technical",      desc: "LC, system design, and take-homes",        guides: 0,  route: "/guides/technical",    color: 0xfde68a, emissive: 0xfbbf24 },
-    { id: "misc",        label: "misc",            desc: "Everything else worth knowing",            guides: 0,  route: "/guides/misc",         color: 0xfed7aa, emissive: 0xfb923c },
+    { id: "wiki",        label: "progsu / wiki", desc: "",                                         central: true,                 color: 0xd8b4fe, emissive: 0xa855f7 },
+    { id: "zero-to-hero", label: "zero to hero",  desc: "CS theory, math, and first principles",    route: "/guides/zero-to-hero", color: 0xbae6fd, emissive: 0x22d3ee },
+    { id: "career",      label: "career",         desc: "Recruiting, resumes, and offer strategy",  route: "/guides/career",       color: 0xbbf7d0, emissive: 0x34d399 },
+    { id: "networking",  label: "networking",     desc: "Cold outreach, LinkedIn, and warm intros", route: "/guides/networking",   color: 0xfecdd3, emissive: 0xfb7185 },
+    { id: "technical",   label: "technical",      desc: "LC, system design, and take-homes",        route: "/guides/technical",    color: 0xfde68a, emissive: 0xfbbf24 },
+    { id: "misc",        label: "misc",           desc: "Everything else worth knowing",            route: "/guides/misc",         color: 0xfed7aa, emissive: 0xfb923c },
   ] as const;
 
   type NodeDef   = typeof NODE_DEFS[number];
@@ -556,6 +566,7 @@
 
   // ── Three.js setup ─────────────────────────────────────────────
   const root    = document.getElementById("constellation-root")!;
+  const guideCounts: Record<string, number> = JSON.parse(root.dataset.guideCounts ?? "{}");
   const canvas  = document.getElementById("graph-canvas") as HTMLCanvasElement;
   const labelEl = document.getElementById("label-layer")!;
   const tip     = document.getElementById("node-tooltip")!;
@@ -1511,7 +1522,7 @@
         g.setAttribute("data-route", (n as any).route ?? "");
         g.setAttribute("data-label", n.label);
         g.setAttribute("data-desc",  (n as any).desc ?? "");
-        g.setAttribute("data-guides", String((n as any).guides ?? 0));
+        g.setAttribute("data-guides", String(guideCounts[n.id] ?? 0));
       }
 
       // Nebula cloud halo layers
