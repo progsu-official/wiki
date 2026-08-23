@@ -3,6 +3,7 @@ import fs from "node:fs";
 import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
 import { remarkWikilinks } from "./src/lib/remark-wikilinks.mjs";
+import { remarkCallouts } from "./src/lib/remark-callouts.mjs";
 
 // Every guide is a symlink into the vault submodule. If it isn't checked out,
 // the collection silently comes back empty and we'd ship a wiki with no guides.
@@ -14,7 +15,7 @@ if (!fs.existsSync(vaultDir) || fs.readdirSync(vaultDir).length === 0) {
 export default defineConfig({
   integrations: [tailwind(), mdx()],
   markdown: {
-    remarkPlugins: [remarkWikilinks],
+    remarkPlugins: [remarkWikilinks, remarkCallouts],
   },
   vite: {
     resolve: {
