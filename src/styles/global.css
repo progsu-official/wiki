@@ -33,15 +33,15 @@
   --color-cyan-500: #06b6d4;
 
   /* Semantic accent — override per-page with [data-accent="cyan"] */
-  --accent: var(--color-purple-500);
+  --accent: var(--color-purple-400);
   --accent-light: var(--color-purple-300);
-  --accent-text: var(--color-purple-400);
-  --accent-dim: rgba(168, 85, 247, 0.4);
-  --accent-subtle: rgba(168, 85, 247, 0.15);
-  --accent-faint: rgba(168, 85, 247, 0.08);
-  --accent-glow: rgba(76, 29, 149, 0.35);
-  --accent-border: rgba(168, 85, 247, 0.20);
-  --accent-border-hover: rgba(168, 85, 247, 0.45);
+  --accent-text: var(--color-purple-300);
+  --accent-dim: rgba(168, 85, 247, 0.28);
+  --accent-subtle: rgba(168, 85, 247, 0.10);
+  --accent-faint: rgba(168, 85, 247, 0.05);
+  --accent-glow: rgba(76, 29, 149, 0.22);
+  --accent-border: rgba(168, 85, 247, 0.14);
+  --accent-border-hover: rgba(168, 85, 247, 0.30);
 
   /* Text */
   --color-text-primary: rgba(255, 255, 255, 0.95);
@@ -134,14 +134,14 @@
   --z-modal: 50;
 
   /* Glass surface */
-  --glass-bg:        rgba(25, 22, 42, 0.6);
-  --glass-bg-strong: rgba(25, 22, 42, 0.75);
-  --glass-border:    rgba(255, 255, 255, 0.10);
-  --glass-border-hi: rgba(255, 255, 255, 0.18);
+  --glass-bg:        rgba(22, 19, 38, 0.34);
+  --glass-bg-strong: rgba(22, 19, 38, 0.50);
+  --glass-border:    rgba(255, 255, 255, 0.09);
+  --glass-border-hi: rgba(255, 255, 255, 0.24);
   --glass-shadow:    0 10px 40px -10px rgba(0, 0, 0, 0.5),
                      0 2px 8px -2px rgba(0, 0, 0, 0.3);
-  --glass-blur:      20px;
-  --glass-saturate:  160%;
+  --glass-blur:      16px;
+  --glass-saturate:  110%;
 }
 
 .surface-glass {
@@ -209,6 +209,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    scrollbar-gutter: stable;
   }
 
   body {
