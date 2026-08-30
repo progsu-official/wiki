@@ -1,10 +1,19 @@
 ---
+
 ---
 
-<div class="csb surface-glass" id="course-search-wrap">
+<div class="csb" id="course-search-wrap">
   <div class="csb__icon" aria-hidden="true">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+    >
+      <circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path>
     </svg>
   </div>
   <input
@@ -17,41 +26,50 @@
     placeholder=""
   />
   <span class="csb__placeholder" id="csb-placeholder" aria-hidden="true"></span>
-  <kbd class="csb__kbd surface-glass" id="csb-kbd">/</kbd>
+  <kbd class="csb__kbd" id="csb-kbd">/</kbd>
 </div>
 
 <style>
   .csb {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-3) var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
-    position: relative;
+    transition:
+      border-color var(--duration-fast) var(--ease),
+      box-shadow var(--duration-fast) var(--ease);
+  }
+  .csb:focus-within {
+    border-color: var(--c-brand-2);
+    box-shadow: 0 0 0 3px var(--c-brand-soft);
   }
 
   .csb__icon {
-    color: var(--color-text-muted);
-    flex-shrink: 0;
     display: flex;
+    flex-shrink: 0;
+    color: var(--c-text-3);
     transition: color var(--duration-fast) var(--ease);
   }
   .csb:focus-within .csb__icon {
-    color: var(--accent-text);
+    color: var(--c-brand-1);
   }
 
   .csb__input {
     flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    font-family: var(--font-mono);
-    font-size: var(--text-base);
-    color: var(--color-text-primary);
-    caret-color: var(--accent-text);
     min-width: 0;
     position: relative;
     z-index: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--c-text-1);
+    caret-color: var(--c-brand-2);
   }
   .csb__input:focus,
   .csb__input:focus-visible {
@@ -61,12 +79,12 @@
 
   .csb__placeholder {
     position: absolute;
-    left: calc(var(--space-5) + 14px + var(--space-3));
-    font-family: var(--font-mono);
+    left: calc(var(--space-4) + 16px + var(--space-3));
+    font-family: var(--font-body);
     font-size: var(--text-base);
-    color: var(--color-text-muted);
+    color: var(--c-text-3);
     pointer-events: none;
-    transition: opacity 0.4s ease;
+    transition: opacity var(--duration-slow) var(--ease);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -74,39 +92,44 @@
   }
 
   .csb__kbd {
+    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    padding: var(--space-1) var(--space-2);
+    color: var(--c-text-3);
+    background: var(--c-bg);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-sm);
-    letter-spacing: var(--tracking-wide);
-    flex-shrink: 0;
+    padding: 2px var(--space-2);
+    line-height: 1.4;
     transition: opacity var(--duration-fast) var(--ease);
   }
   .csb__kbd.hidden {
     opacity: 0;
     pointer-events: none;
   }
+
+  @media (max-width: 640px) {
+    .csb {
+      padding: var(--space-3) var(--space-4);
+      min-height: 48px;
+    }
+  }
 </style>
 
 <script>
-  const input = document.getElementById('course-search') as HTMLInputElement;
-  const placeholder = document.getElementById('csb-placeholder')!;
-  const kbd = document.getElementById('csb-kbd')!;
+  const input = document.getElementById("course-search") as HTMLInputElement;
+  const placeholder = document.getElementById("csb-placeholder")!;
+  const kbd = document.getElementById("csb-kbd")!;
 
-  const hints = [
-    'try CSC 2720',
-    'try a professor name',
-    'try discrete math',
-  ];
+  const hints = ["try CSC 2720", "try a professor name", "try discrete math"];
   let hintIndex = 0;
   let hintTimer: ReturnType<typeof setInterval> | null = null;
 
   function showHint() {
-    placeholder.style.opacity = '0';
+    placeholder.style.opacity = "0";
     setTimeout(() => {
       placeholder.textContent = hints[hintIndex];
-      placeholder.style.opacity = '1';
+      placeholder.style.opacity = "1";
       hintIndex = (hintIndex + 1) % hints.length;
     }, 400);
   }
@@ -118,8 +141,11 @@
   }
 
   function stopHints() {
-    if (hintTimer) { clearInterval(hintTimer); hintTimer = null; }
-    placeholder.style.opacity = '0';
+    if (hintTimer) {
+      clearInterval(hintTimer);
+      hintTimer = null;
+    }
+    placeholder.style.opacity = "0";
   }
 
   function updatePlaceholder() {
@@ -132,36 +158,36 @@
 
   startHints();
 
-  input.addEventListener('focus', () => {
-    kbd.classList.add('hidden');
+  input.addEventListener("focus", () => {
+    kbd.classList.add("hidden");
     stopHints();
   });
 
-  input.addEventListener('blur', () => {
-    kbd.classList.remove('hidden');
+  input.addEventListener("blur", () => {
+    kbd.classList.remove("hidden");
     updatePlaceholder();
   });
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   function emitSearch() {
-    window.dispatchEvent(new CustomEvent('course-search', { detail: { query: input.value } }));
+    window.dispatchEvent(new CustomEvent("course-search", { detail: { query: input.value } }));
   }
 
-  input.addEventListener('input', () => {
+  input.addEventListener("input", () => {
     updatePlaceholder();
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(emitSearch, 150);
   });
 
   // / to focus
-  window.addEventListener('keydown', (e: KeyboardEvent) => {
+  window.addEventListener("keydown", (e: KeyboardEvent) => {
     const tag = (document.activeElement as HTMLElement)?.tagName;
-    if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+    if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
       e.preventDefault();
       input.focus();
     }
-    if (e.key === 'Escape' && document.activeElement === input) {
-      input.value = '';
+    if (e.key === "Escape" && document.activeElement === input) {
+      input.value = "";
       input.blur();
       if (debounceTimer) clearTimeout(debounceTimer);
       emitSearch();

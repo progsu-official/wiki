@@ -1,239 +1,206 @@
 ---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import SiteSearch from "../components/SiteSearch.astro";
-import "../styles/global.css";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
 interface Props {
   title: string;
   description?: string;
+  /** Widens the content container from 688px to 1104px. */
   wide?: boolean;
-  accent?: 'purple' | 'cyan';
+  /** Drops the container entirely, for full-bleed landing pages. */
+  fullBleed?: boolean;
 }
 
-const { title, description, wide = false, accent } = Astro.props;
+const { title, description = SITE_DESCRIPTION, wide = false, fullBleed = false } = Astro.props;
+
+const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu.com");
 ---
 
 <!doctype html>
-<html lang="en" data-accent={accent}>
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content={description ?? SITE_DESCRIPTION} />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title} | {SITE_TITLE}</title>
-  </head>
-  <body>
-    <!-- Cosmic background, matches the ConstellationGraph home hero -->
-    <div class="bg-nebula" aria-hidden="true"></div>
-    <div class="bg-nebula bg-nebula--deep" aria-hidden="true"></div>
-    <div class="bg-stars bg-stars--far" aria-hidden="true"></div>
-    <div class="bg-stars bg-stars--mid" aria-hidden="true"></div>
-    <div class="bg-stars bg-stars--near" aria-hidden="true"></div>
-    <div class="bg-vignette" aria-hidden="true"></div>
+    <link rel="canonical" href={canonical} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
 
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    {/* Runs before first paint so the page never flashes the wrong theme. */}
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("progsu-theme");
+          var dark = stored
+            ? stored === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", dark);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
     <Navbar />
 
-    <main id="main-content" class:list={['layout-main', { 'layout-main--wide': wide }]}>
+    <main
+      id="main-content"
+      class:list={["layout-main", { "layout-main--wide": wide, "layout-main--bleed": fullBleed }]}
+    >
       <slot />
     </main>
 
     <Footer />
-
     <SiteSearch />
 
-    <!-- Keyboard shortcuts modal -->
-    <div class="kbd-modal-backdrop" id="kbd-modal-backdrop" role="dialog" aria-label="Keyboard shortcuts" aria-modal="true">
+    <div
+      class="kbd-modal-backdrop"
+      id="kbd-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="kbd-modal-title"
+      hidden
+    >
       <div class="kbd-modal">
-        <h2 class="kbd-modal__title">keyboard shortcuts</h2>
-
-        <div class="kbd-modal__group">
-          <h3 class="kbd-modal__group-label">navigation</h3>
-          <div class="kbd-modal__row">
-            <span class="kbd-modal__action">focus search</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">/</kbd></span>
-          </div>
+        <h2 class="kbd-modal__title" id="kbd-modal-title">keyboard shortcuts</h2>
+        <div class="kbd-modal__row">
+          <span class="kbd-modal__action">search</span>
+          <span class="kbd-modal__keys"><kbd class="kbd-modal__key">/</kbd></span>
         </div>
-
-        <div class="kbd-modal__group">
-          <h3 class="kbd-modal__group-label">general</h3>
-          <div class="kbd-modal__row">
-            <span class="kbd-modal__action">show this dialog</span>
-            <span class="kbd-modal__keys"><kbd class="kbd-modal__key">?</kbd></span>
-          </div>
+        <div class="kbd-modal__row">
+          <span class="kbd-modal__action">this dialog</span>
+          <span class="kbd-modal__keys"><kbd class="kbd-modal__key">?</kbd></span>
         </div>
-
-        <button class="kbd-modal__close" id="kbd-modal-close">close (esc)</button>
+        <button class="kbd-modal__close" type="button" id="kbd-modal-close">close</button>
       </div>
     </div>
 
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .layout-main {
+        flex: 1;
+        width: 100%;
+        max-width: calc(var(--page-width) + 2 * var(--space-6));
+        margin-inline: auto;
+        padding: var(--space-16) var(--page-gutter) var(--space-24);
+      }
+
+      .layout-main--wide {
+        max-width: calc(var(--page-width-wide) + 2 * var(--space-6));
+      }
+
+      /* Landing pages paint their own bands edge to edge. */
+      .layout-main--bleed {
+        max-width: none;
+        margin-inline: 0;
+        padding: 0;
+      }
+
+      @media (max-width: 768px) {
+        .layout-main:not(.layout-main--bleed) {
+          padding: var(--space-10) var(--page-gutter) var(--space-16);
+        }
+      }
+    </style>
+
     <script>
-      const kbdBackdrop = document.getElementById('kbd-modal-backdrop')!;
-      const kbdClose = document.getElementById('kbd-modal-close')!;
+      // ── Keyboard shortcuts ──────────────────────────────────────
+      const backdrop = document.getElementById("kbd-modal-backdrop");
+      const closeBtn = document.getElementById("kbd-modal-close");
+      let lastFocused: HTMLElement | null = null;
+
+      function isTyping(el: EventTarget | null) {
+        const node = el as HTMLElement | null;
+        if (!node) return false;
+        const tag = node.tagName;
+        return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || node.isContentEditable;
+      }
+
+      function closeKbdModal() {
+        if (!backdrop) return;
+        backdrop.hidden = true;
+        backdrop.classList.remove("open");
+        lastFocused?.focus();
+      }
 
       function openKbdModal() {
-        kbdBackdrop.classList.add('open');
-        kbdClose.focus();
-      }
-      function closeKbdModal() {
-        kbdBackdrop.classList.remove('open');
+        if (!backdrop) return;
+        lastFocused = document.activeElement as HTMLElement;
+        backdrop.hidden = false;
+        backdrop.classList.add("open");
+        closeBtn?.focus();
       }
 
-      kbdClose.addEventListener('click', closeKbdModal);
-      kbdBackdrop.addEventListener('click', (e) => {
-        if (e.target === kbdBackdrop) closeKbdModal();
+      document.addEventListener("keydown", (e) => {
+        if (isTyping(e.target)) return;
+        if (e.key === "?" && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          backdrop?.hidden ? openKbdModal() : closeKbdModal();
+        }
+        if (e.key === "Escape" && backdrop && !backdrop.hidden) closeKbdModal();
       });
 
-      window.addEventListener('keydown', (e: KeyboardEvent) => {
-        const tag = (document.activeElement as HTMLElement)?.tagName;
-        const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
-          (document.activeElement as HTMLElement)?.isContentEditable;
+      closeBtn?.addEventListener("click", closeKbdModal);
+      backdrop?.addEventListener("click", (e) => {
+        if (e.target === backdrop) closeKbdModal();
+      });
 
-        if (e.key === 'Escape' && kbdBackdrop.classList.contains('open')) {
-          e.preventDefault();
-          closeKbdModal();
-          return;
-        }
+      // ── Code block copy buttons ─────────────────────────────────
+      // Progressive enhancement: the language label is CSS-only, this
+      // just adds the button. `pre` doesn't scroll (its `code` does),
+      // so an absolutely positioned button stays pinned.
+      const COPY_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+      const DONE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-        if (inInput) return;
+      document.querySelectorAll<HTMLPreElement>("pre.astro-code").forEach((pre) => {
+        if (pre.querySelector(".code-copy")) return;
 
-        if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
-          e.preventDefault();
-          if (kbdBackdrop.classList.contains('open')) closeKbdModal();
-          else openKbdModal();
-          return;
-        }
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "code-copy";
+        btn.setAttribute("aria-label", "copy code");
+        btn.innerHTML = COPY_ICON;
+
+        btn.addEventListener("click", async () => {
+          const code = pre.querySelector("code");
+          if (!code) return;
+          try {
+            await navigator.clipboard.writeText(code.innerText);
+            btn.dataset.copied = "true";
+            btn.innerHTML = DONE_ICON;
+            btn.setAttribute("aria-label", "copied");
+            setTimeout(() => {
+              delete btn.dataset.copied;
+              btn.innerHTML = COPY_ICON;
+              btn.setAttribute("aria-label", "copy code");
+            }, 2000);
+          } catch {
+            // Clipboard is unavailable over plain http; nothing useful to say.
+          }
+        });
+
+        pre.appendChild(btn);
       });
     </script>
   </body>
 </html>
-
-<style>
-  body {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* ── Cosmic layers, matches ConstellationGraph's .layer-nebula/.layer-stars/.vignette ── */
-  .bg-nebula {
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 50% 45%, rgba(76,29,149,.35), transparent 70%),
-      radial-gradient(ellipse 50% 40% at 20% 75%, rgba(30,27,75,.5),   transparent 65%),
-      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(13,42,90,.4),   transparent 65%),
-      linear-gradient(180deg, #02020a 0%, #050516 50%, #02020a 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .bg-nebula--deep {
-    inset: -15%;
-    background:
-      radial-gradient(ellipse 80% 60% at 45% 40%, rgba(76,29,149,.30), transparent 70%),
-      radial-gradient(ellipse 60% 55% at 75% 65%, rgba(124,58,237,.22), transparent 65%),
-      radial-gradient(ellipse 70% 50% at 25% 70%, rgba(139,92,246,.20), transparent 60%),
-      radial-gradient(ellipse 90% 70% at 55% 50%, rgba(30,27,75,.40), transparent 75%),
-      radial-gradient(ellipse 50% 45% at 80% 30%, rgba(76,29,149,.18), transparent 60%),
-      radial-gradient(ellipse 55% 50% at 15% 35%, rgba(168,85,247,.14), transparent 55%),
-      radial-gradient(ellipse 100% 80% at 50% 55%, rgba(76,29,149,.12), transparent 80%);
-    will-change: transform;
-    animation: driftNebula 200s linear infinite;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .bg-nebula--deep { animation: none; }
-  }
-
-  .bg-stars {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    will-change: transform;
-  }
-  .bg-stars--far {
-    background-image:
-      radial-gradient(1px 1px at 12% 23%, rgba(255,255,255,.5), transparent),
-      radial-gradient(1px 1px at 78% 67%, rgba(255,255,255,.4), transparent),
-      radial-gradient(1px 1px at 34% 81%, rgba(255,255,255,.45), transparent),
-      radial-gradient(1px 1px at 88% 14%, rgba(255,255,255,.5), transparent),
-      radial-gradient(1px 1px at 5%  55%, rgba(255,255,255,.35), transparent),
-      radial-gradient(1px 1px at 65% 30%, rgba(255,255,255,.3), transparent),
-      radial-gradient(1px 1px at 25% 8%,  rgba(255,255,255,.4), transparent),
-      radial-gradient(1px 1px at 95% 88%, rgba(255,255,255,.4), transparent),
-      radial-gradient(1px 1px at 45% 18%, rgba(255,255,255,.3), transparent),
-      radial-gradient(1px 1px at 15% 75%, rgba(255,255,255,.5), transparent),
-      radial-gradient(1px 1px at 55% 92%, rgba(255,255,255,.35), transparent),
-      radial-gradient(1px 1px at 38% 45%, rgba(255,255,255,.25), transparent);
-    background-size: 280px 280px;
-    animation: driftFar 180s linear infinite;
-    opacity: .7;
-  }
-  .bg-stars--mid {
-    background-image:
-      radial-gradient(1.5px 1.5px at 22% 33%, rgba(255,255,255,.7), transparent),
-      radial-gradient(1.5px 1.5px at 68% 57%, rgba(216,180,254,.6), transparent),
-      radial-gradient(1.5px 1.5px at 84% 31%, rgba(255,255,255,.65), transparent),
-      radial-gradient(1.5px 1.5px at 8%  65%, rgba(255,255,255,.6), transparent),
-      radial-gradient(1.5px 1.5px at 92% 78%, rgba(186,230,253,.55), transparent),
-      radial-gradient(1.5px 1.5px at 48% 88%, rgba(255,255,255,.5), transparent),
-      radial-gradient(1.5px 1.5px at 33% 12%, rgba(255,255,255,.55), transparent),
-      radial-gradient(1.5px 1.5px at 72% 8%,  rgba(216,180,254,.5), transparent);
-    background-size: 380px 380px;
-    animation: driftMid 120s linear infinite;
-    opacity: .85;
-  }
-  .bg-stars--near {
-    background-image:
-      radial-gradient(2px 2px at 18% 73%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.4) 30%, transparent 60%),
-      radial-gradient(2px 2px at 73% 22%, rgba(216,180,254,.85) 0%, rgba(216,180,254,.3) 30%, transparent 60%),
-      radial-gradient(2px 2px at 87% 84%, rgba(255,255,255,.9) 0%, rgba(255,255,255,.35) 30%, transparent 60%),
-      radial-gradient(2px 2px at 6%  26%, rgba(186,230,253,.8) 0%, rgba(186,230,253,.3) 30%, transparent 60%);
-    background-size: 480px 480px;
-    animation: driftNear 80s linear infinite;
-    opacity: .9;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .bg-stars--far, .bg-stars--mid, .bg-stars--near { animation: none; }
-  }
-
-  @keyframes driftFar    { from { transform: translate(0,0) }   to { transform: translate(60px,40px) } }
-  @keyframes driftMid    { from { transform: translate(0,0) }   to { transform: translate(-80px,50px) } }
-  @keyframes driftNear   { from { transform: translate(0,0) }   to { transform: translate(100px,-60px) } }
-  @keyframes driftNebula { from { transform: translate(0,0) }   to { transform: translate(40px,25px) } }
-
-  .bg-vignette {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse 95% 80% at 50% 50%, transparent 40%, rgba(0,0,0,.65) 95%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── Main content ── */
-  .layout-main {
-    position: relative;
-    z-index: var(--z-base);
-    flex: 1;
-    max-width: var(--page-width);
-    margin: 0 auto;
-    width: 100%;
-    padding: var(--space-24) var(--page-gutter) var(--space-16);
-  }
-
-  .layout-main--wide {
-    max-width: var(--page-width-wide);
-  }
-
-  @media (max-width: 768px) {
-    .layout-main {
-      padding-top: var(--space-20);
-      padding-bottom: var(--space-12);
-    }
-  }
-</style>

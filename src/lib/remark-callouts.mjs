@@ -50,7 +50,7 @@ export function remarkCallouts() {
       const open = {
         type: "html",
         value:
-          `<aside class="callout callout--${variant} surface-glass" role="note"` +
+          `<aside class="callout callout--${variant}" role="note"` +
           ` aria-label="${escapeHtml(title || LABELS[variant])}">` +
           `<div class="callout__icon" aria-hidden="true">` +
           `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"` +

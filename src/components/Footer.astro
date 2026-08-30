@@ -1,82 +1,178 @@
 ---
-import { SITE_TITLE } from "../consts";
+import { SOCIAL_LINKS } from "../consts";
 import SocialRow from "./SocialRow.astro";
+
+const guideLinks = [
+  { label: "zero to hero", href: "/guides/zero-to-hero" },
+  { label: "career", href: "/guides/career" },
+  { label: "technical", href: "/guides/technical" },
+  { label: "networking", href: "/guides/networking" },
+];
+
+const progsuLinks = [{ label: "progsu.com", href: "https://progsu.com" }, ...SOCIAL_LINKS];
+
+const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer" role="contentinfo">
-  <div class="site-footer__inner">
-    <SocialRow />
-    <div class="site-footer__content">
-      <p class="site-footer__text">
-        &copy; {new Date().getFullYear()} {SITE_TITLE} &middot; built by progsu
-      </p>
-      <span class="site-footer__sep" aria-hidden="true">&middot;</span>
-      <a href="https://github.com/progsu-official" class="site-footer__link" rel="noopener noreferrer">
-        open resource
-      </a>
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a href="/" class="site-footer__wordmark">
+          <span class="site-footer__wordmark-name">progsu</span>
+          <span class="site-footer__wordmark-sep" aria-hidden="true">/</span>
+          <span class="site-footer__wordmark-sub">wiki</span>
+        </a>
+        <p class="site-footer__desc">guides and course notes for cs students at georgia state.</p>
+      </div>
+
+      <div class="site-footer__cols">
+        <nav class="site-footer__col" aria-label="Guides">
+          <h2 class="site-footer__heading">guides</h2>
+          <ul class="site-footer__list">
+            {
+              guideLinks.map((link) => (
+                <li>
+                  <a href={link.href} class="site-footer__link">
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <nav class="site-footer__col" aria-label="progsu">
+          <h2 class="site-footer__heading">progsu</h2>
+          <ul class="site-footer__list">
+            {
+              progsuLinks.map((link) => (
+                <li>
+                  <a href={link.href} class="site-footer__link" target="_blank" rel="noopener">
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__legal">&copy; {year} progsu &middot; built by progsu</p>
+      <SocialRow />
     </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    position: relative;
-    z-index: var(--z-base);
-    padding: var(--space-10) var(--page-gutter);
+    border-top: 1px solid var(--c-divider);
+    background: var(--c-bg-alt);
+    padding-block: var(--space-12);
     margin-top: auto;
   }
 
-  .site-footer__inner {
-    max-width: var(--page-width-wide);
-    margin: 0 auto;
+  .site-footer__top {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-10);
+    padding-bottom: var(--space-10);
   }
 
-  .site-footer__content {
-    display: flex;
+  .site-footer__brand {
+    max-width: 34ch;
+  }
+
+  .site-footer__wordmark {
+    display: inline-flex;
     align-items: center;
     gap: var(--space-1);
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--c-text-1);
+  }
+  .site-footer__wordmark:hover {
+    color: var(--c-text-1);
+  }
+  .site-footer__wordmark-sep,
+  .site-footer__wordmark-sub {
+    color: var(--c-text-3);
+    font-weight: 500;
   }
 
-  .site-footer__sep {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
+  .site-footer__desc {
+    margin: var(--space-3) 0 0;
+    font-size: 14px;
+    line-height: var(--leading-relaxed);
+    color: var(--c-text-3);
   }
 
-  .site-footer__text {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
+  .site-footer__cols {
+    display: flex;
+    gap: var(--space-16);
+  }
+
+  .site-footer__heading {
+    margin: 0 0 var(--space-4);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-text-1);
+  }
+
+  .site-footer__list {
+    list-style: none;
     margin: 0;
-    text-align: center;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
   }
 
   .site-footer__link {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
-    text-decoration: none;
-    white-space: nowrap;
-    transition: color var(--duration-normal) var(--ease);
+    font-size: 14px;
+    color: var(--c-text-3);
+    transition: color var(--duration-fast) var(--ease);
   }
   .site-footer__link:hover {
-    color: var(--color-text-tertiary);
+    color: var(--c-brand-1);
   }
 
-  @media (max-width: 480px) {
-    .site-footer__content {
+  .site-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-top: var(--space-6);
+  }
+
+  .site-footer__legal {
+    margin: 0;
+    font-size: 14px;
+    color: var(--c-text-3);
+  }
+
+  @media (max-width: 767px) {
+    .site-footer__top {
       flex-direction: column;
-      align-items: center;
-      gap: var(--space-2);
+      gap: var(--space-8);
     }
-    .site-footer__sep {
-      display: none;
+
+    .site-footer__cols {
+      gap: var(--space-10);
+    }
+
+    .site-footer__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-5);
     }
   }
 </style>

@@ -1,112 +1,151 @@
 ---
+import Badge from "./Badge.astro";
+
+type Icon = "compass" | "briefcase" | "code" | "users" | "layers";
+
 interface Props {
   title: string;
   href: string;
   description: string;
   count: number;
-  variant?: 'featured' | 'default' | 'muted';
+  icon: Icon;
+  variant?: "featured" | "default";
   eyebrow?: string;
 }
 
-const { title, href, description, count, variant = 'default', eyebrow } = Astro.props;
+const { title, href, description, count, icon, variant = "default", eyebrow } = Astro.props;
+
+const ICONS: Record<Icon, string> = {
+  compass:
+    "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z",
+  briefcase:
+    "M20 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16",
+  code: "M16 18l6-6-6-6M8 6l-6 6 6 6",
+  users:
+    "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  layers: "M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2zM3.27 6.96L12 12.01l8.73-5.05M12 22.08V12",
+};
+
+const countLabel = `${count} ${count === 1 ? "guide" : "guides"}`;
 ---
 
-<a href={href} class:list={['card', 'surface-glass', `card--${variant}`]}>
-  {eyebrow && <span class="card__eyebrow">{eyebrow}</span>}
-  <div class="card__head">
-    <span class="card__title">{title}</span>
-    <span class="card__count">{String(count).padStart(2, '0')} guides</span>
-  </div>
-  <p class="card__desc">{description}</p>
+<a
+  href={href}
+  class:list={["card", "card--link", "cat", variant === "featured" && "cat--featured"]}
+>
+  <span class="card__icon cat__icon" aria-hidden="true">
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d={ICONS[icon]}></path>
+    </svg>
+  </span>
+
+  {
+    eyebrow && (
+      <span class="cat__eyebrow">
+        <Badge text={eyebrow} variant="brand" />
+      </span>
+    )
+  }
+
+  <span class="cat__head">
+    <h2 class="card__title cat__title">{title}</h2>
+    <span class="cat__count">{countLabel}</span>
+  </span>
+
+  <p class="card__text">{description}</p>
+
+  <span class="cat__arrow" aria-hidden="true">&rarr;</span>
 </a>
 
 <style>
-  .card {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    gap: var(--space-2) var(--space-4);
-    padding: var(--space-5) var(--space-6);
+  /* The global :focus-visible rule squares the corners off; a card keeps its own. */
+  .cat:focus-visible {
     border-radius: var(--radius-lg);
-    text-decoration: none;
-    transition:
-      background var(--duration-normal) var(--ease),
-      border-color var(--duration-normal) var(--ease),
-      box-shadow var(--duration-normal) var(--ease);
-    align-items: start;
-    min-height: 44px;
-  }
-  .card:hover {
-    background: var(--accent-faint);
-    border-color: var(--glass-border-hi);
-    box-shadow: var(--glass-shadow), var(--shadow-glow);
   }
 
-  .card__head {
+  a.cat {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-6);
+  }
+
+  a.cat .cat__icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--space-4);
+  }
+
+  .cat__eyebrow {
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+
+  .cat__head {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: var(--space-3);
+    margin-bottom: var(--space-2);
   }
 
-  .card__title {
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: var(--text-lg);
-    color: var(--color-text-primary);
-  }
-
-  .card__count {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--accent-light);
-    letter-spacing: var(--tracking-wider);
-    opacity: 0.6;
-  }
-
-  .card__desc {
-    grid-column: 1;
-    font-size: var(--text-sm);
-    color: var(--color-text-tertiary);
-    line-height: var(--leading-normal);
+  h2.cat__title {
     margin: 0;
   }
 
-  /* ── Eyebrow ── */
-  .card__eyebrow {
-    grid-column: 1 / -1;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-widest);
-    color: var(--accent-light);
-    opacity: 0.75;
+  .cat__count {
+    font-size: var(--text-sm);
+    color: var(--c-text-3);
   }
 
-  /* ── Featured variant ── */
-  .card--featured {
-    padding: var(--space-8) var(--space-8);
-  }
-  .card--featured .card__title {
-    font-size: var(--text-2xl);
-  }
-  .card--featured .card__desc {
+  .cat__arrow {
+    position: absolute;
+    top: var(--space-6);
+    right: var(--space-6);
     font-size: var(--text-base);
-    color: var(--color-text-secondary);
+    line-height: 1;
+    color: var(--c-text-3);
+    transition:
+      color var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
   }
 
-  /* ── Muted variant ── */
-  .card--muted {
-    opacity: 0.55;
+  a.cat:hover .cat__arrow {
+    color: var(--c-brand-1);
+    transform: translateX(4px);
   }
-  .card--muted:hover {
-    opacity: 0.85;
+
+  /* The entry point spans the full grid and reads a size larger. */
+  a.cat--featured {
+    grid-column: 1 / -1;
+  }
+
+  .cat--featured .cat__title {
+    font-size: var(--text-xl);
+  }
+
+  .cat--featured .card__text {
+    font-size: var(--text-base);
   }
 
   @media (max-width: 480px) {
-    .card {
-      padding: var(--space-4) var(--space-5);
+    a.cat {
+      padding: var(--space-5);
     }
-    .card--featured {
-      padding: var(--space-6) var(--space-5);
+
+    .cat__arrow {
+      top: var(--space-5);
+      right: var(--space-5);
     }
   }
 </style>

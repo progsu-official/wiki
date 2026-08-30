@@ -1,4 +1,6 @@
 ---
+import Badge from "./Badge.astro";
+
 interface Props {
   title: string;
   href: string;
@@ -11,101 +13,92 @@ interface Props {
 const { title, href, readTime, authorName, tags, badge } = Astro.props;
 ---
 
-<a href={href} class="guide-card surface-glass">
-  <div class="guide-card__head">
-    <div class="guide-card__title-row">
+<a href={href} class="card card--link guide-card">
+  <span class="guide-card__body">
+    <span class="guide-card__title-row">
       <span class="guide-card__title">{title}</span>
-      {badge && <span class="guide-card__badge">{badge}</span>}
-    </div>
+      {badge && <Badge text={badge} variant="brand" />}
+    </span>
     <span class="guide-card__meta">{readTime} · {authorName}</span>
-  </div>
-  {tags.length > 0 && (
-    <div class="guide-card__tags">
-      {tags.map((tag) => <span class="guide-card__tag">{tag}</span>)}
-    </div>
-  )}
+    {
+      tags.length > 0 && (
+        <span class="guide-card__tags">
+          {tags.map((tag) => (
+            <Badge text={tag} />
+          ))}
+        </span>
+      )
+    }
+  </span>
+  <span class="guide-card__arrow" aria-hidden="true">&rarr;</span>
 </a>
 
 <style>
-  .guide-card {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-2) var(--space-4);
-    padding: var(--space-5) var(--space-6);
+  /* The global :focus-visible rule squares the corners off; a card keeps its own. */
+  .guide-card:focus-visible {
     border-radius: var(--radius-lg);
-    text-decoration: none;
-    transition:
-      background var(--duration-normal) var(--ease),
-      border-color var(--duration-normal) var(--ease),
-      box-shadow var(--duration-normal) var(--ease);
-    align-items: start;
-    min-height: 44px;
-  }
-  .guide-card:hover {
-    background: var(--accent-faint);
-    border-color: var(--glass-border-hi);
-    box-shadow: var(--glass-shadow), var(--shadow-glow);
   }
 
-  .guide-card__head {
-    grid-column: 1;
+  /* `a.` outbids the global `.card` padding without !important. */
+  a.guide-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 44px;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .guide-card__body {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
+    min-width: 0;
+    flex: 1;
   }
 
   .guide-card__title-row {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
     flex-wrap: wrap;
+    gap: var(--space-3);
   }
 
   .guide-card__title {
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: var(--text-lg);
-    color: var(--color-text-primary);
-  }
-
-  .guide-card__badge {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-widest);
-    color: var(--accent-text);
-    background: var(--accent-faint);
-    border: 1px solid var(--accent-border);
-    border-radius: var(--radius-full);
-    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    color: var(--c-text-1);
   }
 
   .guide-card__meta {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
-    letter-spacing: var(--tracking-wide);
+    font-size: var(--text-sm);
+    color: var(--c-text-3);
   }
 
   .guide-card__tags {
-    grid-column: 1;
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-top: var(--space-1);
   }
 
-  .guide-card__tag {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--accent-light);
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-full);
-    padding: 0.15em var(--space-2);
-    opacity: 0.85;
-  }
-  .guide-card__tag::before {
-    content: "#";
+  .guide-card__arrow {
+    flex-shrink: 0;
+    font-size: var(--text-base);
+    line-height: 1;
+    color: var(--c-text-3);
+    transition:
+      color var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
   }
 
+  a.guide-card:hover .guide-card__arrow {
+    color: var(--c-brand-1);
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 480px) {
+    a.guide-card {
+      padding: var(--space-4);
+    }
+  }
 </style>

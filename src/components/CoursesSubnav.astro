@@ -1,70 +1,77 @@
 ---
 interface Props {
-  active: 'browse' | 'scheduler' | 'plans' | 'compare';
+  active: "browse" | "scheduler" | "plans" | "compare";
 }
 
 const { active } = Astro.props;
 
 const tabs = [
-  { key: 'browse',    label: 'browse',    href: '/courses' },
-  { key: 'scheduler', label: 'scheduler', href: '/courses/scheduler' },
-  { key: 'plans',     label: 'plans',     href: '/courses/plans' },
-  { key: 'compare',   label: 'compare',   href: '/courses/compare' },
+  { key: "browse", label: "browse", href: "/courses" },
+  { key: "scheduler", label: "scheduler", href: "/courses/scheduler" },
+  { key: "plans", label: "plans", href: "/courses/plans" },
+  { key: "compare", label: "compare", href: "/courses/compare" },
 ] as const;
 ---
 
 <nav class="csub" aria-label="Courses sections">
-  {tabs.map(t => (
-    <a
-      href={t.href}
-      class:list={['csub__link', { 'is-active': t.key === active }]}
-      aria-current={t.key === active ? 'page' : undefined}
-    >
-      {t.label}
-    </a>
-  ))}
+  {
+    tabs.map((t) => (
+      <a
+        href={t.href}
+        class:list={["csub__link", { "is-active": t.key === active }]}
+        aria-current={t.key === active ? "page" : undefined}
+      >
+        {t.label}
+      </a>
+    ))
+  }
 </nav>
 
 <style>
   .csub {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
+    gap: var(--space-6);
     margin-bottom: var(--space-8);
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--c-divider);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .csub::-webkit-scrollbar {
+    display: none;
   }
 
   .csub__link {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wider);
-    color: var(--color-text-muted);
+    position: relative;
+    flex-shrink: 0;
+    padding: var(--space-3) 0;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--c-text-2);
     text-decoration: none;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-sm);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
     transition:
       color var(--duration-fast) var(--ease),
-      background var(--duration-fast) var(--ease);
+      border-color var(--duration-fast) var(--ease);
   }
   .csub__link:hover {
-    color: var(--color-text-secondary);
+    color: var(--c-text-1);
   }
   .csub__link.is-active {
-    color: var(--accent-text);
-    background: var(--accent-subtle);
+    color: var(--c-brand-1);
+    border-bottom-color: var(--c-brand-2);
+    font-weight: 600;
   }
 
   @media (max-width: 640px) {
     .csub {
-      flex-wrap: nowrap;
-      gap: 0;
+      gap: var(--space-5);
     }
     .csub__link {
-      flex: 1;
-      text-align: center;
-      padding: var(--space-3) var(--space-2);
-      font-size: 0.7rem;
+      padding: var(--space-3) var(--space-1);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
   }
 </style>

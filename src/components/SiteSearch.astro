@@ -1,23 +1,46 @@
 ---
+
 ---
 
-<div class="sitesearch-backdrop" id="sitesearch-backdrop" role="dialog" aria-label="Search" aria-modal="true">
-  <div class="sitesearch-panel surface-glass surface-glass--strong">
+<div
+  class="sitesearch-backdrop"
+  id="sitesearch-backdrop"
+  role="dialog"
+  aria-label="Search"
+  aria-modal="true"
+>
+  <div class="sitesearch-panel">
     <div class="sitesearch-input-row">
-      <div class="sitesearch-icon" aria-hidden="true">
-        <div class="sitesearch-icon-handle"></div>
-      </div>
+      <svg
+        class="sitesearch-icon"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.5-3.5"></path>
+      </svg>
       <input
         id="sitesearch-input"
         class="sitesearch-input"
         type="text"
-        placeholder="search guides and categories..."
+        placeholder="search guides and categories"
         autocomplete="off"
         spellcheck="false"
       />
-      <kbd class="sitesearch-esc surface-glass">esc</kbd>
+      <kbd class="sitesearch-esc">esc</kbd>
     </div>
     <ul class="sitesearch-results" id="sitesearch-results"></ul>
+    <div class="sitesearch-hints">
+      <span class="sitesearch-hint"><kbd>&uarr;</kbd><kbd>&darr;</kbd> to navigate</span>
+      <span class="sitesearch-hint"><kbd>&crarr;</kbd> to select</span>
+      <span class="sitesearch-hint"><kbd>esc</kbd> to close</span>
+    </div>
   </div>
 </div>
 
@@ -26,11 +49,9 @@
     display: none;
     position: fixed;
     inset: 0;
-    z-index: 300;
-    background: rgba(2, 2, 8, 0.7);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    padding: 12vh var(--page-gutter, 1.5rem) var(--space-8, 2rem);
+    z-index: var(--z-modal);
+    background: rgba(0, 0, 0, 0.6);
+    padding: var(--space-20) var(--space-5) var(--space-8);
     overflow-y: auto;
   }
   .sitesearch-backdrop.open {
@@ -38,110 +59,162 @@
   }
 
   .sitesearch-panel {
-    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    max-width: 640px;
+    max-height: calc(100vh - var(--space-20) - var(--space-8));
     margin: 0 auto;
-    border-radius: var(--radius-lg, 0.75rem);
+    background: var(--c-bg);
+    border: 1px solid var(--c-divider);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
     overflow: hidden;
   }
 
   .sitesearch-input-row {
     display: flex;
     align-items: center;
-    gap: var(--space-3, 0.75rem);
-    padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
-    border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--c-divider);
+    flex-shrink: 0;
   }
 
   .sitesearch-icon {
-    width: 12px;
-    height: 12px;
-    border: 1.5px solid rgba(216, 180, 254, 0.7);
-    border-radius: 50%;
+    color: var(--c-text-3);
     flex-shrink: 0;
-    position: relative;
-  }
-  .sitesearch-icon-handle {
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 5px;
-    height: 1.5px;
-    background: rgba(216, 180, 254, 0.7);
-    transform: rotate(45deg);
-    border-radius: 1px;
   }
 
   .sitesearch-input {
     flex: 1;
+    min-width: 0;
     background: none;
     border: none;
     outline: none;
-    color: var(--color-text-primary, #fff);
-    font-family: var(--font-mono, monospace);
-    font-size: var(--text-sm, 0.9rem);
+    color: var(--c-text-1);
+    font-family: var(--font-body);
+    font-size: 16px;
   }
   .sitesearch-input::placeholder {
-    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+    color: var(--c-text-3);
   }
 
   .sitesearch-esc {
-    font-family: var(--font-mono, monospace);
-    font-size: var(--text-xs, 0.7rem);
-    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
-    padding: 0.15rem 0.4rem;
-    border-radius: var(--radius-sm, 0.25rem);
     flex-shrink: 0;
+    padding: 2px var(--space-2);
+    border: 1px solid var(--c-divider);
+    border-radius: var(--radius-sm);
+    background: var(--c-bg-soft);
+    color: var(--c-text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
   }
 
   .sitesearch-results {
     list-style: none;
     margin: 0;
-    max-height: 60vh;
+    padding: var(--space-2);
+    flex: 1;
     overflow-y: auto;
-    padding: var(--space-2, 0.5rem);
   }
 
+  .sitesearch-hints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--c-divider);
+    background: var(--c-bg-alt);
+    flex-shrink: 0;
+  }
+
+  .sitesearch-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 12px;
+    color: var(--c-text-3);
+  }
+  .sitesearch-hint kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border: 1px solid var(--c-divider);
+    border-radius: var(--radius-sm);
+    background: var(--c-bg);
+    color: var(--c-text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  /* Rows are injected by the script below, so their styles must stay global. */
   :global(.sitesearch-group-label) {
-    font-family: var(--font-mono, monospace);
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
-    padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem) var(--space-1, 0.25rem);
+    padding: var(--space-3) var(--space-3) var(--space-1);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--c-text-3);
   }
 
   :global(.sitesearch-item) {
     display: flex;
     align-items: baseline;
-    gap: var(--space-3, 0.6rem);
-    padding: var(--space-3, 0.6rem) var(--space-3, 0.75rem);
-    border-radius: var(--radius-md, 0.4rem);
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
     cursor: pointer;
   }
   :global(.sitesearch-item.active) {
-    background: var(--accent-faint, rgba(168, 85, 247, 0.15));
+    background: var(--c-brand-soft);
+    color: var(--c-brand-1);
   }
 
   :global(.sitesearch-item-title) {
-    font-family: var(--font-heading, Georgia, serif);
-    font-style: italic;
-    font-size: 0.95rem;
-    color: var(--color-text-primary, #fff);
     flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--c-text-1);
+  }
+  :global(.sitesearch-item.active .sitesearch-item-title) {
+    color: var(--c-brand-1);
   }
 
   :global(.sitesearch-item-meta) {
-    font-family: var(--font-mono, monospace);
-    font-size: 0.65rem;
-    color: var(--color-text-tertiary, rgba(255, 255, 255, 0.45));
     flex-shrink: 0;
+    font-size: 12px;
+    color: var(--c-text-3);
+  }
+  :global(.sitesearch-item.active .sitesearch-item-meta) {
+    color: var(--c-brand-1);
   }
 
   :global(.sitesearch-empty) {
-    padding: var(--space-6, 1.5rem);
+    padding: var(--space-10) var(--space-6);
     text-align: center;
-    font-family: var(--font-mono, monospace);
-    font-size: 0.8rem;
-    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+    font-size: 14px;
+    color: var(--c-text-3);
+  }
+
+  @media (max-width: 767px) {
+    .sitesearch-backdrop {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .sitesearch-panel {
+      max-width: none;
+      height: 100%;
+      max-height: none;
+      border: none;
+      border-radius: 0;
+    }
   }
 </style>
 
@@ -171,9 +244,14 @@
     if (!data) return;
     const q = query.trim().toLowerCase();
 
-    const containerMatches = q ? data.containers.filter((c) => includes(c.title, q)) : data.containers;
+    const containerMatches = q
+      ? data.containers.filter((c) => includes(c.title, q))
+      : data.containers;
     const pageMatches = q
-      ? data.pages.filter((p) => includes(p.title, q) || includes(p.category, q) || p.tags.some((t) => includes(t, q)))
+      ? data.pages.filter(
+          (p) =>
+            includes(p.title, q) || includes(p.category, q) || p.tags.some((t) => includes(t, q))
+        )
       : data.pages;
 
     // containers (checkpoints) rank first, guide pages after
@@ -221,7 +299,9 @@
     results.querySelectorAll<HTMLElement>(".sitesearch-item").forEach((el) => {
       el.classList.toggle("active", Number(el.dataset.index) === activeIndex);
     });
-    results.querySelector<HTMLElement>(".sitesearch-item.active")?.scrollIntoView({ block: "nearest" });
+    results
+      .querySelector<HTMLElement>(".sitesearch-item.active")
+      ?.scrollIntoView({ block: "nearest" });
   }
 
   async function openSiteSearch() {
@@ -272,7 +352,10 @@
 
     const tag = (document.activeElement as HTMLElement)?.tagName;
     const inInput =
-      tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (document.activeElement as HTMLElement)?.isContentEditable;
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      tag === "SELECT" ||
+      (document.activeElement as HTMLElement)?.isContentEditable;
     if (inInput) return;
 
     if (e.key === "/" && !e.ctrlKey && !e.metaKey) {

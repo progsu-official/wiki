@@ -1,0 +1,13 @@
+dist
+node_modules
+.astro
+package-lock.json
+
+# src/content/guides/* are symlinks into the vault submodule. Without this,
+# `prettier --write .` reformats vault markdown in place and dirties the
+# submodule pointer.
+vault
+src/content/guides
+
+# Static design references, kept verbatim.
+reference

@@ -27,29 +27,38 @@ A user-first site is recognizable by what isn't there. **Reduce, don't add.**
 
 Existing tokens live in [src/styles/global.css](src/styles/global.css). Use them — don't introduce new colors, fonts, or spacing values.
 
-- **Theme:** cosmic dark — nebula + star layers from [Layout.astro](src/layouts/Layout.astro). Don't fight the background.
-- **Surfaces:** glass (`surface-glass` class). Soft borders, subtle backdrop blur.
-- **Type:** italic heading font for titles, mono for codes/numbers/technical bits, sans for body.
-- **Accents:** purple and cyan. Use sparingly — accent is for one or two things on a screen, not everything.
+- **Theme:** light by default, dark via the `dark` class on `<html>`. Every color comes from a `--c-*` token so both themes work. Never hardcode `#fff`/`#000` for a surface or text.
+- **The gradient is a special occasion.** `--grad-brand` (`#3d2377` → `#141021`) is only ever used full-bleed, on a `.brand-band`. Ordinary accents use the solid ramp (`--c-brand-1/2/3`) so long reading pages stay calm. Inside a band, text uses `--c-text-inverse-*`.
+- **Surfaces:** flat. `--c-bg-soft` fill, `--c-divider` hairline, `--shadow-*` for elevation. No glass, no blur. (`.surface-glass` survives only as a compat alias for a flat card.)
+- **Type:** Inter everywhere, 600 for headings. Mono (`--font-mono`) only for genuinely technical strings — course codes, CRNs, times, counts.
 - **Whitespace:** generous. Spacing scale tokens (`--space-*`) only.
-- **Motion:** soft fades, subtle glow on hover, never harsh snaps or bouncy transitions.
+- **Motion:** soft fades and 2px hover lifts, never harsh snaps or bouncy transitions.
 - **Color is never the only signal.** Pair every colored indicator with text, icon, or shape.
+- **Code blocks are dark in both themes.** One Shiki theme (`vitesse-dark`), language label from the transformer in `astro.config.mjs`.
 
 ## Existing building blocks (reuse before creating)
 
-- [PageHeader.astro](src/components/PageHeader.astro) — every top-level page
-- [CategoryCard.astro](src/components/CategoryCard.astro) — reference for card visual language
-- [Breadcrumb.astro](src/components/Breadcrumb.astro), [Callout.astro](src/components/Callout.astro), [Badge.astro](src/components/Badge.astro), [SearchBar.astro](src/components/SearchBar.astro), [TableOfContents.astro](src/components/TableOfContents.astro)
-- [ConstellationGraph.astro](src/components/ConstellationGraph.astro) — the signature visual; reach for it when visualizing relationships (prereq chains, learning paths, related topics)
-- [Layout.astro](src/layouts/Layout.astro) — supports `wide` and `accent` props
-- [ContentLayout.astro](src/layouts/ContentLayout.astro) — for long-form pages
+**Global classes** in [global.css](src/styles/global.css) — reach for these before writing CSS: `.container`, `.divider`, `.brand-band`, `.brand-text`, `.btn` (`--brand/--alt/--ghost/--lg/--sm`), `.card` (`--link`, `__title`, `__text`, `__icon`), `.badge` (`--brand/tip/warning/danger/info`), `.prose`, `.callout`, `.sr-only`, `.skel`.
+
+**Layouts**
+- [Layout.astro](src/layouts/Layout.astro) — the shell: head, theme bootstrap, navbar, footer, search modal. Props `title`, `description`, `wide`, `fullBleed`.
+- [DocsLayout.astro](src/layouts/DocsLayout.astro) — the three-column docs shell. Use it for every guide page; it supplies the sidebar, the "on this page" rail, the mobile drawer, and prev/next + edit-on-github. Props `title`, `description`, `headings`, `editSlug`, `updated`.
+
+**Components**
+- [PageHeader.astro](src/components/PageHeader.astro) — `title` + `intro` for index pages, `title` + `meta` + `tags` for articles
+- [CategoryCard.astro](src/components/CategoryCard.astro) / [FeatureCard.astro](src/components/FeatureCard.astro) — feature cards (near-duplicates; consolidate when either is next touched)
+- [GuideCard.astro](src/components/GuideCard.astro), [Badge.astro](src/components/Badge.astro), [Callout.astro](src/components/Callout.astro), [Breadcrumb.astro](src/components/Breadcrumb.astro)
+- [Sidebar.astro](src/components/Sidebar.astro), [Aside.astro](src/components/Aside.astro), [DocFooter.astro](src/components/DocFooter.astro) — docs chrome, driven by [guideNav.ts](src/lib/guideNav.ts)
+- [Navbar.astro](src/components/Navbar.astro), [ThemeToggle.astro](src/components/ThemeToggle.astro), [Footer.astro](src/components/Footer.astro), [SiteSearch.astro](src/components/SiteSearch.astro)
+
+**Sidebar order** is curated in [guideNav.ts](src/lib/guideNav.ts). A new vault guide appears automatically at the end of its category; add it to `ORDER` to place it deliberately. The same flat order drives prev/next and the category listings.
 
 Check `src/components/` before building new components. Extend existing ones with variant props before forking.
 
 ## Quality-of-life patterns to keep
 
 - `/` keyboard shortcut focuses search from anywhere
-- `g <letter>` navigation shortcuts; `?` opens shortcut help
+- `?` opens the shortcut help dialog (there are no `g <letter>` shortcuts; they were documented but never implemented)
 - Visible focus rings on every interactive element
 - Loading skeletons matched to final layout (no spinners, no layout shift)
 - Undo toasts for any removal action (5-second window)
@@ -75,6 +84,7 @@ Guides are symlinks from `src/content/guides/` into the `vault` submodule.
 - Modals or confirmations for low-stakes actions
 - Cute copy, marketing voice, exclamation points
 - New design tokens, fonts, or color values
+- Running `npm run fmt` without checking `.prettierignore` — `src/content/guides/*` symlinks into the vault submodule
 - Comments that explain what well-named code already says
 - Documentation files (`.md`) unless explicitly requested
 

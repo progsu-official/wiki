@@ -4,10 +4,10 @@ interface Props {
   height?: string;
 }
 
-const { label, height = '120px' } = Astro.props;
+const { label, height = "120px" } = Astro.props;
 ---
 
-<div class="zone surface-glass" style={`min-height: ${height}`}>
+<div class="zone" style={`min-height: ${height}`}>
   <span class="zone__label">{label}</span>
 </div>
 
@@ -16,16 +16,14 @@ const { label, height = '120px' } = Astro.props;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--c-bg-soft);
+    border: 1px dashed var(--c-border);
     border-radius: var(--radius-lg);
-    border-style: dashed;
   }
 
   .zone__label {
-    font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
-    text-transform: uppercase;
+    color: var(--c-text-3);
     text-align: center;
     padding: var(--space-4);
   }

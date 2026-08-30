@@ -1,50 +1,55 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "../../../layouts/Layout.astro";
-import Breadcrumb from "../../../components/Breadcrumb.astro";
+import DocsLayout from "../../../layouts/DocsLayout.astro";
 import PageHeader from "../../../components/PageHeader.astro";
-import Badge from "../../../components/Badge.astro";
 import GuideCard from "../../../components/GuideCard.astro";
+import { getGuideNav } from "../../../lib/guideNav";
 
-const guides = (await getCollection("guides", (entry) => entry.data.category === "networking")).sort(
-  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
-);
+const intro = "cold outreach, linkedin, warm intros, and building relationships that open doors.";
+
+// Listed in the sidebar's reading order, so the two never disagree on screen.
+const { flat } = await getGuideNav();
+const order = (slug: string) => {
+  const i = flat.findIndex((item) => item.link === `/guides/${slug}`);
+  return i === -1 ? flat.length : i;
+};
+
+const guides = (
+  await getCollection("guides", (entry) => entry.data.category === "networking")
+).sort((a, b) => order(a.slug) - order(b.slug));
 ---
 
-<Layout title="Networking" accent="cyan">
-  <Breadcrumb items={[
-    { label: "Home", href: "/" },
-    { label: "Guides", href: "/guides" },
-    { label: "Networking" },
-  ]} />
+<DocsLayout title="networking" description={intro}>
+  <PageHeader title="networking" intro={intro} />
 
-  <PageHeader
-    eyebrow="networking"
-    headline="know the right<br>people."
-    subline="Cold outreach, LinkedIn strategy, warm intros, and how to build relationships that actually open doors."
-  />
-
-  {guides.length > 0 ? (
-    <div class="guide-list">
-      {guides.map((guide) => (
-        <GuideCard
-          title={guide.data.title}
-          href={`/guides/networking/${guide.slug.split("/")[1]}`}
-          readTime={guide.data.readTime}
-          authorName={guide.data.author.name}
-          tags={guide.data.tags}
-        />
-      ))}
-    </div>
-  ) : (
-    <Badge text="guides coming soon" />
-  )}
-</Layout>
+  {
+    guides.length > 0 ? (
+      <div class="guides">
+        {guides.map((guide) => (
+          <GuideCard
+            title={guide.data.title}
+            href={`/guides/${guide.slug}`}
+            readTime={guide.data.readTime}
+            authorName={guide.data.author.name}
+            tags={guide.data.tags}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="empty">nothing here yet. guides show up as members write them.</p>
+    )
+  }
+</DocsLayout>
 
 <style>
-  .guide-list {
+  .guides {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--c-text-3);
   }
 </style>

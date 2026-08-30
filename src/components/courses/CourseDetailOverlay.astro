@@ -3,15 +3,15 @@ import Zone from "./Zone.astro";
 ---
 
 <div class="overlay-backdrop" id="course-detail-overlay" style="display:none">
-  <div class="overlay surface-glass surface-glass--strong">
-    <button class="overlay__close" aria-label="Close">&times;</button>
+  <div class="overlay">
+    <button class="overlay__close" type="button" aria-label="Close">&times;</button>
 
     <div class="overlay__layout">
-      <Zone label="course title &middot; number &middot; credits" height="60px" />
+      <Zone label="course title · number · credits" height="60px" />
       <Zone label="student-written description" height="100px" />
       <Zone label="prerequisite chain visualization" height="140px" />
-      <Zone label="semesters offered &middot; typical availability" height="60px" />
-      <Zone label="member notes &middot; workload &middot; honest takes" height="160px" />
+      <Zone label="semesters offered · typical availability" height="60px" />
+      <Zone label="member notes · workload · honest takes" height="160px" />
       <Zone label="add to schedule button" height="50px" />
     </div>
   </div>
@@ -22,7 +22,7 @@ import Zone from "./Zone.astro";
     position: fixed;
     inset: 0;
     z-index: var(--z-overlay);
-    background: rgba(2, 2, 10, 0.6);
+    background: rgba(20, 16, 33, 0.5);
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -35,7 +35,10 @@ import Zone from "./Zone.astro";
     max-width: 560px;
     max-height: 85vh;
     overflow-y: auto;
+    background: var(--c-bg-elv);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
     padding: var(--space-8);
   }
 
@@ -45,7 +48,7 @@ import Zone from "./Zone.astro";
     right: var(--space-4);
     background: none;
     border: none;
-    color: var(--color-text-muted);
+    color: var(--c-text-3);
     font-size: var(--text-xl);
     cursor: pointer;
     width: 44px;
@@ -53,11 +56,14 @@ import Zone from "./Zone.astro";
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-sm);
-    transition: color var(--duration-fast) var(--ease);
+    border-radius: var(--radius-md);
+    transition:
+      color var(--duration-fast) var(--ease),
+      background-color var(--duration-fast) var(--ease);
   }
   .overlay__close:hover {
-    color: var(--color-text-primary);
+    color: var(--c-text-1);
+    background: var(--c-bg-mute);
   }
 
   .overlay__layout {

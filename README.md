@@ -17,9 +17,9 @@ progsu is Georgia State University's programming club. This wiki is our knowledg
 ## Technology Stack
 
 - **Astro**: Static site generator
-- **Three.js**: 3D constellation graph on the homepage
-- **D3**: Force simulation for graph layout
-- **Tailwind CSS**: Utility-first styling
+- **Inter / JetBrains Mono**: Self-hosted variable fonts via Fontsource
+- **Shiki**: Build-time syntax highlighting
+- **Mermaid**: Diagrams, loaded lazily only on pages that use them
 - **MDX**: Markdown with component support
 
 ## Getting Started
@@ -64,17 +64,23 @@ npm run fmt        # Format code with Prettier
 wiki/
 ├── src/
 │   ├── components/
-│   │   ├── ConstellationGraph.astro  # 3D interactive homepage graph
-│   │   ├── Navbar.astro              # Site navigation
+│   │   ├── Navbar.astro             # Site navigation + theme toggle
+│   │   ├── Sidebar.astro            # Docs sidebar (built from the guides collection)
+│   │   ├── Aside.astro              # "on this page" rail
+│   │   ├── DocFooter.astro          # Edit link, last updated, prev/next
 │   │   └── Footer.astro             # Site footer
 │   ├── layouts/
-│   │   └── Layout.astro             # Base page layout with cosmic background
+│   │   ├── Layout.astro             # Base shell: head, theme bootstrap, nav, footer
+│   │   └── DocsLayout.astro         # Three-column docs shell
+│   ├── lib/
+│   │   ├── guideNav.ts              # Sidebar tree + prev/next order
+│   │   └── remark-*.mjs             # Wikilinks, mermaid, callouts
 │   ├── pages/
-│   │   ├── index.astro              # Homepage (constellation hero)
-│   │   ├── guides/                  # Guide category pages
-│   │   └── courses/                 # Courses page
+│   │   ├── index.astro              # Landing page
+│   │   ├── guides/                  # Guide listings and articles
+│   │   └── _courses/                # Courses (not routed yet)
 │   ├── styles/
-│   │   └── global.css               # Global styles + Tailwind
+│   │   └── global.css               # Design tokens, base, prose, components
 │   └── consts.ts                    # Site config and nav links
 ├── reference/                       # Design reference files
 ├── public/                          # Static assets
@@ -87,7 +93,7 @@ Contributions from all club members are welcome whether that's writing a new gui
 
 ### Adding or Editing Guides
 
-Guides are written in MDX and live in `src/pages/guides/`. To add one:
+Guides are Markdown in the [vault](https://github.com/progsu-official/vault) submodule, surfaced through `src/content/guides/`. To add one:
 
 1. Create a new `.mdx` file in the appropriate category folder
 2. Follow the existing frontmatter format

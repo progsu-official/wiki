@@ -1,0 +1,272 @@
+---
+import Layout from "./Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import Aside from "../components/Aside.astro";
+import DocFooter from "../components/DocFooter.astro";
+import { getGuideNav } from "../lib/guideNav";
+
+interface Props {
+  title: string;
+  description?: string;
+  headings?: { depth: number; slug: string; text: string }[];
+  /** Guide slug, e.g. "career/resume-guide" — drives the edit-on-github link. */
+  editSlug?: string;
+  updated?: Date;
+}
+
+const { title, description, headings = [], editSlug, updated } = Astro.props;
+
+const { flat } = await getGuideNav();
+const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
+
+const index = flat.findIndex((item) => item.link === pathname);
+const prev = index > 0 ? flat[index - 1] : null;
+const next = index !== -1 && index < flat.length - 1 ? flat[index + 1] : null;
+
+const editUrl = editSlug
+  ? `https://github.com/progsu-official/vault/edit/main/${editSlug}.md`
+  : undefined;
+
+const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
+---
+
+<Layout title={title} description={description} fullBleed>
+  <div class="doc">
+    <div class="doc__localnav">
+      <button
+        class="doc__menu"
+        id="sb-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="doc-sidebar"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        menu
+      </button>
+      <span class="doc__localnav-title">{title}</span>
+    </div>
+
+    <div class="doc__backdrop" id="sb-backdrop" hidden></div>
+
+    <aside class="doc__sidebar" id="doc-sidebar">
+      <Sidebar />
+    </aside>
+
+    <div class="doc__main">
+      <div class:list={["doc__grid", { "doc__grid--with-aside": hasAside }]}>
+        <article class="doc__content">
+          <slot />
+          <DocFooter prev={prev} next={next} editUrl={editUrl} updated={updated} />
+        </article>
+
+        {
+          hasAside && (
+            <div class="doc__aside">
+              <Aside headings={headings} />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .doc {
+    position: relative;
+  }
+
+  /* ── Mobile local nav ──────────────────────────────────── */
+
+  .doc__localnav {
+    position: sticky;
+    top: var(--nav-height);
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 48px;
+    padding-inline: var(--page-gutter);
+    background: var(--c-bg);
+    border-bottom: 1px solid var(--c-divider);
+  }
+
+  .doc__menu {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+    padding: var(--space-2) 0;
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--c-text-2);
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease);
+  }
+
+  .doc__menu:hover {
+    color: var(--c-brand-1);
+  }
+
+  .doc__localnav-title {
+    overflow: hidden;
+    font-size: var(--text-sm);
+    color: var(--c-text-3);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .doc__localnav-title::before {
+    content: "/";
+    margin-right: var(--space-3);
+    color: var(--c-divider);
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────── */
+
+  .doc__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .doc__backdrop[hidden] {
+    display: none;
+  }
+
+  .doc__sidebar {
+    position: fixed;
+    top: var(--nav-height);
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--z-overlay) + 1);
+    width: min(var(--sidebar-width), 80vw);
+    padding-inline: var(--space-6);
+    background: var(--c-bg);
+    border-right: 1px solid var(--c-divider);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(-100%);
+    transition: transform var(--duration-normal) var(--ease);
+  }
+
+  .doc__sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* ── Content ───────────────────────────────────────────── */
+
+  .doc__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: calc(var(--content-width) + 2 * var(--page-gutter));
+    margin-inline: auto;
+    padding: var(--space-10) var(--page-gutter) var(--space-24);
+  }
+
+  .doc__content {
+    min-width: 0;
+  }
+
+  /* Above the article on narrow screens, a rail on wide ones. */
+  .doc__aside {
+    order: -1;
+    margin-bottom: var(--space-8);
+  }
+
+  @media (min-width: 960px) {
+    .doc__localnav,
+    .doc__backdrop {
+      display: none;
+    }
+
+    .doc__sidebar {
+      z-index: var(--z-sticky);
+      transform: none;
+      box-shadow: none;
+      padding-left: max(var(--space-8), calc((100vw - var(--layout-max-width)) / 2));
+    }
+
+    .doc__main {
+      padding-left: var(--sidebar-width);
+    }
+
+    .doc__grid {
+      padding-top: var(--space-12);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .doc__grid--with-aside {
+      grid-template-columns: minmax(0, var(--content-width)) var(--aside-width);
+      gap: var(--space-16);
+      max-width: calc(
+        var(--content-width) + var(--aside-width) + var(--space-16) + 2 * var(--page-gutter)
+      );
+    }
+
+    .doc__grid--with-aside .doc__aside {
+      order: 0;
+      margin-bottom: 0;
+    }
+  }
+</style>
+
+<script>
+  const sidebar = document.getElementById("doc-sidebar");
+  const backdrop = document.getElementById("sb-backdrop");
+  const toggle = document.getElementById("sb-toggle");
+
+  if (sidebar && backdrop && toggle) {
+    const setOpen = (open: boolean) => {
+      sidebar.classList.toggle("is-open", open);
+      backdrop.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+      // Only lock the page behind the drawer; on desktop it isn't a drawer.
+      document.body.style.overflow = open ? "hidden" : "";
+    };
+
+    toggle.addEventListener("click", () => {
+      setOpen(!sidebar.classList.contains("is-open"));
+    });
+
+    backdrop.addEventListener("click", () => setOpen(false));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && sidebar.classList.contains("is-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Following a link inside the drawer should close it.
+    sidebar.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a")) setOpen(false);
+    });
+
+    // Leaving the drawer breakpoint must not strand a locked body.
+    const wide = window.matchMedia("(min-width: 960px)");
+    wide.addEventListener("change", (e) => {
+      if (e.matches) setOpen(false);
+    });
+  }
+</script>

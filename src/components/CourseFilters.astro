@@ -1,10 +1,19 @@
 ---
+
 ---
 
 <!-- Mobile floating trigger (hidden on desktop) -->
-<button class="cf-trigger surface-glass" id="cf-trigger" aria-label="Open filters">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
-  <span>Filters</span>
+<button class="cf-trigger btn btn--alt" id="cf-trigger" type="button" aria-label="Open filters">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"></path></svg
+  >
+  <span>filters</span>
   <span class="cf-trigger__count" id="cf-trigger-count"></span>
 </button>
 
@@ -12,18 +21,33 @@
 <div class="cf-backdrop" id="cf-backdrop"></div>
 
 <!-- Filter panel (inline on desktop, bottom-sheet on mobile) -->
-<div class="cf surface-glass" id="course-filters">
+<div class="cf" id="course-filters">
   <div class="cf__header">
     <span class="cf__title">filters</span>
-    <button class="cf__clear" id="cf-clear">clear all</button>
+    <button class="cf__clear" id="cf-clear" type="button">clear all</button>
   </div>
 
   <!-- ── Dropdown: subject (single-select) ── -->
   <div class="cf__dropdown" data-dropdown="subject">
-    <button class="cf__dropdown-header" aria-expanded="false" aria-controls="cf-dd-subject" aria-label="subject filter, all">
+    <button
+      class="cf__dropdown-header"
+      type="button"
+      aria-expanded="false"
+      aria-controls="cf-dd-subject"
+      aria-label="subject filter, all"
+    >
       <span class="cf__dropdown-label">subject</span>
 
-      <svg class="cf__dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      <svg
+        class="cf__dropdown-chevron"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg
+      >
     </button>
     <div class="cf__dropdown-body" id="cf-dd-subject">
       <div class="cf__options" data-group="subject" role="radiogroup" aria-label="Subject filter">
@@ -55,13 +79,33 @@
 
   <!-- ── Dropdown: time of day (multi-select) ── -->
   <div class="cf__dropdown" data-dropdown="time">
-    <button class="cf__dropdown-header" aria-expanded="false" aria-controls="cf-dd-time" aria-label="time of day filter">
+    <button
+      class="cf__dropdown-header"
+      type="button"
+      aria-expanded="false"
+      aria-controls="cf-dd-time"
+      aria-label="time of day filter"
+    >
       <span class="cf__dropdown-label">time of day</span>
 
-      <svg class="cf__dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      <svg
+        class="cf__dropdown-chevron"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg
+      >
     </button>
     <div class="cf__dropdown-body" id="cf-dd-time">
-      <div class="cf__options cf__options--multi" data-group="time" role="group" aria-label="Time of day filter">
+      <div
+        class="cf__options cf__options--multi"
+        data-group="time"
+        role="group"
+        aria-label="Time of day filter"
+      >
         <label class="cf__option">
           <input type="checkbox" value="morning" class="cf__option-input" />
           <span class="cf__option-check"></span>
@@ -84,13 +128,33 @@
   <div class="cf__expanded" id="cf-expanded">
     <!-- ── Dropdown: course level (multi-select) ── -->
     <div class="cf__dropdown" data-dropdown="level">
-      <button class="cf__dropdown-header" aria-expanded="false" aria-controls="cf-dd-level" aria-label="course level filter">
+      <button
+        class="cf__dropdown-header"
+        type="button"
+        aria-expanded="false"
+        aria-controls="cf-dd-level"
+        aria-label="course level filter"
+      >
         <span class="cf__dropdown-label">course level</span>
 
-        <svg class="cf__dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        <svg
+          class="cf__dropdown-chevron"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg
+        >
       </button>
       <div class="cf__dropdown-body" id="cf-dd-level">
-        <div class="cf__options cf__options--multi" data-group="level" role="group" aria-label="Course level filter">
+        <div
+          class="cf__options cf__options--multi"
+          data-group="level"
+          role="group"
+          aria-label="Course level filter"
+        >
           <label class="cf__option">
             <input type="checkbox" value="1000" class="cf__option-input" />
             <span class="cf__option-check"></span>
@@ -117,13 +181,33 @@
 
     <!-- ── Dropdown: credits (multi-select) ── -->
     <div class="cf__dropdown" data-dropdown="credits">
-      <button class="cf__dropdown-header" aria-expanded="false" aria-controls="cf-dd-credits" aria-label="credits filter">
+      <button
+        class="cf__dropdown-header"
+        type="button"
+        aria-expanded="false"
+        aria-controls="cf-dd-credits"
+        aria-label="credits filter"
+      >
         <span class="cf__dropdown-label">credits</span>
 
-        <svg class="cf__dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        <svg
+          class="cf__dropdown-chevron"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg
+        >
       </button>
       <div class="cf__dropdown-body" id="cf-dd-credits">
-        <div class="cf__options cf__options--multi" data-group="credits" role="group" aria-label="Credits filter">
+        <div
+          class="cf__options cf__options--multi"
+          data-group="credits"
+          role="group"
+          aria-label="Credits filter"
+        >
           <label class="cf__option">
             <input type="checkbox" value="3" class="cf__option-input" />
             <span class="cf__option-check"></span>
@@ -140,13 +224,33 @@
 
     <!-- ── Dropdown: days (multi-select) ── -->
     <div class="cf__dropdown" data-dropdown="days">
-      <button class="cf__dropdown-header" aria-expanded="false" aria-controls="cf-dd-days" aria-label="days filter">
+      <button
+        class="cf__dropdown-header"
+        type="button"
+        aria-expanded="false"
+        aria-controls="cf-dd-days"
+        aria-label="days filter"
+      >
         <span class="cf__dropdown-label">days</span>
 
-        <svg class="cf__dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        <svg
+          class="cf__dropdown-chevron"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg
+        >
       </button>
       <div class="cf__dropdown-body" id="cf-dd-days">
-        <div class="cf__options cf__options--multi" data-group="days" role="group" aria-label="Days filter">
+        <div
+          class="cf__options cf__options--multi"
+          data-group="days"
+          role="group"
+          aria-label="Days filter"
+        >
           <label class="cf__option">
             <input type="checkbox" value="M" class="cf__option-input" />
             <span class="cf__option-check"></span>
@@ -184,14 +288,29 @@
   </div>
 
   <!-- ── More filters expander ── -->
-  <button class="cf__more" id="cf-more" aria-expanded="false" aria-controls="cf-expanded">
+  <button
+    class="cf__more"
+    id="cf-more"
+    type="button"
+    aria-expanded="false"
+    aria-controls="cf-expanded"
+  >
     <span>more filters</span>
     <span class="cf__more-count" id="cf-more-count"></span>
-    <svg class="cf__more-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+    <svg
+      class="cf__more-chevron"
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg
+    >
   </button>
 
   <!-- Mobile close -->
-  <button class="cf__done" id="cf-done">done</button>
+  <button class="cf__done btn btn--brand" id="cf-done" type="button">done</button>
 </div>
 
 <style>
@@ -201,6 +320,8 @@
     flex-direction: column;
     gap: var(--space-5);
     padding: var(--space-5);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
   }
 
@@ -208,21 +329,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-3);
   }
 
   .cf__title {
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: var(--text-lg);
-    color: var(--color-text-primary);
+    font-size: var(--text-base);
     font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--c-text-1);
   }
 
   .cf__clear {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--accent-dim);
-    letter-spacing: var(--tracking-wider);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--c-brand-1);
     background: none;
     border: none;
     cursor: pointer;
@@ -230,8 +350,12 @@
     display: none;
     transition: color var(--duration-fast) var(--ease);
   }
-  .cf__clear:hover { color: var(--accent-text); }
-  .cf__clear.visible { display: inline; }
+  .cf__clear:hover {
+    color: var(--c-brand-2);
+  }
+  .cf__clear.visible {
+    display: inline;
+  }
 
   /* ── Dropdown ── */
   .cf__dropdown {
@@ -248,33 +372,28 @@
     background: none;
     border: none;
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease);
+    text-align: left;
   }
   .cf__dropdown-header:hover .cf__dropdown-label {
-    color: var(--color-text-secondary);
-  }
-  .cf__dropdown-header:focus-visible {
-    outline: 2px solid var(--accent-border);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
+    color: var(--c-text-1);
   }
 
   .cf__dropdown-label {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--c-text-2);
     transition: color var(--duration-fast) var(--ease);
   }
 
   .cf__dropdown-chevron {
     margin-left: auto;
-    color: var(--color-text-muted);
+    color: var(--c-text-3);
     flex-shrink: 0;
     transition: transform var(--duration-normal) var(--ease);
   }
   .cf__dropdown.open .cf__dropdown-chevron {
     transform: rotate(180deg);
+    color: var(--c-brand-1);
   }
 
   .cf__dropdown-body {
@@ -294,7 +413,12 @@
     padding: 0;
   }
   .cf__dropdown.open .cf__options {
-    padding: var(--space-2) 0 var(--space-1);
+    background: var(--c-bg-elv);
+    border: 1px solid var(--c-divider);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2);
+    margin-top: var(--space-2);
   }
 
   .cf__option {
@@ -304,10 +428,10 @@
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background var(--duration-fast) var(--ease);
+    transition: background-color var(--duration-fast) var(--ease);
   }
   .cf__option:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--c-bg-mute);
   }
 
   .cf__option-input {
@@ -317,51 +441,50 @@
     height: 0;
   }
   .cf__option-input:focus-visible + .cf__option-check {
-    outline: 2px solid var(--accent-border);
-    outline-offset: 2px;
+    box-shadow: var(--focus-ring);
   }
 
   .cf__option-check {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    border: 1px solid var(--glass-border-hi);
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--c-border);
+    background: var(--c-bg);
     flex-shrink: 0;
     position: relative;
     transition:
-      background var(--duration-fast) var(--ease),
+      background-color var(--duration-fast) var(--ease),
       border-color var(--duration-fast) var(--ease);
   }
   input[type="radio"] + .cf__option-check {
     border-radius: var(--radius-full);
   }
   .cf__option-input:checked + .cf__option-check {
-    background: var(--accent-subtle);
-    border-color: var(--accent-border);
+    background: var(--c-brand-2);
+    border-color: var(--c-brand-2);
   }
   .cf__option-input:checked + .cf__option-check::after {
-    content: '';
+    content: "";
     position: absolute;
-    top: 3px;
-    left: 3px;
+    top: 4px;
+    left: 4px;
     width: 6px;
     height: 6px;
-    border-radius: 2px;
-    background: var(--accent-text);
+    border-radius: 1px;
+    background: #fff;
   }
   input[type="radio"]:checked + .cf__option-check::after {
     border-radius: var(--radius-full);
   }
 
   .cf__option-text {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--text-sm);
+    color: var(--c-text-2);
     transition: color var(--duration-fast) var(--ease);
   }
   .cf__option-input:checked ~ .cf__option-text {
-    color: var(--color-text-secondary);
+    color: var(--c-text-1);
+    font-weight: 500;
   }
 
   /* ── Toggle ── */
@@ -371,45 +494,56 @@
     gap: var(--space-3);
     cursor: pointer;
   }
-  .cf__toggle input { display: none; }
+  .cf__toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
   .cf__toggle-track {
-    width: 28px;
-    height: 16px;
+    width: 32px;
+    height: 18px;
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--glass-border);
+    background: var(--c-bg-mute);
+    border: 1px solid var(--c-border);
     position: relative;
     flex-shrink: 0;
-    transition: background var(--duration-fast) var(--ease),
-                border-color var(--duration-fast) var(--ease);
+    transition:
+      background-color var(--duration-fast) var(--ease),
+      border-color var(--duration-fast) var(--ease);
   }
   .cf__toggle input:checked + .cf__toggle-track {
-    background: var(--accent-subtle);
-    border-color: var(--accent-border);
+    background: var(--c-brand-2);
+    border-color: var(--c-brand-2);
+  }
+  .cf__toggle input:focus-visible + .cf__toggle-track {
+    box-shadow: var(--focus-ring);
   }
 
   .cf__toggle-knob {
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: var(--radius-full);
-    background: var(--color-text-muted);
-    transition: transform var(--duration-fast) var(--ease),
-                background var(--duration-fast) var(--ease);
+    background: var(--c-text-3);
+    transition:
+      transform var(--duration-fast) var(--ease),
+      background-color var(--duration-fast) var(--ease);
   }
   .cf__toggle input:checked + .cf__toggle-track .cf__toggle-knob {
-    transform: translateX(12px);
-    background: var(--accent-text);
+    transform: translateX(14px);
+    background: #fff;
   }
 
   .cf__toggle-label {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--text-sm);
+    color: var(--c-text-2);
+  }
+  .cf__toggle input:checked ~ .cf__toggle-label {
+    color: var(--c-text-1);
   }
 
   /* ── More filters expander ── */
@@ -417,27 +551,30 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--c-text-2);
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
     transition: color var(--duration-fast) var(--ease);
   }
-  .cf__more:hover { color: var(--color-text-secondary); }
+  .cf__more:hover {
+    color: var(--c-text-1);
+  }
 
   .cf__more-count {
-    font-size: 0.6rem;
-    color: var(--accent-text);
-    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--c-brand-1);
   }
-  .cf__more-count:empty { display: none; }
+  .cf__more-count:empty {
+    display: none;
+  }
 
   .cf__more-chevron {
-    color: var(--color-text-muted);
+    color: var(--c-text-3);
     transition: transform var(--duration-normal) var(--ease);
   }
   .cf__more.open .cf__more-chevron {
@@ -448,35 +585,35 @@
     display: none;
     flex-direction: column;
     gap: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--c-divider);
   }
   .cf__expanded.open {
     display: flex;
   }
 
   /* ── Mobile trigger ── */
-  .cf-trigger {
+  .cf-trigger.btn {
     display: none;
     position: fixed;
     bottom: var(--space-5);
     left: 50%;
     transform: translateX(-50%);
     z-index: var(--z-sticky);
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-5);
-    border-radius: var(--radius-full);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-secondary);
-    letter-spacing: var(--tracking-wider);
-    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+  }
+  .cf-trigger.btn:active {
+    transform: translateX(-50%) translateY(1px);
   }
 
   .cf-trigger__count {
-    font-size: 0.6rem;
-    color: var(--accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--c-brand-1);
   }
-  .cf-trigger__count:empty { display: none; }
+  .cf-trigger__count:empty {
+    display: none;
+  }
 
   /* ── Mobile backdrop ── */
   .cf-backdrop {
@@ -484,31 +621,24 @@
     position: fixed;
     inset: 0;
     z-index: var(--z-overlay);
-    background: rgba(2, 2, 10, 0.5);
+    background: rgba(20, 16, 33, 0.5);
   }
-  .cf-backdrop.open { display: block; }
+  .cf-backdrop.open {
+    display: block;
+  }
 
   /* ── Mobile done button ── */
-  .cf__done {
+  .cf__done.btn {
     display: none;
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--accent-text);
-    letter-spacing: var(--tracking-wider);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--space-3) 0;
-    text-align: center;
     margin-top: var(--space-2);
   }
 
   /* ── Mobile layout ── */
   @media (max-width: 900px) {
-    .cf-trigger {
-      display: flex;
+    .cf-trigger.btn {
+      display: inline-flex;
+      height: 44px;
       bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
-      min-height: 44px;
     }
 
     .cf {
@@ -524,14 +654,15 @@
       overflow-y: auto;
       padding: var(--space-6);
       padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
-      background: var(--glass-bg-strong);
+      background: var(--c-bg-elv);
+      box-shadow: var(--shadow-xl);
     }
     .cf.sheet-open {
       display: flex;
     }
-    .cf__done {
-      display: block;
-      min-height: 44px;
+    .cf__done.btn {
+      display: inline-flex;
+      height: 44px;
     }
 
     .cf__option {
@@ -547,62 +678,68 @@
 </style>
 
 <script>
-  const panel = document.getElementById('course-filters')!;
-  const trigger = document.getElementById('cf-trigger')!;
-  const backdrop = document.getElementById('cf-backdrop')!;
-  const doneBtn = document.getElementById('cf-done')!;
-  const clearBtn = document.getElementById('cf-clear')!;
-  const moreBtn = document.getElementById('cf-more')!;
-  const expanded = document.getElementById('cf-expanded')!;
-  const openOnly = document.getElementById('cf-open-only') as HTMLInputElement;
-  const pickOnly = document.getElementById('cf-pick-only') as HTMLInputElement;
-  const triggerCount = document.getElementById('cf-trigger-count')!;
-  const moreCount = document.getElementById('cf-more-count')!;
+  const panel = document.getElementById("course-filters")!;
+  const trigger = document.getElementById("cf-trigger")!;
+  const backdrop = document.getElementById("cf-backdrop")!;
+  const doneBtn = document.getElementById("cf-done")!;
+  const clearBtn = document.getElementById("cf-clear")!;
+  const moreBtn = document.getElementById("cf-more")!;
+  const expanded = document.getElementById("cf-expanded")!;
+  const openOnly = document.getElementById("cf-open-only") as HTMLInputElement;
+  const pickOnly = document.getElementById("cf-pick-only") as HTMLInputElement;
+  const triggerCount = document.getElementById("cf-trigger-count")!;
+  const moreCount = document.getElementById("cf-more-count")!;
 
   // Mobile sheet
-  function openSheet() { panel.classList.add('sheet-open'); backdrop.classList.add('open'); }
-  function closeSheet() { panel.classList.remove('sheet-open'); backdrop.classList.remove('open'); }
-  trigger.addEventListener('click', openSheet);
-  backdrop.addEventListener('click', closeSheet);
-  doneBtn.addEventListener('click', closeSheet);
+  function openSheet() {
+    panel.classList.add("sheet-open");
+    backdrop.classList.add("open");
+  }
+  function closeSheet() {
+    panel.classList.remove("sheet-open");
+    backdrop.classList.remove("open");
+  }
+  trigger.addEventListener("click", openSheet);
+  backdrop.addEventListener("click", closeSheet);
+  doneBtn.addEventListener("click", closeSheet);
 
   // More filters expander
-  moreBtn.addEventListener('click', () => {
-    const opening = !moreBtn.classList.contains('open');
-    moreBtn.classList.toggle('open');
-    expanded.classList.toggle('open');
-    moreBtn.setAttribute('aria-expanded', String(opening));
+  moreBtn.addEventListener("click", () => {
+    const opening = !moreBtn.classList.contains("open");
+    moreBtn.classList.toggle("open");
+    expanded.classList.toggle("open");
+    moreBtn.setAttribute("aria-expanded", String(opening));
   });
 
   // ── Dropdown management ──
-  const dropdowns = panel.querySelectorAll<HTMLElement>('.cf__dropdown');
+  const dropdowns = panel.querySelectorAll<HTMLElement>(".cf__dropdown");
   let openDropdown: HTMLElement | null = null;
 
   function closeAllDropdowns() {
-    dropdowns.forEach(dd => {
-      dd.classList.remove('open');
-      dd.querySelector('.cf__dropdown-header')?.setAttribute('aria-expanded', 'false');
+    dropdowns.forEach((dd) => {
+      dd.classList.remove("open");
+      dd.querySelector(".cf__dropdown-header")?.setAttribute("aria-expanded", "false");
     });
     openDropdown = null;
   }
 
   function toggleDropdown(dd: HTMLElement) {
-    const isOpen = dd.classList.contains('open');
+    const isOpen = dd.classList.contains("open");
     closeAllDropdowns();
     if (!isOpen) {
-      dd.classList.add('open');
-      dd.querySelector('.cf__dropdown-header')?.setAttribute('aria-expanded', 'true');
+      dd.classList.add("open");
+      dd.querySelector(".cf__dropdown-header")?.setAttribute("aria-expanded", "true");
       openDropdown = dd;
     }
   }
 
-  dropdowns.forEach(dd => {
-    const header = dd.querySelector('.cf__dropdown-header')!;
-    header.addEventListener('click', () => toggleDropdown(dd));
+  dropdowns.forEach((dd) => {
+    const header = dd.querySelector(".cf__dropdown-header")!;
+    header.addEventListener("click", () => toggleDropdown(dd));
   });
 
   // Close on outside click
-  document.addEventListener('click', (e) => {
+  document.addEventListener("click", (e) => {
     if (!openDropdown) return;
     if (!openDropdown.contains(e.target as Node)) {
       closeAllDropdowns();
@@ -610,36 +747,38 @@
   });
 
   // Close on Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && openDropdown) {
-      const header = openDropdown.querySelector('.cf__dropdown-header') as HTMLElement;
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && openDropdown) {
+      const header = openDropdown.querySelector(".cf__dropdown-header") as HTMLElement;
       closeAllDropdowns();
       header?.focus();
     }
   });
 
   // ── Option changes → apply filters + update summaries ──
-  panel.addEventListener('change', (e) => {
+  panel.addEventListener("change", (e) => {
     const input = e.target as HTMLInputElement;
-    if (!input.classList.contains('cf__option-input')) return;
+    if (!input.classList.contains("cf__option-input")) return;
 
     // For radio groups, native radio behavior handles mutual exclusion
     applyFilters();
   });
 
-  openOnly.addEventListener('change', applyFilters);
-  pickOnly.addEventListener('change', applyFilters);
+  openOnly.addEventListener("change", applyFilters);
+  pickOnly.addEventListener("change", applyFilters);
 
   // Clear all
-  clearBtn.addEventListener('click', () => {
+  clearBtn.addEventListener("click", () => {
     // Reset radios to "all"
     const allRadio = panel.querySelector('input[type="radio"][value="all"]') as HTMLInputElement;
     if (allRadio) allRadio.checked = true;
 
     // Uncheck all checkboxes in filter groups
-    panel.querySelectorAll<HTMLInputElement>('.cf__options .cf__option-input[type="checkbox"]').forEach(cb => {
-      cb.checked = false;
-    });
+    panel
+      .querySelectorAll<HTMLInputElement>('.cf__options .cf__option-input[type="checkbox"]')
+      .forEach((cb) => {
+        cb.checked = false;
+      });
 
     openOnly.checked = false;
     pickOnly.checked = false;
@@ -649,55 +788,56 @@
   function getActiveValues(group: string): string[] {
     const container = panel.querySelector(`[data-group="${group}"]`);
     if (!container) return [];
-    const checked = Array.from(container.querySelectorAll<HTMLInputElement>('.cf__option-input:checked'));
-    return checked.map(i => i.value).filter(v => v !== 'all');
+    const checked = Array.from(
+      container.querySelectorAll<HTMLInputElement>(".cf__option-input:checked")
+    );
+    return checked.map((i) => i.value).filter((v) => v !== "all");
   }
 
   function applyFilters() {
-    const subjects = getActiveValues('subject');
-    const times = getActiveValues('time');
-    const levels = getActiveValues('level');
-    const credits = getActiveValues('credits');
-    const days = getActiveValues('days');
+    const subjects = getActiveValues("subject");
+    const times = getActiveValues("time");
+    const levels = getActiveValues("level");
+    const credits = getActiveValues("credits");
+    const days = getActiveValues("days");
     const onlyOpen = openOnly.checked;
     const onlyPick = pickOnly.checked;
 
-    const cards = document.querySelectorAll<HTMLElement>('[data-course]');
+    const cards = document.querySelectorAll<HTMLElement>("[data-course]");
     let visible = 0;
 
-    cards.forEach(card => {
+    cards.forEach((card) => {
       let show = true;
 
-      if (subjects.length && !subjects.includes(card.dataset.subject ?? '')) show = false;
-      if (times.length && !times.includes(card.dataset.time ?? '')) show = false;
-      if (levels.length && !levels.includes(card.dataset.level ?? '')) show = false;
-      if (credits.length && !credits.includes(card.dataset.credits ?? '')) show = false;
+      if (subjects.length && !subjects.includes(card.dataset.subject ?? "")) show = false;
+      if (times.length && !times.includes(card.dataset.time ?? "")) show = false;
+      if (levels.length && !levels.includes(card.dataset.level ?? "")) show = false;
+      if (credits.length && !credits.includes(card.dataset.credits ?? "")) show = false;
       if (days.length) {
-        const cardDays = (card.dataset.days ?? '').split(',');
-        if (!days.some(d => cardDays.includes(d))) show = false;
+        const cardDays = (card.dataset.days ?? "").split(",");
+        if (!days.some((d) => cardDays.includes(d))) show = false;
       }
-      if (onlyOpen && Number(card.dataset.seats ?? '0') <= 0) show = false;
-      if (onlyPick && card.dataset.pick !== 'true') show = false;
+      if (onlyOpen && Number(card.dataset.seats ?? "0") <= 0) show = false;
+      if (onlyPick && card.dataset.pick !== "true") show = false;
 
       if (show) {
         delete card.dataset.filteredOut;
       } else {
-        card.dataset.filteredOut = 'true';
+        card.dataset.filteredOut = "true";
       }
-      card.style.display = show ? '' : 'none';
+      card.style.display = show ? "" : "none";
       if (show) visible++;
     });
 
-    const metaCount = document.querySelector('.meta-count');
-    if (metaCount) metaCount.textContent = `${visible} course${visible !== 1 ? 's' : ''}`;
+    const metaCount = document.querySelector(".meta-count");
+    if (metaCount) metaCount.textContent = `${visible} course${visible !== 1 ? "s" : ""}`;
 
     const mainCount = subjects.length + times.length + (onlyOpen ? 1 : 0);
     const extraCount = levels.length + credits.length + days.length + (onlyPick ? 1 : 0);
     const total = mainCount + extraCount;
 
-    clearBtn.classList.toggle('visible', total > 0);
-    triggerCount.textContent = total > 0 ? `(${total})` : '';
-    moreCount.textContent = extraCount > 0 ? `(${extraCount})` : '';
+    clearBtn.classList.toggle("visible", total > 0);
+    triggerCount.textContent = total > 0 ? `(${total})` : "";
+    moreCount.textContent = extraCount > 0 ? `(${extraCount})` : "";
   }
-
 </script>

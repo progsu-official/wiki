@@ -1,0 +1,85 @@
+---
+import SidebarItem from "./SidebarItem.astro";
+import { getGuideNav } from "../lib/guideNav";
+
+const { groups } = await getGuideNav();
+const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
+---
+
+<nav class="sb" aria-label="Guides">
+  <a href="/guides" class:list={["sb__home", { "is-active": pathname === "/guides" }]}>
+    all guides
+  </a>
+
+  {
+    groups.map((group) => (
+      <div class="sb__group">
+        <a
+          href={group.link}
+          class:list={["sb__group-title", { "is-active": pathname === group.link }]}
+        >
+          {group.text}
+        </a>
+        <ul class="sb__list">
+          {group.items.map((item) => (
+            <SidebarItem item={item} pathname={pathname} />
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</nav>
+
+<style>
+  .sb {
+    padding: var(--space-8) 0 var(--space-24);
+  }
+
+  .sb__home {
+    display: block;
+    padding: 6px 0;
+    margin-bottom: var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--c-text-2);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+  }
+
+  .sb__home:hover {
+    color: var(--c-text-1);
+  }
+
+  .sb__home.is-active {
+    color: var(--c-brand-1);
+    font-weight: 600;
+  }
+
+  .sb__group + .sb__group {
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--c-divider);
+  }
+
+  .sb__group-title {
+    display: block;
+    padding: 4px 0;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: var(--tracking-tight);
+    color: var(--c-text-1);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+  }
+
+  .sb__group-title:hover,
+  .sb__group-title.is-active {
+    color: var(--c-brand-1);
+  }
+
+  .sb__list {
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,82 +1,74 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
+import DocsLayout from "../../layouts/DocsLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import CategoryCard from "../../components/CategoryCard.astro";
 
-const allGuides = await getCollection("guides");
-const countFor = (category: string) => allGuides.filter((g) => g.data.category === category).length;
+// roadmap-by-year is frontmatter-only — it exists so wikilinks resolve, and it
+// renders as a card index rather than a guide, so it isn't counted.
+const guides = (await getCollection("guides")).filter(
+  (g) => g.slug !== "zero-to-hero/roadmap-by-year"
+);
+const countFor = (category: string) => guides.filter((g) => g.data.category === category).length;
+
+const intro =
+  "written by people who've been through it. if you're not sure where to begin, start with zero to hero.";
 ---
 
-<Layout title="Guides">
-  <PageHeader
-    eyebrow="guides"
-    headline="everything you need<br>to break in."
-    subline="Signed, dated, and written by people who've been through it."
-  />
+<DocsLayout title="guides" description={intro}>
+  <PageHeader title="guides" intro={intro} />
 
-  <section class="guide-journey">
-    <!-- Featured entry point -->
-    <div class="journey__featured">
-      <CategoryCard
-        title="zero to hero"
-        href="/guides/zero-to-hero"
-        description="start here. CS fundamentals, math intuition, and the first principles that make everything else click."
-        count={countFor("zero-to-hero")}
-        variant="featured"
-        eyebrow="start here"
-      />
-    </div>
-
-    <!-- Middle tier: two columns on desktop -->
-    <div class="journey__mid">
-      <CategoryCard
-        title="technical"
-        href="/guides/technical"
-        description="Leetcode, system design, and take-homes: how to actually prep for coding interviews."
-        count={countFor("technical")}
-      />
-      <CategoryCard
-        title="career"
-        href="/guides/career"
-        description="resumes, timelines, offer negotiation, and how to navigate the hiring process."
-        count={countFor("career")}
-      />
-    </div>
-
-    <div class="journey__mid">
-      <CategoryCard
-        title="networking"
-        href="/guides/networking"
-        description="cold outreach, LinkedIn, warm intros, and building real relationships that lead somewhere."
-        count={countFor("networking")}
-      />
-      <CategoryCard
-        title="misc"
-        href="/guides/misc"
-        description="tools, productivity, and everything else worth knowing."
-        count={countFor("misc")}
-      />
-    </div>
-  </section>
-</Layout>
+  <div class="cats">
+    <CategoryCard
+      title="zero to hero"
+      href="/guides/zero-to-hero"
+      description="the path from no idea what you're doing to an offer in hand, one step at a time."
+      count={countFor("zero-to-hero")}
+      icon="compass"
+      variant="featured"
+      eyebrow="start here"
+    />
+    <CategoryCard
+      title="technical"
+      href="/guides/technical"
+      description="leetcode, system design, and take-homes — how to actually prep for coding interviews."
+      count={countFor("technical")}
+      icon="code"
+    />
+    <CategoryCard
+      title="career"
+      href="/guides/career"
+      description="resumes, timelines, and offers — how to navigate the hiring process."
+      count={countFor("career")}
+      icon="briefcase"
+    />
+    <CategoryCard
+      title="networking"
+      href="/guides/networking"
+      description="cold outreach, linkedin, and warm intros that lead somewhere."
+      count={countFor("networking")}
+      icon="users"
+    />
+    <CategoryCard
+      title="misc"
+      href="/guides/misc"
+      description="tools, productivity, and everything else worth knowing."
+      count={countFor("misc")}
+      icon="layers"
+    />
+  </div>
+</DocsLayout>
 
 <style>
-  .guide-journey {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-  }
-
-  .journey__mid {
+  .cats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-4);
   }
 
   @media (max-width: 640px) {
-    .journey__mid {
-      grid-template-columns: 1fr;
+    .cats {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

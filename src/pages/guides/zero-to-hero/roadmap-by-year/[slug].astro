@@ -1,41 +1,88 @@
 ---
 import { getCollection } from "astro:content";
-import ContentLayout from "../../../../layouts/ContentLayout.astro";
+import DocsLayout from "../../../../layouts/DocsLayout.astro";
 import PageHeader from "../../../../components/PageHeader.astro";
-import { GUIDE_CATEGORIES } from "../../../../consts";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("guides", (entry) => entry.slug.startsWith("zero-to-hero/roadmap-by-year/"));
-  return entries.map((entry) => {
-    const slug = entry.slug.split("/")[2];
-    return {
-      params: { slug },
-      props: { entry },
-    };
-  });
+  const entries = await getCollection("guides", (entry) =>
+    entry.slug.startsWith("zero-to-hero/roadmap-by-year/")
+  );
+  return entries.map((entry) => ({
+    params: { slug: entry.slug.split("/")[2] },
+    props: { entry },
+  }));
 }
 
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
-const categoryMeta = GUIDE_CATEGORIES[entry.data.category];
 
-const breadcrumbs = [
-  { label: "Home", href: "/" },
-  { label: "Guides", href: "/guides" },
-  { label: categoryMeta.label, href: `/guides/${entry.data.category}` },
-  { label: "Roadmap by year", href: `/guides/zero-to-hero/roadmap-by-year` },
-  { label: entry.data.title },
-];
+// Same head handling as guides/[category]/[slug]: the page owns the title, so
+// a lede heading that repeats it steps aside.
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+const lead = headings[0];
+const leadRepeatsTitle = lead?.depth === 1 && norm(lead.text) === norm(entry.data.title);
+const body = leadRepeatsTitle ? headings.slice(1) : headings;
+const shift = body.some((h) => h.depth === 1);
+const toc = shift ? body.map((h) => ({ ...h, depth: h.depth + 1 })) : body;
+
+const updated = entry.data.updated.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  // Frontmatter dates are UTC midnight; formatting them locally renders
+  // the previous day anywhere west of UTC.
+  timeZone: "UTC",
+});
+const meta = `${entry.data.readTime} · by ${entry.data.author.name} · updated ${updated}`;
 ---
 
-<ContentLayout title={entry.data.title} breadcrumbs={breadcrumbs} headings={headings} accent={categoryMeta.accent}>
-  <PageHeader
-    eyebrow={categoryMeta.label.toLowerCase()}
-    headline={entry.data.title}
-    subline={`${entry.data.readTime} · by ${entry.data.author.name} · updated ${entry.data.updated.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
-  />
+<DocsLayout
+  title={entry.data.title}
+  headings={toc}
+  editSlug={entry.slug}
+  updated={entry.data.updated}
+>
+  <PageHeader title={entry.data.title} meta={meta} tags={entry.data.tags} />
 
-  <div class="prose">
+  <div
+    class:list={[
+      "prose",
+      "guide-body",
+      { "guide-body--drop-lead": leadRepeatsTitle, "guide-body--sections": shift },
+    ]}
+  >
     <Content />
   </div>
-</ContentLayout>
+</DocsLayout>
+
+<style>
+  .guide-body.prose.guide-body--drop-lead > :global(h1:first-child) {
+    display: none;
+  }
+
+  /* With it hidden, whatever follows becomes the first thing on the page and
+     should sit flush under the head rule rather than under a second one. */
+  .guide-body.prose.guide-body--drop-lead > :global(h1:first-child + *) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .guide-body.prose.guide-body--sections > :global(h1) {
+    font-size: 24px;
+    line-height: 32px;
+    margin: 48px 0 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--c-divider);
+  }
+
+  .guide-body.prose.guide-body--sections > :global(h1:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+</style>

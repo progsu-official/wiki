@@ -6,33 +6,100 @@ import CourseSearchBar from "../../components/CourseSearchBar.astro";
 import CoursesSubnav from "../../components/CoursesSubnav.astro";
 
 const courses = [
-  { code: "CSC 1010", title: "Computers and Applications", credits: 3, semesters: ["fall","spring","summer"] },
-  { code: "CSC 1301", title: "Principles of Computer Science I", credits: 4, semesters: ["fall","spring","summer"] },
-  { code: "CSC 1302", title: "Principles of Computer Science II", credits: 4, semesters: ["fall","spring"] },
-  { code: "CSC 2720", title: "Data Structures", credits: 4, semesters: ["fall","spring"] },
-  { code: "CSC 3210", title: "Computer Organization and Programming", credits: 4, semesters: ["fall","spring"] },
-  { code: "CSC 3320", title: "System-Level Programming", credits: 4, semesters: ["fall","spring"] },
-  { code: "CSC 4310", title: "Operating Systems", credits: 3, semesters: ["fall","spring"] },
+  {
+    code: "CSC 1010",
+    title: "Computers and Applications",
+    credits: 3,
+    semesters: ["fall", "spring", "summer"],
+  },
+  {
+    code: "CSC 1301",
+    title: "Principles of Computer Science I",
+    credits: 4,
+    semesters: ["fall", "spring", "summer"],
+  },
+  {
+    code: "CSC 1302",
+    title: "Principles of Computer Science II",
+    credits: 4,
+    semesters: ["fall", "spring"],
+  },
+  { code: "CSC 2720", title: "Data Structures", credits: 4, semesters: ["fall", "spring"] },
+  {
+    code: "CSC 3210",
+    title: "Computer Organization and Programming",
+    credits: 4,
+    semesters: ["fall", "spring"],
+  },
+  {
+    code: "CSC 3320",
+    title: "System-Level Programming",
+    credits: 4,
+    semesters: ["fall", "spring"],
+  },
+  { code: "CSC 4310", title: "Operating Systems", credits: 3, semesters: ["fall", "spring"] },
   { code: "CSC 4320", title: "Computer Networks", credits: 3, semesters: ["fall"] },
-  { code: "CSC 4330", title: "Programming Language Concepts", credits: 3, semesters: ["fall","spring"] },
-  { code: "CSC 4350", title: "Software Engineering", credits: 3, semesters: ["fall","spring"] },
+  {
+    code: "CSC 4330",
+    title: "Programming Language Concepts",
+    credits: 3,
+    semesters: ["fall", "spring"],
+  },
+  { code: "CSC 4350", title: "Software Engineering", credits: 3, semesters: ["fall", "spring"] },
   { code: "CSC 4360", title: "Mobile Application Development", credits: 3, semesters: ["fall"] },
-  { code: "CSC 4720", title: "Human-Computer Interaction", credits: 3, semesters: ["fall","spring"] },
-  { code: "MATH 1111", title: "College Algebra", credits: 3, semesters: ["fall","spring","summer"] },
-  { code: "MATH 1113", title: "Precalculus", credits: 3, semesters: ["fall","spring","summer"] },
-  { code: "MATH 1220", title: "Survey of Calculus", credits: 3, semesters: ["fall","spring","summer"] },
-  { code: "MATH 1401", title: "Elementary Statistics", credits: 3, semesters: ["fall","spring","summer"] },
-  { code: "MATH 2211", title: "Calculus of One Variable I", credits: 4, semesters: ["fall","spring","summer"] },
-  { code: "MATH 2212", title: "Calculus of One Variable II", credits: 4, semesters: ["fall","spring"] },
-  { code: "MATH 2215", title: "Multivariate Calculus", credits: 4, semesters: ["fall","spring"] },
-  { code: "MATH 2420", title: "Discrete Mathematics", credits: 3, semesters: ["fall","spring"] },
-  { code: "MATH 2641", title: "Linear Algebra I", credits: 3, semesters: ["fall","spring"] },
-  { code: "MATH 2652", title: "Differential Equations", credits: 3, semesters: ["fall","spring"] },
-  { code: "MATH 3030", title: "Mathematical Models for Computer Science", credits: 3, semesters: ["fall"] },
-  { code: "MATH 3350", title: "Scientific Computing", credits: 3, semesters: ["fall","spring"] },
+  {
+    code: "CSC 4720",
+    title: "Human-Computer Interaction",
+    credits: 3,
+    semesters: ["fall", "spring"],
+  },
+  {
+    code: "MATH 1111",
+    title: "College Algebra",
+    credits: 3,
+    semesters: ["fall", "spring", "summer"],
+  },
+  { code: "MATH 1113", title: "Precalculus", credits: 3, semesters: ["fall", "spring", "summer"] },
+  {
+    code: "MATH 1220",
+    title: "Survey of Calculus",
+    credits: 3,
+    semesters: ["fall", "spring", "summer"],
+  },
+  {
+    code: "MATH 1401",
+    title: "Elementary Statistics",
+    credits: 3,
+    semesters: ["fall", "spring", "summer"],
+  },
+  {
+    code: "MATH 2211",
+    title: "Calculus of One Variable I",
+    credits: 4,
+    semesters: ["fall", "spring", "summer"],
+  },
+  {
+    code: "MATH 2212",
+    title: "Calculus of One Variable II",
+    credits: 4,
+    semesters: ["fall", "spring"],
+  },
+  { code: "MATH 2215", title: "Multivariate Calculus", credits: 4, semesters: ["fall", "spring"] },
+  { code: "MATH 2420", title: "Discrete Mathematics", credits: 3, semesters: ["fall", "spring"] },
+  { code: "MATH 2641", title: "Linear Algebra I", credits: 3, semesters: ["fall", "spring"] },
+  { code: "MATH 2652", title: "Differential Equations", credits: 3, semesters: ["fall", "spring"] },
+  {
+    code: "MATH 3030",
+    title: "Mathematical Models for Computer Science",
+    credits: 3,
+    semesters: ["fall"],
+  },
+  { code: "MATH 3350", title: "Scientific Computing", credits: 3, semesters: ["fall", "spring"] },
 ];
 
-function deriveSubject(code: string) { return code.split(' ')[0]; }
+function deriveSubject(code: string) {
+  return code.split(" ")[0];
+}
 
 const SUBJECT_NAMES: Record<string, string> = {
   CSC: "computer science",
@@ -45,63 +112,83 @@ for (const c of courses) {
   if (!subjectMap.has(subj)) subjectMap.set(subj, []);
   subjectMap.get(subj)!.push(c);
 }
-const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 'CSC').sort()];
+const subjectOrder = [
+  "CSC",
+  ...Array.from(subjectMap.keys())
+    .filter((k) => k !== "CSC")
+    .sort(),
+];
 ---
 
-<Layout title="Courses">
+<Layout
+  title="courses"
+  description="Browse GSU computer science and math courses with notes from progsu members who took them."
+>
   <CoursesSubnav active="browse" />
 
   <PageHeader
-    eyebrow="Courses"
-    headline="find your next<br>semester."
-    subline="GSU courses with notes from members who've taken them."
+    title="find your next semester."
+    intro="gsu courses, with notes from members who have taken them."
   />
 
-  <div class="browse-center">
+  <div class="browse">
     <CourseSearchBar />
 
     <div class="semester-bar" role="group" aria-label="Semester filter">
-      <button class="semester-chip active" data-semester="fall" aria-pressed="true">fall</button>
-      <button class="semester-chip active" data-semester="spring" aria-pressed="true">spring</button>
-      <button class="semester-chip active" data-semester="summer" aria-pressed="true">summer</button>
+      <button class="semester-chip active" type="button" data-semester="fall" aria-pressed="true"
+        >fall</button
+      >
+      <button class="semester-chip active" type="button" data-semester="spring" aria-pressed="true"
+        >spring</button
+      >
+      <button class="semester-chip active" type="button" data-semester="summer" aria-pressed="true"
+        >summer</button
+      >
     </div>
 
     <div id="subject-list">
-      {subjectOrder.map(subj => {
-        const group = subjectMap.get(subj) ?? [];
-        return (
-          <div class="subject-section" data-subject-section={subj}>
-            <div class="subject-label">
-              <span class="subject-label__name">{SUBJECT_NAMES[subj] ?? subj.toLowerCase()}</span>
-              <span class="subject-label__code">{subj}</span>
+      {
+        subjectOrder.map((subj) => {
+          const group = subjectMap.get(subj) ?? [];
+          return (
+            <div class="subject-section" data-subject-section={subj}>
+              <div class="subject-label">
+                <span class="subject-label__name">{SUBJECT_NAMES[subj] ?? subj.toLowerCase()}</span>
+                <span class="subject-label__code">{subj}</span>
+              </div>
+              <div class="code-grid">
+                {group.map((c) => (
+                  <div
+                    data-course-wrap
+                    data-semesters={c.semesters.join(",")}
+                    data-code={c.code}
+                    data-title={c.title}
+                  >
+                    <CourseCard
+                      code={c.code}
+                      title={c.title}
+                      credits={c.credits}
+                      variant="code-only"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div class="code-grid">
-              {group.map(c => (
-                <div
-                  data-course-wrap
-                  data-semesters={c.semesters.join(',')}
-                  data-code={c.code}
-                  data-title={c.title}
-                >
-                  <CourseCard code={c.code} title={c.title} credits={c.credits} variant="code-only" />
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })
+      }
     </div>
 
-    <div class="filter-empty surface-glass" id="filter-empty" style="display:none">
-      <p class="filter-empty__text" id="filter-empty-text">no courses offered in the selected semesters.</p>
+    <div class="filter-empty" id="filter-empty" style="display:none">
+      <p class="filter-empty__text" id="filter-empty-text">
+        no courses offered in the selected semesters.
+      </p>
     </div>
   </div>
 </Layout>
 
 <style>
-  .browse-center {
-    max-width: 680px;
-    margin: 0 auto;
+  .browse {
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
@@ -110,34 +197,37 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
   /* ── Semester chips ── */
   .semester-bar {
     display: flex;
-    justify-content: center;
     gap: var(--space-2);
+    flex-wrap: wrap;
   }
 
   .semester-chip {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    padding: var(--space-2) var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--c-text-2);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-full);
     cursor: pointer;
-    letter-spacing: var(--tracking-wider);
-    min-height: 44px;
-    display: flex;
-    align-items: center;
     transition:
       color var(--duration-fast) var(--ease),
+      background-color var(--duration-fast) var(--ease),
       border-color var(--duration-fast) var(--ease);
   }
   .semester-chip:hover {
-    color: var(--color-text-secondary);
-    border-color: var(--glass-border-hi);
+    color: var(--c-text-1);
+    border-color: var(--c-border);
   }
   .semester-chip.active {
-    color: var(--accent-text);
-    border-color: var(--accent-border);
+    color: var(--c-brand-1);
+    font-weight: 600;
+    background: var(--c-brand-soft);
+    border-color: var(--c-brand-2);
   }
 
   /* ── Subject sections ── */
@@ -145,72 +235,68 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-10);
   }
-  .subject-section:last-child { margin-bottom: 0; }
+  .subject-section:last-child {
+    margin-bottom: 0;
+  }
 
   .subject-label {
     display: flex;
     align-items: baseline;
     gap: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--c-divider);
   }
 
   .subject-label__name {
-    font-family: var(--font-heading);
-    font-style: italic;
     font-size: var(--text-lg);
-    color: var(--color-text-primary);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--c-text-1);
   }
 
   .subject-label__code {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
+    color: var(--c-text-3);
   }
 
   .code-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: var(--space-2);
   }
 
   /* ── Empty state ── */
   .filter-empty {
     text-align: center;
-    padding: var(--space-8);
+    padding: var(--space-10) var(--space-6);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
   }
   .filter-empty__text {
-    font-family: var(--font-heading);
-    font-style: italic;
     font-size: var(--text-base);
-    color: var(--color-text-tertiary);
+    color: var(--c-text-2);
     margin: 0;
   }
 
   @media (max-width: 640px) {
-    .browse-center {
-      padding: 0 var(--space-4);
-    }
-    .subject-label {
+    .semester-chip {
+      flex: 1;
       justify-content: center;
-    }
-    .subject-section {
-      align-items: center;
-    }
-    .code-grid {
-      width: 100%;
+      min-height: 44px;
     }
   }
 </style>
 
 <script>
-  const list = document.getElementById('subject-list')!;
-  const chips = document.querySelectorAll<HTMLButtonElement>('.semester-chip');
-  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-subject-section]'));
-  const filterEmpty = document.getElementById('filter-empty')!;
-  const filterEmptyText = document.getElementById('filter-empty-text')!;
+  const list = document.getElementById("subject-list")!;
+  const chips = document.querySelectorAll<HTMLButtonElement>(".semester-chip");
+  const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-subject-section]"));
+  const filterEmpty = document.getElementById("filter-empty")!;
+  const filterEmptyText = document.getElementById("filter-empty-text")!;
 
   // ── Searchable index ────────────────────────────────────────────
   interface Item {
@@ -218,7 +304,7 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
     section: HTMLElement;
     grid: HTMLElement;
     code: string;
-    codeNorm: string;          // lowercased, alphanumeric only
+    codeNorm: string; // lowercased, alphanumeric only
     titleLower: string;
     titleWords: string[];
     semesters: string[];
@@ -226,23 +312,25 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
   }
 
   function normalize(s: string): string {
-    return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return s.toLowerCase().replace(/[^a-z0-9]/g, "");
   }
 
-  const items: Item[] = Array.from(document.querySelectorAll<HTMLElement>('[data-course-wrap]')).map((el, i) => {
-    const section = el.closest('[data-subject-section]') as HTMLElement;
-    const code = el.dataset.code ?? '';
-    const title = el.dataset.title ?? '';
+  const items: Item[] = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-course-wrap]")
+  ).map((el, i) => {
+    const section = el.closest("[data-subject-section]") as HTMLElement;
+    const code = el.dataset.code ?? "";
+    const title = el.dataset.title ?? "";
     const titleLower = title.toLowerCase();
     return {
       el,
       section,
-      grid: section.querySelector('.code-grid') as HTMLElement,
+      grid: section.querySelector(".code-grid") as HTMLElement,
       code,
       codeNorm: normalize(code),
       titleLower,
       titleWords: titleLower.split(/\s+/).filter(Boolean),
-      semesters: (el.dataset.semesters ?? '').split(','),
+      semesters: (el.dataset.semesters ?? "").split(","),
       originalIndex: i,
     };
   });
@@ -277,7 +365,7 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
     if (!isDigits && c.titleLower === t) return 950;
     if (!isDigits && c.titleWords.includes(t)) return 800;
     if (c.codeNorm.startsWith(tNorm)) return 700;
-    if (!isDigits && t.length >= 2 && c.titleWords.some(w => w.startsWith(t))) return 600;
+    if (!isDigits && t.length >= 2 && c.titleWords.some((w) => w.startsWith(t))) return 600;
     if (!isDigits && t.length >= 3 && c.titleLower.includes(t)) return 400;
     if (c.codeNorm.includes(tNorm)) return 350;
 
@@ -318,11 +406,13 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
   }
 
   // ── State + apply ───────────────────────────────────────────────
-  let currentQuery = '';
+  let currentQuery = "";
 
   function getActiveSemesters(): Set<string> {
     const active = new Set<string>();
-    chips.forEach(c => { if (c.classList.contains('active')) active.add(c.dataset.semester!); });
+    chips.forEach((c) => {
+      if (c.classList.contains("active")) active.add(c.dataset.semester!);
+    });
     return active;
   }
 
@@ -332,8 +422,8 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
     const q = currentQuery.trim();
     const hasQuery = q.length > 0;
 
-    const scored = items.map(it => {
-      const passesSem = semesterShowAll || it.semesters.some(s => active.has(s));
+    const scored = items.map((it) => {
+      const passesSem = semesterShowAll || it.semesters.some((s) => active.has(s));
       const score = hasQuery ? scoreCourse(q, it) : 1;
       return { it, passesSem, score };
     });
@@ -341,7 +431,7 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
     let totalVisible = 0;
     for (const s of scored) {
       const visible = s.passesSem && s.score > 0;
-      s.it.el.style.display = visible ? '' : 'none';
+      s.it.el.style.display = visible ? "" : "none";
       if (visible) totalVisible++;
     }
 
@@ -356,13 +446,15 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
       }
       bySection.forEach((arr, sec) => {
         arr.sort((a, b) => b.score - a.score || a.it.originalIndex - b.it.originalIndex);
-        const grid = sec.querySelector('.code-grid')!;
+        const grid = sec.querySelector(".code-grid")!;
         for (const s of arr) grid.appendChild(s.it.el);
       });
 
       // Sort sections by their best match
       const orderedSections = Array.from(bySection.entries())
-        .sort((a, b) => Math.max(...b[1].map(s => s.score)) - Math.max(...a[1].map(s => s.score)))
+        .sort(
+          (a, b) => Math.max(...b[1].map((s) => s.score)) - Math.max(...a[1].map((s) => s.score))
+        )
         .map(([sec]) => sec);
       for (const sec of orderedSections) list.appendChild(sec);
     } else {
@@ -373,48 +465,50 @@ const subjectOrder = ['CSC', ...Array.from(subjectMap.keys()).filter(k => k !== 
     }
 
     // Section visibility (any visible tile within)
-    sections.forEach(sec => {
-      const tiles = sec.querySelectorAll<HTMLElement>('[data-course-wrap]');
+    sections.forEach((sec) => {
+      const tiles = sec.querySelectorAll<HTMLElement>("[data-course-wrap]");
       let anyVisible = false;
-      tiles.forEach(t => { if (t.style.display !== 'none') anyVisible = true; });
-      sec.style.display = anyVisible ? '' : 'none';
+      tiles.forEach((t) => {
+        if (t.style.display !== "none") anyVisible = true;
+      });
+      sec.style.display = anyVisible ? "" : "none";
     });
 
     if (totalVisible === 0) {
-      filterEmpty.style.display = '';
+      filterEmpty.style.display = "";
       filterEmptyText.textContent = hasQuery
-        ? 'nothing matches that search yet.'
-        : 'no courses offered in the selected semesters.';
+        ? "nothing matches that search yet."
+        : "no courses offered in the selected semesters.";
     } else {
-      filterEmpty.style.display = 'none';
+      filterEmpty.style.display = "none";
     }
   }
 
-  chips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      chip.classList.toggle('active');
-      chip.setAttribute('aria-pressed', String(chip.classList.contains('active')));
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      chip.classList.toggle("active");
+      chip.setAttribute("aria-pressed", String(chip.classList.contains("active")));
       applyFilters();
     });
   });
 
-  window.addEventListener('course-search', (e: Event) => {
-    currentQuery = (e as CustomEvent<{ query: string }>).detail.query ?? '';
+  window.addEventListener("course-search", (e: Event) => {
+    currentQuery = (e as CustomEvent<{ query: string }>).detail.query ?? "";
     applyFilters();
   });
 
   // Tile clicks navigate to detail page
-  document.getElementById('subject-list')!.addEventListener('click', (e) => {
-    const tile = (e.target as HTMLElement).closest('[data-course-tile]') as HTMLElement | null;
+  document.getElementById("subject-list")!.addEventListener("click", (e) => {
+    const tile = (e.target as HTMLElement).closest("[data-course-tile]") as HTMLElement | null;
     if (!tile) return;
     const code = tile.dataset.courseTile!;
-    window.location.href = `/courses/${code.toLowerCase().replace(' ', '-')}`;
+    window.location.href = `/courses/${code.toLowerCase().replace(" ", "-")}`;
   });
-  document.getElementById('subject-list')!.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const tile = (e.target as HTMLElement).closest('[data-course-tile]') as HTMLElement | null;
+  document.getElementById("subject-list")!.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const tile = (e.target as HTMLElement).closest("[data-course-tile]") as HTMLElement | null;
     if (!tile) return;
     e.preventDefault();
-    window.location.href = `/courses/${tile.dataset.courseTile!.toLowerCase().replace(' ', '-')}`;
+    window.location.href = `/courses/${tile.dataset.courseTile!.toLowerCase().replace(" ", "-")}`;
   });
 </script>

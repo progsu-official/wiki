@@ -1,61 +1,62 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "../../../layouts/Layout.astro";
-import Breadcrumb from "../../../components/Breadcrumb.astro";
+import DocsLayout from "../../../layouts/DocsLayout.astro";
 import PageHeader from "../../../components/PageHeader.astro";
-import Badge from "../../../components/Badge.astro";
 import GuideCard from "../../../components/GuideCard.astro";
+import { getGuideNav } from "../../../lib/guideNav";
 
+const intro =
+  "the path from no idea what you're doing to an offer in hand. read getting started first, then work down the list.";
+
+// Listed in the sidebar's reading order, with getting-started pinned to the top.
+const { flat } = await getGuideNav();
+const order = (slug: string) => {
+  if (slug.endsWith("/getting-started")) return -1;
+  const i = flat.findIndex((item) => item.link === `/guides/${slug}`);
+  return i === -1 ? flat.length : i;
+};
+
+// Top level only — the roadmap's per-year guides live on their own page.
 const guides = (
   await getCollection(
     "guides",
-    // top-level only, nested entries (roadmap-by-year/*) live on their own container page
-    (entry) => entry.data.category === "zero-to-hero" && entry.slug.split("/").length === 2,
+    (entry) => entry.data.category === "zero-to-hero" && entry.slug.split("/").length === 2
   )
-).sort((a, b) => {
-  const aSlug = a.slug.split("/")[1];
-  const bSlug = b.slug.split("/")[1];
-  if (aSlug === "getting-started") return -1;
-  if (bSlug === "getting-started") return 1;
-  return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
-});
+).sort((a, b) => order(a.slug) - order(b.slug));
 ---
 
-<Layout title="Zero to Hero">
-  <Breadcrumb items={[
-    { label: "Home", href: "/" },
-    { label: "Guides", href: "/guides" },
-    { label: "Zero to Hero" },
-  ]} />
+<DocsLayout title="zero to hero" description={intro}>
+  <PageHeader title="zero to hero" intro={intro} />
 
-  <PageHeader
-    eyebrow="zero to hero"
-    headline="the bedrock<br>of everything."
-    subline="CS theory, math, and first principles every student should have solid footing in before chasing offers."
-  />
-
-  {guides.length > 0 ? (
-    <div class="guide-list">
-      {guides.map((guide) => (
-        <GuideCard
-          title={guide.data.title}
-          href={`/guides/zero-to-hero/${guide.slug.split("/")[1]}`}
-          readTime={guide.data.readTime}
-          authorName={guide.data.author.name}
-          tags={guide.data.tags}
-          badge={guide.slug.split("/")[1] === "getting-started" ? "start here" : undefined}
-        />
-      ))}
-    </div>
-  ) : (
-    <Badge text="guides coming soon" />
-  )}
-</Layout>
+  {
+    guides.length > 0 ? (
+      <div class="guides">
+        {guides.map((guide) => (
+          <GuideCard
+            title={guide.data.title}
+            href={`/guides/${guide.slug}`}
+            readTime={guide.data.readTime}
+            authorName={guide.data.author.name}
+            tags={guide.data.tags}
+            badge={guide.slug.endsWith("/getting-started") ? "start here" : undefined}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="empty">nothing here yet. guides show up as members write them.</p>
+    )
+  }
+</DocsLayout>
 
 <style>
-  .guide-list {
+  .guides {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--c-text-3);
   }
 </style>

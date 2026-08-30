@@ -1,0 +1,175 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  toc.length > 0 && (
+    <details class="aside" open>
+      <summary class="aside__title">on this page</summary>
+      <ul class="aside__list">
+        {toc.map((h) => (
+          <li class:list={["aside__item", `aside__item--h${h.depth}`]}>
+            <a class="aside__link" href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
+<style>
+  /* Below the aside breakpoint this is a collapsible card above the article;
+     at >=1280px it becomes the sticky rail and stops being collapsible. */
+  .aside {
+    border: 1px solid var(--c-divider);
+    border-radius: var(--radius-md);
+    background: var(--c-bg-soft);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .aside__title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--c-text-1);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .aside__title::-webkit-details-marker {
+    display: none;
+  }
+
+  .aside__title::after {
+    content: "";
+    float: right;
+    width: 6px;
+    height: 6px;
+    margin-top: 4px;
+    border-right: 1.5px solid var(--c-text-3);
+    border-bottom: 1.5px solid var(--c-text-3);
+    transform: rotate(45deg);
+    transition: transform var(--duration-fast) var(--ease);
+  }
+
+  .aside[open] .aside__title::after {
+    transform: rotate(-135deg);
+  }
+
+  .aside__list {
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid var(--c-divider);
+  }
+
+  .aside__item--h3 .aside__link {
+    padding-left: var(--space-8);
+  }
+
+  .aside__link {
+    display: block;
+    padding: 4px var(--space-2) 4px var(--space-4);
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    font-size: var(--text-xs);
+    line-height: 20px;
+    color: var(--c-text-3);
+    text-decoration: none;
+    transition:
+      color var(--duration-fast) var(--ease),
+      border-color var(--duration-fast) var(--ease);
+  }
+
+  .aside__link:hover {
+    color: var(--c-text-1);
+  }
+
+  .aside__link.is-active {
+    color: var(--c-brand-1);
+    border-left-color: var(--c-brand-2);
+  }
+
+  @media (min-width: 1280px) {
+    .aside {
+      position: sticky;
+      top: calc(var(--nav-height) + var(--space-8));
+      max-height: calc(100vh - var(--nav-height) - var(--space-16));
+      overflow-y: auto;
+      border: none;
+      border-radius: 0;
+      background: none;
+      padding: 0;
+    }
+
+    .aside__title {
+      padding-left: var(--space-4);
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .aside__title::after {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const aside = document.querySelector<HTMLDetailsElement>(".aside");
+
+  if (aside) {
+    // Open as a rail on wide screens, collapsed as a card below that.
+    const wide = window.matchMedia("(min-width: 1280px)");
+    const sync = () => {
+      aside.open = wide.matches;
+    };
+    wide.addEventListener("change", sync);
+    sync();
+
+    // Marks the deepest heading whose top has passed under the navbar.
+    const links = Array.from(aside.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
+    const targets = links
+      .map((l) => document.getElementById(l.dataset.tocLink!))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (targets.length) {
+      let queued = false;
+
+      const update = () => {
+        queued = false;
+        const offset = 96;
+        const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 2;
+
+        let currentId = targets[0].id;
+        if (atBottom) {
+          currentId = targets[targets.length - 1].id;
+        } else {
+          for (const t of targets) {
+            if (t.getBoundingClientRect().top <= offset) currentId = t.id;
+            else break;
+          }
+        }
+
+        for (const l of links) l.classList.toggle("is-active", l.dataset.tocLink === currentId);
+      };
+
+      const schedule = () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(update);
+      };
+
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule, { passive: true });
+      update();
+    }
+  }
+</script>

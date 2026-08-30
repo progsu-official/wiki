@@ -1,0 +1,62 @@
+---
+import type { NavItem } from "../lib/guideNav";
+
+interface Props {
+  item: NavItem;
+  pathname: string;
+}
+
+const { item, pathname } = Astro.props;
+const active = pathname === item.link;
+---
+
+<li class="sb__item">
+  <a
+    href={item.link}
+    class:list={["sb__link", { "is-active": active }]}
+    aria-current={active ? "page" : undefined}
+  >
+    {item.text}
+  </a>
+  {
+    item.items.length > 0 && (
+      <ul class="sb__nested">
+        {item.items.map((child) => (
+          <Astro.self item={child} pathname={pathname} />
+        ))}
+      </ul>
+    )
+  }
+</li>
+
+<style>
+  .sb__item {
+    list-style: none;
+  }
+
+  .sb__link {
+    display: block;
+    padding: 6px 0;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--c-text-2);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+  }
+
+  .sb__link:hover {
+    color: var(--c-text-1);
+  }
+
+  .sb__link.is-active {
+    color: var(--c-brand-1);
+    font-weight: 600;
+  }
+
+  .sb__nested {
+    margin: 0 0 0 var(--space-1);
+    padding-left: var(--space-4);
+    border-left: 1px solid var(--c-divider);
+  }
+</style>

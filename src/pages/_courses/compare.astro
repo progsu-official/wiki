@@ -1,9 +1,9 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Breadcrumb from "../../components/Breadcrumb.astro";
+import PageHeader from "../../components/PageHeader.astro";
 import CoursesSubnav from "../../components/CoursesSubnav.astro";
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
 const START_HOUR = 7;
 const END_HOUR = 21;
 const SLOTS = (END_HOUR - START_HOUR) * 2;
@@ -12,66 +12,76 @@ function timeLabel(slot: number) {
   const totalMin = START_HOUR * 60 + slot * 30;
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
-  const suffix = h >= 12 ? 'p' : 'a';
+  const suffix = h >= 12 ? "p" : "a";
   const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
-  return m === 0 ? `${h12}${suffix}` : '';
+  return m === 0 ? `${h12}${suffix}` : "";
 }
-function isHourSlot(slot: number) { return slot % 2 === 0; }
+function isHourSlot(slot: number) {
+  return slot % 2 === 0;
+}
 ---
 
-<Layout title="Compare Schedules — Courses" wide>
-  <Breadcrumb items={[
-    { label: "courses", href: "/courses" },
-    { label: "scheduler", href: "/courses/scheduler" },
-    { label: "compare" },
-  ]} />
-
+<Layout
+  title="compare schedules"
+  description="Put two of your schedules side by side and see what changes."
+  wide
+>
   <CoursesSubnav active="compare" />
 
-  <!-- ── Header ── -->
-  <div class="compare-header">
-    <h1 class="compare-title">compare schedules</h1>
-    <p class="compare-subtitle">pick two to see them side by side.</p>
-  </div>
+  <PageHeader title="compare schedules" intro="pick two to see them side by side." />
 
   <!-- ── Picker row ── -->
   <div class="compare-pickers">
     <div class="picker">
-      <label class="picker__label" for="pick-a">A</label>
-      <select class="picker__select surface-glass" id="pick-a"></select>
+      <label class="picker__label" for="pick-a">a</label>
+      <select class="picker__select" id="pick-a"></select>
     </div>
-    <div class="picker__vs">vs</div>
+    <div class="picker__vs" aria-hidden="true">vs</div>
     <div class="picker">
-      <label class="picker__label" for="pick-b">B</label>
-      <select class="picker__select surface-glass" id="pick-b"></select>
+      <label class="picker__label" for="pick-b">b</label>
+      <select class="picker__select" id="pick-b"></select>
     </div>
   </div>
 
   <!-- ── Empty state ── -->
-  <div class="compare-empty surface-glass" id="compare-empty">
+  <div class="compare-empty" id="compare-empty">
     <p class="compare-empty__text">nothing to compare yet.</p>
-    <p class="compare-empty__hint">create at least two schedules in the <a href="/courses/scheduler">scheduler</a>, then come back.</p>
+    <p class="compare-empty__hint">
+      build at least two schedules in the <a href="/courses/scheduler">scheduler</a>, then come
+      back.
+    </p>
   </div>
 
   <!-- ── Side-by-side grids ── -->
   <div class="compare-grids" id="compare-grids">
     <!-- Grid A -->
     <div class="compare-grid-col">
-      <div class="compare-grid-label" id="label-a">Schedule A</div>
+      <div class="compare-grid-label" id="label-a">schedule a</div>
       <div class="compare-grid-wrap">
         <div class="compare-grid" id="grid-a" style={`--rows: ${SLOTS}; --cols: ${DAYS.length}`}>
           <div class="grid-corner"></div>
-          {DAYS.map(d => <div class="grid-day-header">{d}</div>)}
-          {Array.from({ length: SLOTS }).map((_, slot) => (
-            <Fragment>
-              <div class:list={['grid-time', { 'grid-time--labeled': timeLabel(slot), 'grid-time--hour': isHourSlot(slot) }]}>
-                {timeLabel(slot) && <span>{timeLabel(slot)}</span>}
-              </div>
-              {DAYS.map(day => (
-                <div class:list={['grid-cell', { 'grid-cell--hour': isHourSlot(slot) }]} data-day={day} data-slot={slot}></div>
-              ))}
-            </Fragment>
-          ))}
+          {DAYS.map((d) => <div class="grid-day-header">{d}</div>)}
+          {
+            Array.from({ length: SLOTS }).map((_, slot) => (
+              <Fragment>
+                <div
+                  class:list={[
+                    "grid-time",
+                    { "grid-time--labeled": timeLabel(slot), "grid-time--hour": isHourSlot(slot) },
+                  ]}
+                >
+                  {timeLabel(slot) && <span>{timeLabel(slot)}</span>}
+                </div>
+                {DAYS.map((day) => (
+                  <div
+                    class:list={["grid-cell", { "grid-cell--hour": isHourSlot(slot) }]}
+                    data-day={day}
+                    data-slot={slot}
+                  />
+                ))}
+              </Fragment>
+            ))
+          }
         </div>
         <div class="block-overlay" id="overlay-a"></div>
       </div>
@@ -79,21 +89,32 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
 
     <!-- Grid B -->
     <div class="compare-grid-col">
-      <div class="compare-grid-label" id="label-b">Schedule B</div>
+      <div class="compare-grid-label" id="label-b">schedule b</div>
       <div class="compare-grid-wrap">
         <div class="compare-grid" id="grid-b" style={`--rows: ${SLOTS}; --cols: ${DAYS.length}`}>
           <div class="grid-corner"></div>
-          {DAYS.map(d => <div class="grid-day-header">{d}</div>)}
-          {Array.from({ length: SLOTS }).map((_, slot) => (
-            <Fragment>
-              <div class:list={['grid-time', { 'grid-time--labeled': timeLabel(slot), 'grid-time--hour': isHourSlot(slot) }]}>
-                {timeLabel(slot) && <span>{timeLabel(slot)}</span>}
-              </div>
-              {DAYS.map(day => (
-                <div class:list={['grid-cell', { 'grid-cell--hour': isHourSlot(slot) }]} data-day={day} data-slot={slot}></div>
-              ))}
-            </Fragment>
-          ))}
+          {DAYS.map((d) => <div class="grid-day-header">{d}</div>)}
+          {
+            Array.from({ length: SLOTS }).map((_, slot) => (
+              <Fragment>
+                <div
+                  class:list={[
+                    "grid-time",
+                    { "grid-time--labeled": timeLabel(slot), "grid-time--hour": isHourSlot(slot) },
+                  ]}
+                >
+                  {timeLabel(slot) && <span>{timeLabel(slot)}</span>}
+                </div>
+                {DAYS.map((day) => (
+                  <div
+                    class:list={["grid-cell", { "grid-cell--hour": isHourSlot(slot) }]}
+                    data-day={day}
+                    data-slot={slot}
+                  />
+                ))}
+              </Fragment>
+            ))
+          }
         </div>
         <div class="block-overlay" id="overlay-b"></div>
       </div>
@@ -102,47 +123,28 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
 
   <!-- ── Skeleton (visible until JS hydrates) ── -->
   <div class="compare-skel skel-wrap" id="compare-skel">
-    <div class="compare-skel__summary surface-glass">
+    <div class="compare-skel__summary">
       <div class="skel skel-line" style="width: 90px; margin-bottom: var(--space-5)"></div>
-      {Array.from({ length: 5 }).map(() => (
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-6);margin-bottom:var(--space-3)">
-          <div class="skel skel-line" style="width: 60px"></div>
-          <div class="skel skel-line" style="width: 100px"></div>
-          <div class="skel skel-line" style="width: 60px"></div>
-        </div>
-      ))}
+      {
+        Array.from({ length: 5 }).map(() => (
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-6);margin-bottom:var(--space-3)">
+            <div class="skel skel-line" style="width: 60px" />
+            <div class="skel skel-line" style="width: 100px" />
+            <div class="skel skel-line" style="width: 60px" />
+          </div>
+        ))
+      }
     </div>
   </div>
 
   <!-- ── Comparison summary ── -->
-  <div class="compare-summary surface-glass" id="compare-summary">
+  <div class="compare-summary" id="compare-summary">
     <h3 class="compare-summary__title">comparison</h3>
     <div class="compare-summary__grid" id="summary-grid"></div>
   </div>
 </Layout>
 
 <style>
-  /* ── Header ── */
-  .compare-header {
-    margin-bottom: var(--space-6);
-  }
-
-  .compare-title {
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: var(--text-2xl);
-    color: var(--color-text-primary);
-    margin: 0 0 var(--space-1);
-  }
-
-  .compare-subtitle {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
-    margin: 0;
-  }
-
   /* ── Pickers ── */
   .compare-pickers {
     display: flex;
@@ -161,37 +163,36 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   }
 
   .picker__label {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-widest);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--c-text-3);
     text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
   }
 
   .picker__select {
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: var(--text-sm);
-    color: var(--color-text-primary);
-    padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    outline: none;
     width: 100%;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--c-text-1);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease);
+  }
+  .picker__select:hover {
+    border-color: var(--c-border);
   }
   .picker__select option {
-    background: var(--color-bg-raised);
-    color: var(--color-text-secondary);
-    font-family: var(--font-mono);
-    font-style: normal;
+    background: var(--c-bg-elv);
+    color: var(--c-text-1);
   }
 
   .picker__vs {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-widest);
-    text-transform: uppercase;
+    font-size: var(--text-sm);
+    color: var(--c-text-3);
     padding-bottom: var(--space-2);
     flex-shrink: 0;
   }
@@ -200,30 +201,29 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   .compare-empty {
     text-align: center;
     padding: var(--space-12) var(--space-8);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-8);
   }
 
   .compare-empty__text {
-    font-family: var(--font-heading);
-    font-style: italic;
     font-size: var(--text-base);
-    color: var(--color-text-tertiary);
+    font-weight: 600;
+    color: var(--c-text-1);
     margin: 0 0 var(--space-2);
   }
 
   .compare-empty__hint {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--text-sm);
+    color: var(--c-text-2);
     margin: 0;
     line-height: var(--leading-normal);
   }
 
   .compare-empty__hint a {
-    color: var(--accent-text);
-    text-decoration: none;
+    color: var(--c-brand-1);
+    font-weight: 500;
   }
   .compare-empty__hint a:hover {
     text-decoration: underline;
@@ -235,6 +235,8 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   }
   .compare-skel__summary {
     padding: var(--space-6);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-8);
   }
@@ -254,21 +256,19 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   }
 
   .compare-grid-label {
-    font-family: var(--font-heading);
-    font-style: italic;
     font-size: var(--text-base);
-    color: var(--color-text-primary);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--c-text-1);
   }
 
   .compare-grid-wrap {
+    position: relative;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    background: var(--c-bg);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
-    border: 1px solid var(--glass-border);
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    position: relative;
   }
 
   .block-overlay {
@@ -294,23 +294,21 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   .grid-corner {
     grid-column: 1;
     grid-row: 1;
-    background: var(--glass-bg-strong);
-    border-bottom: 1px solid var(--color-border-subtle);
-    border-right: 1px solid var(--color-border-subtle);
+    background: var(--c-bg-soft);
+    border-bottom: 1px solid var(--c-divider);
+    border-right: 1px solid var(--c-divider);
   }
 
   .grid-day-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-mono);
-    font-size: 0.55rem;
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
-    text-transform: uppercase;
-    background: var(--glass-bg-strong);
-    border-bottom: 1px solid var(--color-border-subtle);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--c-text-2);
+    background: var(--c-bg-soft);
+    border-bottom: 1px solid var(--c-divider);
+    border-right: 1px solid var(--c-divider);
   }
   .grid-day-header:last-of-type {
     border-right: none;
@@ -323,30 +321,28 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
     padding-right: 3px;
     font-family: var(--font-mono);
     font-size: 0.5rem;
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wide);
-    border-right: 1px solid var(--color-border-subtle);
+    color: var(--c-text-3);
+    border-right: 1px solid var(--c-divider);
     position: relative;
   }
   .grid-time > span {
     transform: translateY(-0.35em);
   }
   .grid-time--hour {
-    border-top: 1px solid var(--glass-border);
+    border-top: 1px solid var(--c-divider);
   }
 
   .grid-cell {
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid var(--c-divider);
   }
   .grid-cell--hour {
-    border-top: 1px solid var(--glass-border);
+    border-top: 1px solid var(--c-divider);
   }
 
   /* ── Course blocks (dynamically created — :global needed) ── */
   :global(.cmp-block) {
     position: absolute;
     box-sizing: border-box;
-    border-radius: 0;
     border: 1px solid;
     padding: 1px 4px;
     display: flex;
@@ -361,19 +357,18 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   }
 
   :global(.cmp-block--shared) {
-    opacity: 0.35;
+    opacity: 0.5;
   }
 
   :global(.cmp-block--unique) {
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
+    box-shadow: var(--shadow-sm);
   }
 
   :global(.cmp-block__code) {
     font-family: var(--font-mono);
     font-size: 0.5rem;
     font-weight: 600;
-    color: var(--block-text);
-    letter-spacing: var(--tracking-wider);
+    color: var(--c-text-1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -385,15 +380,17 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   /* ── Comparison summary ── */
   .compare-summary {
     padding: var(--space-6);
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-8);
   }
 
   .compare-summary__title {
-    font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-widest);
+    font-weight: 600;
+    color: var(--c-text-3);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     margin: 0 0 var(--space-5);
   }
@@ -406,23 +403,24 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   }
 
   :global(.cmp-row__label) {
-    font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    letter-spacing: var(--tracking-wider);
+    color: var(--c-text-3);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
     text-align: center;
     grid-column: 1 / -1;
-    padding-top: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--c-divider);
   }
   :global(.cmp-row__label):first-child {
     padding-top: 0;
+    border-top: none;
   }
 
   :global(.cmp-val) {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    letter-spacing: var(--tracking-wider);
+    color: var(--c-text-2);
   }
   :global(.cmp-val--a) {
     text-align: right;
@@ -431,27 +429,23 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
     text-align: left;
   }
   :global(.cmp-val--winner) {
-    color: var(--color-text-primary);
+    color: var(--c-text-1);
     font-weight: 600;
   }
 
   :global(.cmp-indicator) {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--accent-text);
-    letter-spacing: var(--tracking-wide);
+    font-size: var(--text-xs);
+    color: var(--c-brand-1);
     text-align: center;
     min-width: 0;
     padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-sm);
-    background: var(--accent-subtle);
-    border: 1px solid rgba(168, 85, 247, 0.15);
+    border-radius: var(--radius-full);
+    background: var(--c-brand-soft);
   }
 
   :global(.cmp-indicator--neutral) {
-    color: var(--color-text-muted);
+    color: var(--c-text-3);
     background: transparent;
-    border-color: transparent;
   }
 
   /* ── Responsive ── */
@@ -476,12 +470,12 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
     }
 
     .compare-summary__grid {
-      gap: var(--space-3) var(--space-3);
+      gap: var(--space-3);
     }
 
     :global(.cmp-indicator) {
       min-width: 0;
-      font-size: 0.5rem;
+      font-size: 0.6rem;
       padding: var(--space-1) var(--space-2);
     }
 
@@ -492,58 +486,69 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
 </style>
 
 <script>
-  import { DAYS, START_HOUR, subjectColors, courseColor, toSlot, fmtTime } from "../../scripts/courseCatalog";
+  import {
+    DAYS,
+    START_HOUR,
+    subjectColors,
+    courseColor,
+    toSlot,
+    fmtTime,
+  } from "../../scripts/courseCatalog";
   import * as store from "../../scripts/scheduleStore";
   import type { ResolvedEntry, ScheduleData } from "../../scripts/scheduleStore";
 
-  const pickA = document.getElementById('pick-a') as HTMLSelectElement;
-  const pickB = document.getElementById('pick-b') as HTMLSelectElement;
-  const gridA = document.getElementById('grid-a') as HTMLElement;
-  const gridB = document.getElementById('grid-b') as HTMLElement;
-  const overlayA = document.getElementById('overlay-a')!;
-  const overlayB = document.getElementById('overlay-b')!;
-  const labelA = document.getElementById('label-a')!;
-  const labelB = document.getElementById('label-b')!;
-  const summaryGrid = document.getElementById('summary-grid')!;
-  const gridsWrap = document.getElementById('compare-grids')!;
-  const summaryWrap = document.getElementById('compare-summary')!;
-  const emptyState = document.getElementById('compare-empty')!;
-  const compareSkel = document.getElementById('compare-skel')!;
+  const pickA = document.getElementById("pick-a") as HTMLSelectElement;
+  const pickB = document.getElementById("pick-b") as HTMLSelectElement;
+  const gridA = document.getElementById("grid-a") as HTMLElement;
+  const gridB = document.getElementById("grid-b") as HTMLElement;
+  const overlayA = document.getElementById("overlay-a")!;
+  const overlayB = document.getElementById("overlay-b")!;
+  const labelA = document.getElementById("label-a")!;
+  const labelB = document.getElementById("label-b")!;
+  const summaryGrid = document.getElementById("summary-grid")!;
+  const gridsWrap = document.getElementById("compare-grids")!;
+  const summaryWrap = document.getElementById("compare-summary")!;
+  const emptyState = document.getElementById("compare-empty")!;
+  const compareSkel = document.getElementById("compare-skel")!;
 
-  function fmtT(h: number, m: number) { return fmtTime(h, m); }
-  function fmtMins(mins: number) { return fmtT(Math.floor(mins / 60), mins % 60); }
+  function fmtT(h: number, m: number) {
+    return fmtTime(h, m);
+  }
+  function fmtMins(mins: number) {
+    return fmtT(Math.floor(mins / 60), mins % 60);
+  }
 
   function init() {
-    compareSkel.classList.add('hidden');
+    compareSkel.classList.add("hidden");
     const all = store.getAllSchedules();
 
     if (all.length < 2) {
-      emptyState.style.display = '';
-      gridsWrap.style.display = 'none';
-      summaryWrap.style.display = 'none';
-      pickA.innerHTML = '';
-      pickB.innerHTML = '';
+      emptyState.style.display = "";
+      gridsWrap.style.display = "none";
+      summaryWrap.style.display = "none";
+      pickA.innerHTML = "";
+      pickB.innerHTML = "";
       return;
     }
 
-    emptyState.style.display = 'none';
-    gridsWrap.style.display = '';
-    summaryWrap.style.display = '';
+    emptyState.style.display = "none";
+    gridsWrap.style.display = "";
+    summaryWrap.style.display = "";
 
     const prevA = pickA.value;
     const prevB = pickB.value;
 
-    pickA.innerHTML = '';
-    pickB.innerHTML = '';
+    pickA.innerHTML = "";
+    pickB.innerHTML = "";
     for (const s of all) {
       pickA.appendChild(new Option(s.name, s.id));
       pickB.appendChild(new Option(s.name, s.id));
     }
 
-    if (prevA && all.some(s => s.id === prevA)) pickA.value = prevA;
+    if (prevA && all.some((s) => s.id === prevA)) pickA.value = prevA;
     else pickA.value = all[0].id;
 
-    if (prevB && all.some(s => s.id === prevB)) pickB.value = prevB;
+    if (prevB && all.some((s) => s.id === prevB)) pickB.value = prevB;
     else pickB.value = all.length > 1 ? all[1].id : all[0].id;
 
     render();
@@ -560,9 +565,9 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
     labelA.textContent = schedA.name;
     labelB.textContent = schedB.name;
 
-    const codesA = new Set(entriesA.map(e => e.code));
-    const codesB = new Set(entriesB.map(e => e.code));
-    const sharedCodes = new Set([...codesA].filter(c => codesB.has(c)));
+    const codesA = new Set(entriesA.map((e) => e.code));
+    const codesB = new Set(entriesB.map((e) => e.code));
+    const sharedCodes = new Set([...codesA].filter((c) => codesB.has(c)));
 
     renderGrid(gridA, overlayA, entriesA, sharedCodes);
     renderGrid(gridB, overlayB, entriesB, sharedCodes);
@@ -573,8 +578,13 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
   const CMP_HEADER = 28;
   const CMP_SLOT = 16;
 
-  function renderGrid(grid: HTMLElement, overlay: HTMLElement, entries: ResolvedEntry[], shared: Set<string>) {
-    overlay.innerHTML = '';
+  function renderGrid(
+    grid: HTMLElement,
+    overlay: HTMLElement,
+    entries: ResolvedEntry[],
+    shared: Set<string>
+  ) {
+    overlay.innerHTML = "";
     const gridW = grid.offsetWidth;
     const colW = (gridW - CMP_GUTTER) / DAYS.length;
 
@@ -597,12 +607,24 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
       const startSlot = toSlot(e.section.startH, e.section.startM);
       const endSlot = toSlot(e.section.endH, e.section.endM);
       for (const day of e.section.days) {
-        blocks.push({ entry: e, day, dayIdx: DAYS.indexOf(day as any), startSlot, endSlot, isShared, color: c, overlapIdx: 0, overlapTotal: 1 });
+        blocks.push({
+          entry: e,
+          day,
+          dayIdx: DAYS.indexOf(day as any),
+          startSlot,
+          endSlot,
+          isShared,
+          color: c,
+          overlapIdx: 0,
+          overlapTotal: 1,
+        });
       }
     }
 
     for (let d = 0; d < DAYS.length; d++) {
-      const dayBlocks = blocks.filter(b => b.dayIdx === d).sort((a, b) => a.startSlot - b.startSlot);
+      const dayBlocks = blocks
+        .filter((b) => b.dayIdx === d)
+        .sort((a, b) => a.startSlot - b.startSlot);
       for (let i = 0; i < dayBlocks.length; i++) {
         const group = [dayBlocks[i]];
         let groupEnd = dayBlocks[i].endSlot;
@@ -622,21 +644,23 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
     }
 
     for (const b of blocks) {
-      const x = CMP_GUTTER + b.dayIdx * colW + (b.overlapIdx * colW / b.overlapTotal);
+      const x = CMP_GUTTER + b.dayIdx * colW + (b.overlapIdx * colW) / b.overlapTotal;
       const w = colW / b.overlapTotal;
       const y = CMP_HEADER + b.startSlot * CMP_SLOT;
       const h = (b.endSlot - b.startSlot) * CMP_SLOT;
 
-      const el = document.createElement('div');
-      el.className = `cmp-block ${b.isShared ? 'cmp-block--shared' : 'cmp-block--unique'}`;
+      const el = document.createElement("div");
+      el.className = `cmp-block ${b.isShared ? "cmp-block--shared" : "cmp-block--unique"}`;
       el.style.left = `${x}px`;
       el.style.top = `${y}px`;
       el.style.width = `${w}px`;
       el.style.height = `${h}px`;
-      el.style.background = `linear-gradient(${b.color.bg}, ${b.color.bg}), #0e0e24`;
+      el.style.background = `linear-gradient(${b.color.bg}, ${b.color.bg}), linear-gradient(${b.color.bg}, ${b.color.bg}), var(--c-bg)`;
       el.style.borderColor = b.color.border;
-      el.style.setProperty('--block-text', b.color.text);
-      el.setAttribute('aria-label', `${b.entry.code}${b.isShared ? ' (in both schedules)' : ' (unique to this schedule)'}`);
+      el.setAttribute(
+        "aria-label",
+        `${b.entry.code}${b.isShared ? " (in both schedules)" : " (unique to this schedule)"}`
+      );
       el.innerHTML = `<span class="cmp-block__code">${b.entry.code}</span>`;
       overlay.appendChild(el);
     }
@@ -647,15 +671,15 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
     schedB: ScheduleData,
     entriesA: ResolvedEntry[],
     entriesB: ResolvedEntry[],
-    shared: Set<string>,
+    shared: Set<string>
   ) {
     const statsA = store.computeStats(entriesA);
     const statsB = store.computeStats(entriesB);
 
-    const onlyA = entriesA.filter(e => !shared.has(e.code));
-    const onlyB = entriesB.filter(e => !shared.has(e.code));
+    const onlyA = entriesA.filter((e) => !shared.has(e.code));
+    const onlyB = entriesB.filter((e) => !shared.has(e.code));
 
-    summaryGrid.innerHTML = '';
+    summaryGrid.innerHTML = "";
 
     function addRow(
       label: string,
@@ -663,105 +687,131 @@ function isHourSlot(slot: number) { return slot % 2 === 0; }
       valB: string,
       indicator: string,
       winA: boolean,
-      winB: boolean,
+      winB: boolean
     ) {
-      const lbl = document.createElement('div');
-      lbl.className = 'cmp-row__label';
+      const lbl = document.createElement("div");
+      lbl.className = "cmp-row__label";
       lbl.textContent = label;
       summaryGrid.appendChild(lbl);
 
-      const a = document.createElement('div');
-      a.className = `cmp-val cmp-val--a${winA ? ' cmp-val--winner' : ''}`;
+      const a = document.createElement("div");
+      a.className = `cmp-val cmp-val--a${winA ? " cmp-val--winner" : ""}`;
       a.textContent = valA;
       summaryGrid.appendChild(a);
 
-      const ind = document.createElement('div');
-      ind.className = `cmp-indicator${indicator === 'same' ? ' cmp-indicator--neutral' : ''}`;
+      const ind = document.createElement("div");
+      ind.className = `cmp-indicator${indicator === "same" ? " cmp-indicator--neutral" : ""}`;
       ind.textContent = indicator;
       summaryGrid.appendChild(ind);
 
-      const b = document.createElement('div');
-      b.className = `cmp-val cmp-val--b${winB ? ' cmp-val--winner' : ''}`;
+      const b = document.createElement("div");
+      b.className = `cmp-val cmp-val--b${winB ? " cmp-val--winner" : ""}`;
       b.textContent = valB;
       summaryGrid.appendChild(b);
     }
 
     // Credits
     const crDiff = statsA.credits - statsB.credits;
-    const crInd = crDiff === 0 ? 'same'
-      : crDiff > 0 ? `${crDiff} more credit${crDiff !== 1 ? 's' : ''}`
-      : `${-crDiff} fewer credit${crDiff !== -1 ? 's' : ''}`;
-    addRow('credits', String(statsA.credits), String(statsB.credits), crInd, crDiff > 0, crDiff < 0);
+    const crInd =
+      crDiff === 0
+        ? "same"
+        : crDiff > 0
+          ? `${crDiff} more credit${crDiff !== 1 ? "s" : ""}`
+          : `${-crDiff} fewer credit${crDiff !== -1 ? "s" : ""}`;
+    addRow(
+      "credits",
+      String(statsA.credits),
+      String(statsB.credits),
+      crInd,
+      crDiff > 0,
+      crDiff < 0
+    );
 
     // Contact hours
     const chDiff = Math.round((statsA.contactHours - statsB.contactHours) * 10) / 10;
-    const chInd = chDiff === 0 ? 'same'
-      : chDiff > 0 ? `${chDiff} more hr${chDiff !== 1 ? 's' : ''}/wk`
-      : `${-chDiff} fewer hr${chDiff !== -1 ? 's' : ''}/wk`;
+    const chInd =
+      chDiff === 0
+        ? "same"
+        : chDiff > 0
+          ? `${chDiff} more hr${chDiff !== 1 ? "s" : ""}/wk`
+          : `${-chDiff} fewer hr${chDiff !== -1 ? "s" : ""}/wk`;
     addRow(
-      'contact',
+      "contact",
       `${statsA.contactHours}h/wk`,
       `${statsB.contactHours}h/wk`,
       chInd,
-      false, false,
+      false,
+      false
     );
 
     // Days off
     const doffA = statsA.daysOff.length;
     const doffB = statsB.daysOff.length;
     const doffDiff = doffA - doffB;
-    const doffInd = doffDiff === 0 ? 'same'
-      : doffDiff > 0 ? `${doffDiff} more day${doffDiff !== 1 ? 's' : ''} off`
-      : `${-doffDiff} fewer day${doffDiff !== -1 ? 's' : ''} off`;
+    const doffInd =
+      doffDiff === 0
+        ? "same"
+        : doffDiff > 0
+          ? `${doffDiff} more day${doffDiff !== 1 ? "s" : ""} off`
+          : `${-doffDiff} fewer day${doffDiff !== -1 ? "s" : ""} off`;
     addRow(
-      'days off',
-      doffA > 0 ? statsA.daysOff.join(', ') : 'none',
-      doffB > 0 ? statsB.daysOff.join(', ') : 'none',
+      "days off",
+      doffA > 0 ? statsA.daysOff.join(", ") : "none",
+      doffB > 0 ? statsB.daysOff.join(", ") : "none",
       doffInd,
-      doffDiff > 0, doffDiff < 0,
+      doffDiff > 0,
+      doffDiff < 0
     );
 
     // Earliest start
     if (entriesA.length && entriesB.length) {
       const earlyDiff = statsA.earliestMin - statsB.earliestMin;
-      const earlyInd = earlyDiff === 0 ? 'same'
-        : earlyDiff > 0 ? `starts ${Math.round(earlyDiff / 60 * 10) / 10}h later`
-        : `starts ${Math.round(-earlyDiff / 60 * 10) / 10}h earlier`;
+      const earlyInd =
+        earlyDiff === 0
+          ? "same"
+          : earlyDiff > 0
+            ? `starts ${Math.round((earlyDiff / 60) * 10) / 10}h later`
+            : `starts ${Math.round((-earlyDiff / 60) * 10) / 10}h earlier`;
       addRow(
-        'earliest class',
+        "earliest class",
         fmtMins(statsA.earliestMin),
         fmtMins(statsB.earliestMin),
         earlyInd,
-        false, false,
+        false,
+        false
       );
 
       // Latest end
       const lateDiff = statsA.latestMin - statsB.latestMin;
-      const lateInd = lateDiff === 0 ? 'same'
-        : lateDiff > 0 ? `ends ${Math.round(lateDiff / 60 * 10) / 10}h later`
-        : `ends ${Math.round(-lateDiff / 60 * 10) / 10}h earlier`;
+      const lateInd =
+        lateDiff === 0
+          ? "same"
+          : lateDiff > 0
+            ? `ends ${Math.round((lateDiff / 60) * 10) / 10}h later`
+            : `ends ${Math.round((-lateDiff / 60) * 10) / 10}h earlier`;
       addRow(
-        'latest class',
+        "latest class",
         fmtMins(statsA.latestMin),
         fmtMins(statsB.latestMin),
         lateInd,
-        false, false,
+        false,
+        false
       );
     }
 
     // Unique courses
-    const uniqueA = onlyA.map(e => e.code).join(', ') || '—';
-    const uniqueB = onlyB.map(e => e.code).join(', ') || '—';
-    const uniqueInd = shared.size > 0
-      ? `${shared.size} shared`
-      : 'no overlap';
-    addRow('unique courses', uniqueA, uniqueB, uniqueInd, false, false);
+    const uniqueA = onlyA.map((e) => e.code).join(", ") || "—";
+    const uniqueB = onlyB.map((e) => e.code).join(", ") || "—";
+    const uniqueInd = shared.size > 0 ? `${shared.size} shared` : "no overlap";
+    addRow("unique courses", uniqueA, uniqueB, uniqueInd, false, false);
   }
 
-  pickA.addEventListener('change', render);
-  pickB.addEventListener('change', render);
+  pickA.addEventListener("change", render);
+  pickB.addEventListener("change", render);
 
   init();
 
-  window.addEventListener('resize', () => { if (gridsWrap.style.display !== 'none') render(); });
+  window.addEventListener("resize", () => {
+    if (gridsWrap.style.display !== "none") render();
+  });
 </script>

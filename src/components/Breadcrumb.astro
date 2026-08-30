@@ -11,65 +11,78 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<nav class="breadcrumb" aria-label="Breadcrumb">
-  <ol class="breadcrumb__list">
-    {items.map((item, i) => (
-      <li class="breadcrumb__item">
-        {i > 0 && <span class="breadcrumb__sep" aria-hidden="true">/</span>}
-        {item.href ? (
-          <a href={item.href} class="breadcrumb__link">{item.label}</a>
-        ) : (
-          <span class="breadcrumb__current" aria-current="page">{item.label}</span>
-        )}
-      </li>
-    ))}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol class="crumbs__list">
+    {
+      items.map((item, i) => (
+        <li class="crumbs__item">
+          {i > 0 && (
+            <span class="crumbs__sep" aria-hidden="true">
+              /
+            </span>
+          )}
+          {item.href ? (
+            <a href={item.href} class="crumbs__link">
+              {item.label}
+            </a>
+          ) : (
+            <span class="crumbs__current" aria-current="page">
+              {item.label}
+            </span>
+          )}
+        </li>
+      ))
+    }
   </ol>
 </nav>
 
 <style>
-  .breadcrumb {
-    margin-bottom: var(--space-8);
+  .crumbs {
+    margin-bottom: var(--space-6);
   }
 
-  .breadcrumb__list {
+  .crumbs__list {
     display: flex;
-    flex-wrap: nowrap;
     align-items: center;
     gap: var(--space-2);
-    list-style: none;
-    padding: 0;
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wider);
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
-  .breadcrumb__list::-webkit-scrollbar {
+
+  .crumbs__list::-webkit-scrollbar {
     display: none;
   }
 
-  .breadcrumb__sep {
-    color: var(--color-text-muted);
-    user-select: none;
-  }
-
-  .breadcrumb__item {
+  .crumbs__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     white-space: nowrap;
   }
 
-  .breadcrumb__link {
-    color: var(--accent-dim);
-    text-decoration: none;
-    transition: color var(--duration-normal) var(--ease);
-    padding: var(--space-1) 0;
-  }
-  .breadcrumb__link:hover {
-    color: var(--accent-text);
+  .crumbs__sep {
+    color: var(--c-divider);
+    user-select: none;
   }
 
-  .breadcrumb__current {
-    color: var(--color-text-tertiary);
+  .crumbs__link {
+    display: inline-block;
+    padding: var(--space-1) 0;
+    color: var(--c-text-3);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+  }
+
+  .crumbs__link:hover {
+    color: var(--c-brand-1);
+  }
+
+  .crumbs__current {
+    color: var(--c-text-1);
   }
 </style>

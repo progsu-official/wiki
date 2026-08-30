@@ -1,38 +1,202 @@
 ---
-import Navbar from "../components/Navbar.astro";
-import ConstellationGraph from "../components/ConstellationGraph.astro";
-import "../styles/global.css";
-import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import HeroBand from "../components/HeroBand.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+
+const guides = await getCollection("guides");
+const countFor = (category: string) => guides.filter((g) => g.data.category === category).length;
+
+const categories = [
+  {
+    slug: "zero-to-hero",
+    title: "zero to hero",
+    text: "start here. what to do first, in what order, and how to get from no experience to a first internship.",
+    icon: "route",
+  },
+  {
+    slug: "career",
+    title: "career",
+    text: "resumes, applications, interviews, and what to do once an offer is on the table.",
+    icon: "briefcase",
+  },
+  {
+    slug: "technical",
+    title: "technical",
+    text: "data structures, leetcode, and how to prepare for a coding interview without burning out.",
+    icon: "code",
+  },
+  {
+    slug: "networking",
+    title: "networking",
+    text: "cold emails, linkedin, referrals, and the atlanta events worth showing up to.",
+    icon: "people",
+  },
+  {
+    slug: "misc",
+    title: "misc",
+    text: "tools, note-taking, and the useful things that didn't fit anywhere else.",
+    icon: "bookmark",
+  },
+] as const;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={SITE_DESCRIPTION} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{SITE_TITLE}</title>
-  </head>
-  <body>
-    <main id="main-content" class="hero-viewport">
-      <ConstellationGraph />
-      <Navbar />
-    </main>
-  </body>
-</html>
+<Layout
+  title="the gsu builders' wiki"
+  description="an open wiki for gsu students breaking into tech — guides on internships, interviews, resumes, and networking, written by students who've been through it."
+  fullBleed
+>
+  <HeroBand
+    eyebrow="an open wiki · by progsu"
+    title="the open wiki for<br>breaking into tech."
+    subtitle="knowledge from gsu students who landed offers in quant, big tech, research, and beyond. signed, dated, free. take what helps."
+  >
+    <a class="btn btn--alt btn--lg" href="/guides/zero-to-hero/getting-started">
+      start reading →
+    </a>
+    <a class="btn btn--ghost btn--lg" href="/guides">browse all guides</a>
+  </HeroBand>
+
+  <section class="features">
+    <div class="container">
+      <div class="features__inner">
+        <h2 class="features__heading">browse by topic</h2>
+
+        <div class="features__grid">
+          {
+            categories.map((category) => (
+              <FeatureCard
+                title={category.title}
+                text={category.text}
+                href={`/guides/${category.slug}`}
+                count={countFor(category.slug)}
+              >
+                <svg
+                  slot="icon"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  {category.icon === "route" && (
+                    <Fragment>
+                      <circle cx="6" cy="19" r="3" />
+                      <circle cx="18" cy="5" r="3" />
+                      <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+                    </Fragment>
+                  )}
+                  {category.icon === "briefcase" && (
+                    <Fragment>
+                      <rect x="2" y="7" width="20" height="14" rx="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </Fragment>
+                  )}
+                  {category.icon === "code" && (
+                    <Fragment>
+                      <path d="m16 18 6-6-6-6" />
+                      <path d="m8 6-6 6 6 6" />
+                    </Fragment>
+                  )}
+                  {category.icon === "people" && (
+                    <Fragment>
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <path d="M16 3.3a4 4 0 0 1 0 7.4" />
+                      <path d="M19 15.1a4 4 0 0 1 3 3.9v2" />
+                    </Fragment>
+                  )}
+                  {category.icon === "bookmark" && (
+                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                  )}
+                </svg>
+              </FeatureCard>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="brand-band closing">
+    <div class="closing__inner container">
+      <p class="closing__line">everything here is written by gsu students, for gsu students.</p>
+      <a class="btn btn--alt" href="https://github.com/progsu-official/vault" rel="noopener">
+        contribute a guide
+      </a>
+    </div>
+  </section>
+</Layout>
 
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-    background: #06060f;
+  /* .btn is a pill; the global focus ring would otherwise square it off. */
+  .btn:focus-visible {
+    border-radius: var(--radius-full);
   }
 
-  .hero-viewport {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
+  .features {
+    padding-block: var(--space-24);
+  }
+
+  .features__inner {
+    max-width: var(--page-width-wide);
+    margin-inline: auto;
+  }
+
+  .features__heading {
+    margin: 0 0 var(--space-8);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--c-text-1);
+  }
+
+  .features__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 1080px) {
+    .features__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .closing {
+    --focus-ring: 0 0 0 2px var(--grad-stop-2), 0 0 0 4px var(--c-text-inverse-1);
+    padding-block: var(--space-20);
+  }
+
+  .closing__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  .closing .closing__line {
+    margin: 0;
+    font-size: var(--text-lg);
+    color: var(--c-text-inverse-2);
+  }
+
+  @media (max-width: 640px) {
+    .features {
+      padding-block: var(--space-16);
+    }
+
+    /* Mobile hit targets: the hero and closing buttons go full width. */
+    .btn--lg,
+    .closing .btn {
+      width: 100%;
+      min-height: 44px;
+    }
   }
 </style>

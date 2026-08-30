@@ -1,0 +1,64 @@
+---
+interface Props {
+  title: string;
+  text: string;
+  href: string;
+  /** How many guides sit behind this card. Left off when there's nothing to count. */
+  count?: number;
+}
+
+const { title, text, href, count } = Astro.props;
+const hasIcon = Astro.slots.has("icon");
+---
+
+<a href={href} class="card card--link feature">
+  {
+    hasIcon && (
+      <span class="card__icon" aria-hidden="true">
+        <slot name="icon" />
+      </span>
+    )
+  }
+  <div class="feature__head">
+    <h3 class="card__title feature__title">{title}</h3>
+    {
+      count !== undefined && (
+        <span class="feature__count">
+          {count}
+          <span class="sr-only">{count === 1 ? " guide" : " guides"}</span>
+        </span>
+      )
+    }
+  </div>
+  <p class="card__text">{text}</p>
+</a>
+
+<style>
+  /* The global :focus-visible rule squares the corners off; a card keeps its own. */
+  .feature:focus-visible {
+    border-radius: var(--radius-lg);
+  }
+
+  .feature__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  .feature .feature__title {
+    margin: 0;
+  }
+
+  .feature__count {
+    flex-shrink: 0;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--c-bg-mute);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 20px;
+    color: var(--c-text-3);
+  }
+</style>

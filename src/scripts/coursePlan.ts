@@ -1,8 +1,8 @@
-import * as persist from './persist';
+import * as persist from "./persist";
 
-const KEY = 'starred';
+const KEY = "starred";
 const raw = persist.get<unknown>(KEY, []);
-const initial = Array.isArray(raw) ? raw.filter((v): v is string => typeof v === 'string') : [];
+const initial = Array.isArray(raw) ? raw.filter((v): v is string => typeof v === "string") : [];
 const starred = new Set<string>(initial);
 const listeners = new Set<() => void>();
 
@@ -41,5 +41,5 @@ export function onChange(fn: () => void) {
 }
 
 function notify() {
-  listeners.forEach(fn => fn());
+  listeners.forEach((fn) => fn());
 }

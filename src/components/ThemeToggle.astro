@@ -1,0 +1,108 @@
+---
+/* The no-FOUC bootstrap lives in the shell <head>; this only handles the click. */
+---
+
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+  <svg
+    class="theme-toggle__icon theme-toggle__icon--sun"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <line x1="12" y1="2" x2="12" y2="4"></line>
+    <line x1="12" y1="20" x2="12" y2="22"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="2" y1="12" x2="4" y2="12"></line>
+    <line x1="20" y1="12" x2="22" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+  <svg
+    class="theme-toggle__icon theme-toggle__icon--moon"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"></path>
+  </svg>
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--c-text-3);
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--ease),
+      background-color var(--duration-fast) var(--ease);
+  }
+  .theme-toggle:hover {
+    color: var(--c-text-1);
+    background: var(--c-bg-soft);
+  }
+
+  .theme-toggle__icon {
+    transition: opacity var(--duration-fast) var(--ease);
+  }
+
+  .theme-toggle__icon--moon {
+    display: none;
+  }
+  :global(html.dark) .theme-toggle__icon--sun {
+    display: none;
+  }
+  :global(html.dark) .theme-toggle__icon--moon {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle,
+    .theme-toggle__icon {
+      transition: none;
+    }
+  }
+
+  /* Nav rows keep 44px hit targets on touch. */
+  @media (max-width: 767px) {
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+    }
+  }
+</style>
+
+<script>
+  const THEME_KEY = "progsu-theme";
+
+  document.querySelectorAll<HTMLButtonElement>(".theme-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      try {
+        localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+      } catch {
+        /* localStorage throws in some privacy modes; the toggle still works for this page. */
+      }
+    });
+  });
+</script>

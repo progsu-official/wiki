@@ -13,10 +13,27 @@ if (!fs.existsSync(vaultDir) || fs.readdirSync(vaultDir).length === 0) {
   throw new Error("./vault is empty - run: git submodule update --init --recursive");
 }
 
+// Shiki drops the language on the floor; the CSS label in global.css reads it
+// back off the <pre>. Plain-text blocks get no label.
+const labelLanguage = {
+  pre(node) {
+    const lang = this.options.lang;
+    if (lang && lang !== "text" && lang !== "plaintext" && lang !== "ansi") {
+      node.properties["data-language"] = lang;
+    }
+  },
+};
+
 export default defineConfig({
   integrations: [tailwind(), mdx()],
   markdown: {
     remarkPlugins: [remarkWikilinks, remarkMermaid, remarkCallouts],
+    shikiConfig: {
+      // Code blocks stay dark in both themes, so one theme is enough.
+      theme: "vitesse-dark",
+      wrap: false,
+      transformers: [labelLanguage],
+    },
   },
   vite: {
     resolve: {

@@ -1,5 +1,5 @@
-import { catalog, DAYS, type Course, type Section } from './courseCatalog';
-import * as persist from './persist';
+import { catalog, DAYS, type Course, type Section } from "./courseCatalog";
+import * as persist from "./persist";
 
 export interface ScheduleEntry {
   code: string;
@@ -28,14 +28,14 @@ export interface ScheduleStats {
   daysOff: string[];
 }
 
-const STORAGE_KEY = 'schedules';
-const ACTIVE_KEY = 'activeScheduleId';
+const STORAGE_KEY = "schedules";
+const ACTIVE_KEY = "activeScheduleId";
 
 const defaultSeeds: ScheduleEntry[] = [
-  { code: 'CSC 2720', sectionId: '001' },
-  { code: 'CSC 4310', sectionId: '001' },
-  { code: 'MATH 2212', sectionId: '001' },
-  { code: 'MATH 2420', sectionId: '001' },
+  { code: "CSC 2720", sectionId: "001" },
+  { code: "CSC 4310", sectionId: "001" },
+  { code: "MATH 2212", sectionId: "001" },
+  { code: "MATH 2420", sectionId: "001" },
 ];
 
 function genId() {
@@ -47,9 +47,9 @@ function loadAll(): ScheduleData[] {
   if (stored && stored.length > 0) return stored;
   const initial: ScheduleData = {
     id: genId(),
-    name: 'Ideal',
-    semester: 'Fall 2026',
-    courses: defaultSeeds.map(e => ({ ...e })),
+    name: "Ideal",
+    semester: "Fall 2026",
+    courses: defaultSeeds.map((e) => ({ ...e })),
   };
   saveAll([initial]);
   setActiveId(initial.id);
@@ -75,7 +75,7 @@ export function getAllSchedules(): ScheduleData[] {
 export function getActive(): ScheduleData {
   const all = loadAll();
   const id = getActiveId();
-  return all.find(s => s.id === id) ?? all[0];
+  return all.find((s) => s.id === id) ?? all[0];
 }
 
 export function setActive(id: string) {
@@ -83,12 +83,12 @@ export function setActive(id: string) {
 }
 
 export function getScheduleById(id: string): ScheduleData | undefined {
-  return loadAll().find(s => s.id === id);
+  return loadAll().find((s) => s.id === id);
 }
 
 export function updateSchedule(updated: ScheduleData) {
   const all = loadAll();
-  const idx = all.findIndex(s => s.id === updated.id);
+  const idx = all.findIndex((s) => s.id === updated.id);
   if (idx >= 0) all[idx] = updated;
   else all.push(updated);
   saveAll(all);
@@ -96,12 +96,12 @@ export function updateSchedule(updated: ScheduleData) {
 
 export function duplicateSchedule(sourceId: string, newName: string): ScheduleData {
   const all = loadAll();
-  const source = all.find(s => s.id === sourceId);
+  const source = all.find((s) => s.id === sourceId);
   const dup: ScheduleData = {
     id: genId(),
     name: newName,
-    semester: source?.semester ?? 'Fall 2026',
-    courses: source ? source.courses.map(e => ({ ...e })) : [],
+    semester: source?.semester ?? "Fall 2026",
+    courses: source ? source.courses.map((e) => ({ ...e })) : [],
   };
   all.push(dup);
   saveAll(all);
@@ -110,9 +110,9 @@ export function duplicateSchedule(sourceId: string, newName: string): ScheduleDa
 
 export function deleteSchedule(id: string) {
   let all = loadAll();
-  all = all.filter(s => s.id !== id);
+  all = all.filter((s) => s.id !== id);
   if (all.length === 0) {
-    all.push({ id: genId(), name: 'Ideal', semester: 'Fall 2026', courses: [] });
+    all.push({ id: genId(), name: "Ideal", semester: "Fall 2026", courses: [] });
   }
   saveAll(all);
   if (getActiveId() === id) setActiveId(all[0].id);
@@ -121,8 +121,8 @@ export function deleteSchedule(id: string) {
 export function resolve(entries: ScheduleEntry[]): ResolvedEntry[] {
   const result: ResolvedEntry[] = [];
   for (const e of entries) {
-    const course = catalog.find(c => c.code === e.code);
-    const section = course?.sections.find(s => s.id === e.sectionId);
+    const course = catalog.find((c) => c.code === e.code);
+    const section = course?.sections.find((s) => s.id === e.sectionId);
     if (course && section) result.push({ code: e.code, sectionId: e.sectionId, course, section });
   }
   return result;
@@ -132,7 +132,10 @@ export function computeStats(entries: ResolvedEntry[]): ScheduleStats {
   if (entries.length === 0) {
     return { credits: 0, contactHours: 0, earliestMin: 0, latestMin: 0, daysOff: [...DAYS] };
   }
-  let credits = 0, contactMin = 0, earlyMin = 24 * 60, lateMin = 0;
+  let credits = 0,
+    contactMin = 0,
+    earlyMin = 24 * 60,
+    lateMin = 0;
   const allDays = new Set<string>();
   for (const e of entries) {
     credits += e.course.credits;
@@ -141,13 +144,13 @@ export function computeStats(entries: ResolvedEntry[]): ScheduleStats {
     if (st < earlyMin) earlyMin = st;
     if (en > lateMin) lateMin = en;
     contactMin += (en - st) * e.section.days.length;
-    e.section.days.forEach(d => allDays.add(d));
+    e.section.days.forEach((d) => allDays.add(d));
   }
   return {
     credits,
-    contactHours: Math.round(contactMin / 60 * 10) / 10,
+    contactHours: Math.round((contactMin / 60) * 10) / 10,
     earliestMin: earlyMin,
     latestMin: lateMin,
-    daysOff: DAYS.filter(d => !allDays.has(d)),
+    daysOff: DAYS.filter((d) => !allDays.has(d)),
   };
 }
