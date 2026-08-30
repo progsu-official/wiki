@@ -18,11 +18,11 @@
 
   /* Brand ramp — pulled from the progsu gradient, lightened until it
      clears AA on white. --c-brand-1 is 7.1:1 on #fff. */
-  --c-brand-1: #6d28d9;
-  --c-brand-2: #7c3aed;
-  --c-brand-3: #8b5cf6;
-  --c-brand-soft: rgba(124, 58, 237, 0.14);
-  --c-brand-softer: rgba(124, 58, 237, 0.07);
+  --c-brand-1: #5b21b6;
+  --c-brand-2: #6d28d9;
+  --c-brand-3: #7c3aed;
+  --c-brand-soft: rgba(109, 40, 217, 0.13);
+  --c-brand-softer: rgba(109, 40, 217, 0.07);
 
   /* The progsu classic gradient. Only ever used full-bleed, on a band
      that carries its own light-on-dark text — never as a page ground. */
@@ -42,10 +42,10 @@
      markers. Every stop holds white text (worst case 5.38:1), which is why it
      stops at #9333ea rather than running up to progsu.com's #c084fc: that
      lighter end gives white only 2.64:1 and can't carry a label. */
-  --grad-accent: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #9333ea 100%);
-  --grad-accent-hover: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a855f7 100%);
+  --grad-accent: linear-gradient(135deg, #5b21b6 0%, #6d28d9 50%, #7e22ce 100%);
+  --grad-accent-hover: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #9333ea 100%);
   /* Non-text rules: underlines and active indicators. Free to run lighter. */
-  --grad-accent-line: linear-gradient(90deg, #6d28d9, #a855f7);
+  --grad-accent-line: linear-gradient(90deg, #5b21b6, #9333ea);
 
   /* Surfaces */
   --c-bg: #ffffff;
@@ -70,7 +70,7 @@
 
   /* Code blocks stay dark in both themes — they read as a distinct
      surface, and it keeps one Shiki theme instead of two. */
-  --c-code-bg: #1e1e21;
+  --c-code-bg: #18181b;
   --c-code-border: rgba(255, 255, 255, 0.08);
   --c-code-text: rgba(235, 232, 245, 0.86);
   --c-code-tab-text: rgba(235, 232, 245, 0.5);
@@ -78,8 +78,8 @@
   --c-code-inline-bg: rgba(142, 150, 170, 0.14);
 
   /* Custom blocks (tip / info / warning / danger) */
-  --c-tip-1: #7c3aed;
-  --c-tip-soft: rgba(124, 58, 237, 0.1);
+  --c-tip-1: #6d28d9;
+  --c-tip-soft: rgba(109, 40, 217, 0.1);
   --c-info-1: #3451b2;
   --c-info-soft: rgba(52, 81, 178, 0.09);
   --c-warning-1: #915930;
@@ -178,18 +178,20 @@
 html.dark {
   color-scheme: dark;
 
-  --c-brand-1: #a78bfa;
-  --c-brand-2: #8b5cf6;
-  --c-brand-3: #7c3aed;
-  --c-brand-soft: rgba(139, 92, 246, 0.18);
-  --c-brand-softer: rgba(139, 92, 246, 0.09);
+  /* #8b5cf6 would be the next step down but lands at 4.27:1 on the darker
+     ground, so the link colour stops here. */
+  --c-brand-1: #9575f6;
+  --c-brand-2: #7c3aed;
+  --c-brand-3: #6d28d9;
+  --c-brand-soft: rgba(124, 58, 237, 0.2);
+  --c-brand-softer: rgba(124, 58, 237, 0.1);
 
   /* Neutral grey, not tinted purple — the purple belongs to the accents. */
-  --c-bg: #1b1b1f;
-  --c-bg-alt: #161618;
-  --c-bg-soft: #202127;
-  --c-bg-mute: #2a2a30;
-  --c-bg-elv: #202127;
+  --c-bg: #161618;
+  --c-bg-alt: #101012;
+  --c-bg-soft: #1c1c20;
+  --c-bg-mute: #26262b;
+  --c-bg-elv: #1c1c20;
 
   --c-text-1: rgba(255, 255, 255, 0.87);
   --c-text-2: rgba(235, 235, 245, 0.6);
@@ -197,17 +199,17 @@ html.dark {
 
   --c-divider: rgba(130, 130, 140, 0.26);
   --c-border: rgba(130, 130, 140, 0.46);
-  --c-gutter: #101012;
+  --c-gutter: #0a0a0b;
 
-  --c-code-bg: #161618;
+  --c-code-bg: #101012;
   --c-code-inline-bg: rgba(200, 200, 215, 0.16);
 
   /* Buttons keep the light ramp so white labels stay legible; only the
      non-text rules lighten, since #7c3aed is just 3.01:1 on this grey. */
-  --grad-accent-line: linear-gradient(90deg, #8b5cf6, #c084fc);
+  --grad-accent-line: linear-gradient(90deg, #7c3aed, #a855f7);
 
-  --c-tip-1: #a78bfa;
-  --c-tip-soft: rgba(139, 92, 246, 0.16);
+  --c-tip-1: #9575f6;
+  --c-tip-soft: rgba(124, 58, 237, 0.18);
   --c-info-1: #a8b1ff;
   --c-info-soft: rgba(101, 117, 233, 0.16);
   --c-warning-1: #f2c97d;

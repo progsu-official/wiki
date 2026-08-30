@@ -166,6 +166,9 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* A nav rail shouldn't carry the full-width page scrollbar. */
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-border) transparent;
     transform: translateX(-100%);
     transition: transform var(--duration-normal) var(--ease);
   }
@@ -173,6 +176,26 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
   .doc__sidebar.is-open {
     transform: translateX(0);
     box-shadow: var(--shadow-xl);
+  }
+
+  .doc__sidebar::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .doc__sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* The global thumb insets itself with a 2px --c-bg border, which on a 5px
+     track would leave a 1px sliver. */
+  .doc__sidebar::-webkit-scrollbar-thumb {
+    background: var(--c-border);
+    border: none;
+    border-radius: var(--radius-full);
+  }
+
+  .doc__sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--c-text-3);
   }
 
   /* ── Content ───────────────────────────────────────────── */

@@ -123,6 +123,8 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
       top: calc(var(--nav-height) + var(--space-8));
       max-height: calc(100vh - var(--nav-height) - var(--space-16));
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--c-border) transparent;
       border: none;
       border-radius: 0;
       background: none;
@@ -137,6 +139,20 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
     .aside__title::after {
       display: none;
+    }
+
+    .aside::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .aside::-webkit-scrollbar-thumb {
+      background: var(--c-border);
+      border: none;
+      border-radius: var(--radius-full);
     }
   }
 </style>

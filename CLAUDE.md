@@ -28,6 +28,7 @@ A user-first site is recognizable by what isn't there. **Reduce, don't add.**
 Existing tokens live in [src/styles/global.css](src/styles/global.css). Use them — don't introduce new colors, fonts, or spacing values.
 
 - **Theme:** light by default, dark via the `dark` class on `<html>`. Every color comes from a `--c-*` token so both themes work. Never hardcode `#fff`/`#000` for a surface or text.
+- **One contrast trap:** `--c-brand-1` on `--c-bg-mute` is 4.41:1 in dark — just under AA. Nothing pairs them today; use `--c-text-1`/`--c-text-2` on mute surfaces.
 - **The gradient is a special occasion.** `--grad-brand` (`#3d2377` → `#141021`) is only ever used full-bleed, on a `.brand-band`. Ordinary accents use the solid ramp (`--c-brand-1/2/3`) so long reading pages stay calm. Inside a band, text uses `--c-text-inverse-*`.
 - **Surfaces:** flat. `--c-bg-soft` fill, `--c-divider` hairline, `--shadow-*` for elevation. No glass, no blur. (`.surface-glass` survives only as a compat alias for a flat card.)
 - **Type:** Inter everywhere, 600 for headings. Mono (`--font-mono`) only for genuinely technical strings — course codes, CRNs, times, counts.

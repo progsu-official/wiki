@@ -49,12 +49,11 @@ const categories = [
   <HeroBand
     eyebrow="an open wiki · by progsu"
     title="the open wiki for<br>breaking into tech."
-    subtitle="knowledge from gsu students who landed offers in quant, big tech, research, and beyond. signed, dated, free. take what helps."
+    subtitle="written by gsu students who have already broken in."
   >
     <a class="btn btn--alt btn--lg" href="/guides/zero-to-hero/getting-started">
       start reading →
     </a>
-    <a class="btn btn--ghost btn--lg" href="/guides">browse all guides</a>
   </HeroBand>
 
   <section class="features">
@@ -121,15 +120,6 @@ const categories = [
       </div>
     </div>
   </section>
-
-  <section class="brand-band closing">
-    <div class="closing__inner container">
-      <p class="closing__line">everything here is written by gsu students, for gsu students.</p>
-      <a class="btn btn--alt" href="https://github.com/progsu-official/vault" rel="noopener">
-        contribute a guide
-      </a>
-    </div>
-  </section>
 </Layout>
 
 <style>
@@ -162,33 +152,13 @@ const categories = [
     }
   }
 
-  .closing {
-    padding-block: var(--space-20);
-  }
-
-  .closing__inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-6);
-    text-align: center;
-  }
-
-  .closing .closing__line {
-    margin: 0;
-    font-size: var(--text-lg);
-    color: var(--c-text-inverse-2);
-  }
-
   @media (max-width: 640px) {
     .features {
       padding-block: var(--space-16);
     }
 
-    /* Mobile hit targets: the hero and closing buttons go full width. */
-    .btn--lg,
-    .closing .btn {
+    /* Mobile hit target: the hero button goes full width. */
+    .btn--lg {
       width: 100%;
       min-height: 44px;
     }

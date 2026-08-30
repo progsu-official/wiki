@@ -27,13 +27,8 @@ const hasActions = Astro.slots.has("default");
 
 <style>
   .hero {
-    padding-block: var(--space-32);
+    padding-block: var(--space-24);
   }
-
-  /* The band bottoms out on its darkest stop, which now sits darker than the
-     grey page under it — the seam reads as a fade rather than an edge. A
-     hairline closes the band deliberately. `.brand-band` supplies the
-     positioning and the inverted focus ring. */
 
   .hero__inner {
     display: flex;
@@ -43,11 +38,10 @@ const hasActions = Astro.slots.has("default");
   }
 
   .hero .hero__eyebrow {
-    margin: 0 0 var(--space-5);
+    margin: 0 0 var(--space-4);
     font-size: var(--text-sm);
-    font-weight: 500;
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: var(--tracking-normal);
     color: var(--c-text-inverse-3);
   }
 
@@ -61,8 +55,8 @@ const hasActions = Astro.slots.has("default");
   }
 
   .hero .hero__subtitle {
-    margin: var(--space-6) 0 0;
-    max-width: 60ch;
+    margin: var(--space-5) 0 0;
+    max-width: 46ch;
     font-size: var(--text-lg);
     line-height: var(--leading-normal);
     color: var(--c-text-inverse-2);
@@ -73,12 +67,12 @@ const hasActions = Astro.slots.has("default");
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--space-4);
-    margin-top: var(--space-10);
+    margin-top: var(--space-8);
   }
 
   @media (max-width: 768px) {
     .hero {
-      padding-block: var(--space-20);
+      padding-block: var(--space-16);
     }
   }
 </style>
