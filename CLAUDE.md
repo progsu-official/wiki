@@ -59,6 +59,14 @@ Check `src/components/` before building new components. Extend existing ones wit
 
 Writing for GSU students — many first-gen, many self-taught, many anxious about breaking into tech. They are smart but new. Don't condescend; don't assume. Frame everything as *"here's how"* not *"you should already know."*
 
+## Local vault preview
+
+Guides are symlinks from `src/content/guides/` into the `vault` submodule.
+
+- `./scripts/vault-local.sh --dev` renders unpushed `../vault` commits on localhost — it fetches the sibling clone over the filesystem, never GitHub. `--reset` restores the normal checkout.
+- The script is untracked (`/scripts/` is in `.git/info/exclude`), so it is machine-local and absent from fresh clones.
+- While previewing, `git status` shows `modified: vault (new commits)`. Don't commit that pointer — it references a commit that isn't on the vault remote.
+
 ## Things to avoid
 
 - Adding features, refactors, or abstractions beyond what was asked
