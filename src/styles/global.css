@@ -38,6 +38,15 @@
   --grad-brand-linear: linear-gradient(135deg, #3d2377 0%, #241748 55%, #141021 100%);
   --grad-brand-text: linear-gradient(120deg, #d8b4fe 18%, #a855f7 55%, #7c3aed 100%);
 
+  /* Accent gradient — the purple that carries buttons, badges and active
+     markers. Every stop holds white text (worst case 5.38:1), which is why it
+     stops at #9333ea rather than running up to progsu.com's #c084fc: that
+     lighter end gives white only 2.64:1 and can't carry a label. */
+  --grad-accent: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #9333ea 100%);
+  --grad-accent-hover: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a855f7 100%);
+  /* Non-text rules: underlines and active indicators. Free to run lighter. */
+  --grad-accent-line: linear-gradient(90deg, #6d28d9, #a855f7);
+
   /* Surfaces */
   --c-bg: #ffffff;
   --c-bg-alt: #f6f6f7;
@@ -51,7 +60,8 @@
   --c-text-3: rgba(60, 60, 67, 0.56);
   --c-text-inverse-1: rgba(255, 255, 255, 0.95);
   --c-text-inverse-2: rgba(255, 255, 255, 0.72);
-  --c-text-inverse-3: rgba(255, 255, 255, 0.5);
+  /* 0.5 gave only 4.23:1 against the band's lightest stop (#3d2377). */
+  --c-text-inverse-3: rgba(255, 255, 255, 0.56);
 
   /* Lines */
   --c-divider: rgba(60, 60, 67, 0.12);
@@ -60,7 +70,7 @@
 
   /* Code blocks stay dark in both themes — they read as a distinct
      surface, and it keeps one Shiki theme instead of two. */
-  --c-code-bg: #181425;
+  --c-code-bg: #1e1e21;
   --c-code-border: rgba(255, 255, 255, 0.08);
   --c-code-text: rgba(235, 232, 245, 0.86);
   --c-code-tab-text: rgba(235, 232, 245, 0.5);
@@ -127,7 +137,7 @@
   /* Layout */
   --nav-height: 64px;
   --sidebar-width: 272px;
-  --aside-width: 224px;
+  --aside-width: 240px;
   --layout-max-width: 1440px;
   --content-width: 688px;
   --page-width: 688px;
@@ -174,22 +184,27 @@ html.dark {
   --c-brand-soft: rgba(139, 92, 246, 0.18);
   --c-brand-softer: rgba(139, 92, 246, 0.09);
 
-  --c-bg: #1a1526;
-  --c-bg-alt: #141021;
-  --c-bg-soft: #221c30;
-  --c-bg-mute: #2b2340;
-  --c-bg-elv: #221c30;
+  /* Neutral grey, not tinted purple — the purple belongs to the accents. */
+  --c-bg: #1b1b1f;
+  --c-bg-alt: #161618;
+  --c-bg-soft: #202127;
+  --c-bg-mute: #2a2a30;
+  --c-bg-elv: #202127;
 
-  --c-text-1: rgba(255, 255, 250, 0.87);
-  --c-text-2: rgba(235, 232, 245, 0.62);
-  --c-text-3: rgba(235, 232, 245, 0.4);
+  --c-text-1: rgba(255, 255, 255, 0.87);
+  --c-text-2: rgba(235, 235, 245, 0.6);
+  --c-text-3: rgba(235, 235, 245, 0.38);
 
-  --c-divider: rgba(140, 130, 165, 0.24);
-  --c-border: rgba(140, 130, 165, 0.44);
-  --c-gutter: #100d18;
+  --c-divider: rgba(130, 130, 140, 0.26);
+  --c-border: rgba(130, 130, 140, 0.46);
+  --c-gutter: #101012;
 
-  --c-code-bg: #141021;
-  --c-code-inline-bg: rgba(180, 170, 210, 0.16);
+  --c-code-bg: #161618;
+  --c-code-inline-bg: rgba(200, 200, 215, 0.16);
+
+  /* Buttons keep the light ramp so white labels stay legible; only the
+     non-text rules lighten, since #7c3aed is just 3.01:1 on this grey. */
+  --grad-accent-line: linear-gradient(90deg, #8b5cf6, #c084fc);
 
   --c-tip-1: #a78bfa;
   --c-tip-soft: rgba(139, 92, 246, 0.16);
@@ -406,6 +421,18 @@ html.dark {
   --focus-ring: 0 0 0 2px var(--grad-stop-3), 0 0 0 4px rgba(255, 255, 255, 0.9);
 }
 
+/* The band bottoms out on #141021, which is 1.09:1 against the grey page and
+   1.03:1 against the footer — without this the slab dissolves instead of
+   ending. The token flips per theme, so it also works where the page is white. */
+.brand-band::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--grad-accent-line);
+  pointer-events: none;
+}
+
 .brand-band h1,
 .brand-band h2,
 .brand-band h3 {
@@ -474,13 +501,13 @@ html.dark {
 }
 
 .btn--brand {
-  background: var(--c-brand-2);
-  border-color: var(--c-brand-2);
+  background: var(--grad-accent);
+  border-color: transparent;
   color: #fff;
 }
 .btn--brand:hover {
-  background: var(--c-brand-3);
-  border-color: var(--c-brand-3);
+  background: var(--grad-accent-hover);
+  border-color: transparent;
   color: #fff;
 }
 
@@ -541,10 +568,45 @@ a.card,
 
 a.card:hover,
 .card--link:hover {
-  border-color: var(--c-brand-2);
+  border-color: transparent;
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
   color: inherit;
+}
+
+/* Gradient hairline on hover. A masked ring rather than border-image, so it
+   follows the card's border-radius. The border-color fallback above still
+   reads correctly where mask-composite is unsupported. */
+a.card,
+.card--link {
+  position: relative;
+}
+
+a.card::after,
+.card--link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--grad-accent);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-normal) var(--ease);
+}
+
+a.card:hover::after,
+.card--link:hover::after {
+  opacity: 1;
 }
 
 .card__title {
@@ -591,7 +653,10 @@ a.card:hover,
   border: 1px solid transparent;
 }
 
-.badge--brand,
+.badge--brand {
+  background: var(--grad-accent);
+  color: #fff;
+}
 .badge--tip {
   background: var(--c-tip-soft);
   color: var(--c-tip-1);
@@ -703,19 +768,28 @@ a.card:hover,
 }
 
 /* Links */
+/* The link text stays a solid, readable purple — clipping body-size text to a
+   gradient kills both legibility and the underline. The gradient goes on the
+   underline instead, drawn as a background so it can carry one.
+   box-decoration-break makes a wrapped link underline each line separately. */
 .prose a {
   font-weight: 500;
   color: var(--c-brand-1);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-color: var(--c-brand-soft);
+  text-decoration: none;
+  background-image: var(--grad-accent-line);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  padding-bottom: 1px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   transition:
     color var(--duration-fast) var(--ease),
-    text-decoration-color var(--duration-fast) var(--ease);
+    background-size var(--duration-fast) var(--ease);
 }
 .prose a:hover {
   color: var(--c-brand-2);
-  text-decoration-color: currentColor;
+  background-size: 100% 2px;
 }
 
 /* Lists */

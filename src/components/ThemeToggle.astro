@@ -51,7 +51,9 @@
     border: none;
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--c-text-3);
+    /* Icon-only control: --c-text-3 sits at roughly 3:1 on both grounds, so
+       the sun and moon go one step up and clear it in either theme. */
+    color: var(--c-text-2);
     cursor: pointer;
     transition:
       color var(--duration-fast) var(--ease),

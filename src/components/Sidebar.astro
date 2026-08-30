@@ -7,7 +7,11 @@ const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
 ---
 
 <nav class="sb" aria-label="Guides">
-  <a href="/guides" class:list={["sb__home", { "is-active": pathname === "/guides" }]}>
+  <a
+    href="/guides"
+    class:list={["sb__home", { "is-active": pathname === "/guides" }]}
+    aria-current={pathname === "/guides" ? "page" : undefined}
+  >
     all guides
   </a>
 
@@ -17,6 +21,7 @@ const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
         <a
           href={group.link}
           class:list={["sb__group-title", { "is-active": pathname === group.link }]}
+          aria-current={pathname === group.link ? "page" : undefined}
         >
           {group.text}
         </a>
@@ -36,6 +41,7 @@ const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
   }
 
   .sb__home {
+    position: relative;
     display: block;
     padding: 6px 0;
     margin-bottom: var(--space-6);
@@ -62,6 +68,7 @@ const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
   }
 
   .sb__group-title {
+    position: relative;
     display: block;
     padding: 4px 0;
     font-size: var(--text-sm);
@@ -77,9 +84,34 @@ const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
     color: var(--c-brand-1);
   }
 
+  /* Same marker and gutter offset SidebarItem uses. A group title is active
+     only on its own index page, where no child item is — so the sidebar never
+     shows two of these at once. */
+  .sb__home.is-active::before,
+  .sb__group-title.is-active::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: calc((var(--space-4) + 1px) * -1);
+    width: 2px;
+    border-radius: 1px;
+    background: var(--grad-accent-line);
+  }
+
   .sb__list {
     margin: var(--space-1) 0 0;
     padding: 0;
     list-style: none;
+  }
+
+  /* The sidebar is a touch drawer below 960px, so rows need the 44px target.
+     Above it, it's a pointer-driven rail and keeps vue's tighter density. */
+  @media (max-width: 959px) {
+    .sb__link,
+    .sb__home,
+    .sb__group-title {
+      padding-block: var(--space-3);
+    }
   }
 </style>

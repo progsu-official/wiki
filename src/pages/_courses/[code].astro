@@ -1519,6 +1519,16 @@ const relatedCourses = (course.related ?? [])
     text-align: right;
   }
 
+  /* A full section's action is inert. `.btn` carries no disabled state of its
+     own, so say it here rather than leave it looking pressable. */
+  .cell-action .btn:disabled,
+  .cell-action .btn:disabled:hover {
+    background: var(--c-bg-mute);
+    border-color: transparent;
+    color: var(--c-text-3);
+    cursor: default;
+  }
+
   .seat-badge {
     font-family: var(--font-mono);
     font-weight: 500;

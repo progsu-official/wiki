@@ -64,7 +64,9 @@
     max-width: 640px;
     max-height: calc(100vh - var(--space-20) - var(--space-8));
     margin: 0 auto;
-    background: var(--c-bg);
+    /* The panel is elevated, so it takes the elevated surface: on the grey
+       theme --c-bg would be the page ground showing through the scrim. */
+    background: var(--c-bg-elv);
     border: 1px solid var(--c-divider);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
@@ -104,7 +106,7 @@
     padding: 2px var(--space-2);
     border: 1px solid var(--c-divider);
     border-radius: var(--radius-sm);
-    background: var(--c-bg-soft);
+    background: var(--c-bg-mute);
     color: var(--c-text-3);
     font-family: var(--font-mono);
     font-size: 11px;
@@ -145,7 +147,7 @@
     padding: 0 4px;
     border: 1px solid var(--c-divider);
     border-radius: var(--radius-sm);
-    background: var(--c-bg);
+    background: var(--c-bg-mute);
     color: var(--c-text-3);
     font-family: var(--font-mono);
     font-size: 11px;

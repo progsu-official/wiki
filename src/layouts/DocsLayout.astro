@@ -157,10 +157,13 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     bottom: 0;
     left: 0;
     z-index: calc(var(--z-overlay) + 1);
-    width: min(var(--sidebar-width), 80vw);
-    padding-inline: var(--space-6);
+    /* Drawer sizing: near-full width, capped — same shape as vue's. */
+    width: calc(100vw - 64px);
+    max-width: 320px;
+    padding: var(--space-6) var(--space-6) var(--space-24);
     background: var(--c-bg);
     border-right: 1px solid var(--c-divider);
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     transform: translateX(-100%);
@@ -201,9 +204,11 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
 
     .doc__sidebar {
       z-index: var(--z-sticky);
+      width: var(--sidebar-width);
+      max-width: none;
+      padding: var(--space-6) var(--space-6) var(--space-24) var(--space-8);
       transform: none;
       box-shadow: none;
-      padding-left: max(var(--space-8), calc((100vw - var(--layout-max-width)) / 2));
     }
 
     .doc__main {
@@ -227,6 +232,22 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     .doc__grid--with-aside .doc__aside {
       order: 0;
       margin-bottom: 0;
+    }
+  }
+
+  /* Past --layout-max-width the page gains outer gutters. The sidebar GROWS to
+     absorb the left one; padding alone would eat into its fixed 272px, leaving
+     8px of usable column on a 1920px monitor and spilling its text over the
+     article. The article is inset by the same amount, so the two can't overlap. */
+  @media (min-width: 1440px) {
+    .doc__sidebar {
+      width: calc((100vw - var(--layout-max-width)) / 2 + var(--sidebar-width));
+      padding-left: calc((100vw - var(--layout-max-width)) / 2 + var(--space-8));
+    }
+
+    .doc__main {
+      padding-left: calc((100vw - var(--layout-max-width)) / 2 + var(--sidebar-width));
+      padding-right: calc((100vw - var(--layout-max-width)) / 2);
     }
   }
 </style>

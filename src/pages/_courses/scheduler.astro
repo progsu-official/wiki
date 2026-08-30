@@ -751,13 +751,26 @@ function isHourSlot(slot: number) {
     border-top: 1px solid var(--c-divider);
   }
 
-  /* ── Course blocks (dynamically created — :global needed) ── */
+  /* ── Course blocks (dynamically created — :global needed) ──
+     The catalog palette is authored as dark-theme pastels at low alpha, so one
+     pass of it is nearly invisible on either ground. The fill is composited
+     over the grid's own surface until the block is opaque: three passes on the
+     light ground, where the pastels wash out toward white, and two on the dark
+     grey, where they carry further. Edge and text come from tokens, and the
+     solid-hue bar repeats the legend dot, so the block still reads as a block
+     when the fill itself is faint. */
   :global(.sched-block) {
+    --course-fill: var(--c-brand-soft);
+    --course-hue: var(--c-brand-2);
     position: absolute;
     box-sizing: border-box;
-    border: 1px solid;
+    border: 1px solid var(--c-border);
     border-radius: var(--radius-sm);
-    padding: 2px 4px;
+    padding: 2px 4px 2px 8px;
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -769,8 +782,28 @@ function isHourSlot(slot: number) {
     z-index: 2;
     transition: box-shadow var(--duration-fast) var(--ease);
   }
+  :global(html.dark .sched-block) {
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+  }
+  :global(.sched-block)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--course-hue);
+  }
   :global(.sched-block):hover {
     box-shadow: var(--shadow-md);
+  }
+  /* The hover shadow is on the same property as the focus ring, so state it
+     again here or a hovered block would lose its ring. */
+  :global(.sched-block):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 
   :global(.sched-block__code) {
@@ -903,10 +936,14 @@ function isHourSlot(slot: number) {
     background: var(--c-bg-mute);
   }
 
+  /* Colour key. The solid hue is saturated enough to sit on the dark grey,
+     but thin against the light surface, so it gets a token ring to hold its
+     edge. It only ever repeats what the code beside it already says. */
   :global(.panel-course__dot) {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: var(--radius-full);
+    box-shadow: inset 0 0 0 1px var(--c-border);
     flex-shrink: 0;
   }
 
@@ -1034,7 +1071,7 @@ function isHourSlot(slot: number) {
     position: fixed;
     inset: 0;
     z-index: var(--z-overlay);
-    background: rgba(20, 16, 33, 0.4);
+    background: rgba(0, 0, 0, 0.45);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--duration-normal) var(--ease);
@@ -1186,9 +1223,25 @@ function isHourSlot(slot: number) {
   :global(.add-item):hover {
     border-color: var(--c-brand-2);
   }
+  /* Already on the schedule. The label says so, the dashed edge and the muted
+     text reinforce it — none of which depends on colour, and none of which
+     dims the code below reading contrast the way a blanket opacity did. */
   :global(.add-item.in-schedule) {
-    opacity: 0.5;
+    border-style: dashed;
+    color: var(--c-text-3);
+    cursor: default;
     pointer-events: none;
+  }
+  :global(.add-item.in-schedule) :global(.add-item__code),
+  :global(.add-item.in-schedule) :global(.add-item__title) {
+    color: var(--c-text-3);
+  }
+
+  :global(.add-item__state) {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--c-text-3);
   }
 
   :global(.add-item__code) {
@@ -1250,6 +1303,10 @@ function isHourSlot(slot: number) {
     border-color: var(--c-brand-2);
     color: var(--c-text-1);
   }
+  :global(.add-section-row__meta) {
+    display: block;
+    color: var(--c-text-3);
+  }
 
   /* ── Conflict highlight ── */
   :global(.sched-block.conflict) {
@@ -1258,7 +1315,7 @@ function isHourSlot(slot: number) {
     position: relative;
   }
   :global(.sched-block.conflict)::after {
-    content: "⚠ conflict";
+    content: "conflict";
     position: absolute;
     top: 2px;
     right: 4px;
@@ -1399,6 +1456,9 @@ function isHourSlot(slot: number) {
   }
 
   :global(.day-block) {
+    --course-fill: var(--c-brand-soft);
+    --course-hue: var(--c-brand-2);
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1406,12 +1466,35 @@ function isHourSlot(slot: number) {
     gap: var(--space-1);
     padding: var(--space-4) var(--space-5);
     border-radius: var(--radius-lg);
-    border: 1px solid;
+    border: 1px solid var(--c-border);
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+    overflow: hidden;
     cursor: pointer;
     transition: box-shadow var(--duration-fast) var(--ease);
   }
+  :global(html.dark .day-block) {
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+  }
+  :global(.day-block)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--course-hue);
+  }
   :global(.day-block):hover {
     box-shadow: var(--shadow-md);
+  }
+  :global(.day-block):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 
   :global(.day-block__time) {
@@ -1883,8 +1966,8 @@ function isHourSlot(slot: number) {
       el.style.top = `${y}px`;
       el.style.width = `${w}px`;
       el.style.height = `${h}px`;
-      el.style.background = `linear-gradient(${b.color.bg}, ${b.color.bg}), linear-gradient(${b.color.bg}, ${b.color.bg}), var(--c-bg)`;
-      el.style.borderColor = b.color.border;
+      el.style.setProperty("--course-fill", b.color.bg);
+      el.style.setProperty("--course-hue", solidHue(b.color.bg));
       el.innerHTML = `<span class="sched-block__code">${s.code}</span><span class="sched-block__room">${s.section.room}</span>`;
       blockOverlay.appendChild(el);
     }
@@ -2181,7 +2264,11 @@ function isHourSlot(slot: number) {
     item.innerHTML = `
       <span class="add-item__code">${c.code}</span>
       <span class="add-item__title">${c.title}</span>
-      <svg class="add-item__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      ${
+        inSched
+          ? '<span class="add-item__state">already added</span>'
+          : '<svg class="add-item__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+      }
     `;
 
     const sections = document.createElement("div");
@@ -2189,7 +2276,7 @@ function isHourSlot(slot: number) {
     for (const sec of c.sections) {
       const row = document.createElement("div");
       row.className = "add-section-row";
-      row.innerHTML = `<span>${sec.id} · ${sec.professor}</span><span style="display:block;opacity:0.7">${sec.days.join("/")} ${fmtT(sec.startH, sec.startM)}–${fmtT(sec.endH, sec.endM)} · ${sec.seats}/${sec.cap} seats</span>`;
+      row.innerHTML = `<span>${sec.id} · ${sec.professor}</span><span class="add-section-row__meta">${sec.days.join("/")} ${fmtT(sec.startH, sec.startM)}–${fmtT(sec.endH, sec.endM)} · ${sec.seats}/${sec.cap} seats</span>`;
       row.addEventListener("click", (ev) => {
         ev.stopPropagation();
         addToSchedule(c, sec);
@@ -2342,7 +2429,8 @@ function isHourSlot(slot: number) {
         "aria-label",
         `${s.code} — ${s.course.title}, ${fmtT(s.section.startH, s.section.startM)} to ${fmtT(s.section.endH, s.section.endM)}`
       );
-      el.style.cssText = `background:linear-gradient(${c.bg}, ${c.bg}), linear-gradient(${c.bg}, ${c.bg}), var(--c-bg);border-color:${c.border}`;
+      el.style.setProperty("--course-fill", c.bg);
+      el.style.setProperty("--course-hue", solidHue(c.bg));
       el.innerHTML = `
         <span class="day-block__time">${fmtT(s.section.startH, s.section.startM)}–${fmtT(s.section.endH, s.section.endM)}</span>
         <div class="day-block__body">

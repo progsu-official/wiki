@@ -184,11 +184,24 @@ function timeLabel(slot: number) {
     border-right: 1px solid var(--c-divider);
   }
 
-  /* ── Shared course blocks ── */
+  /* ── Shared course blocks ──
+     The catalog palette is dark-theme pastels at low alpha, so one pass of it
+     barely registers on either ground. The fill is composited over the grid's
+     own surface until the block is opaque: three passes on the light ground,
+     where the pastels wash out toward white, two on the dark grey, where they
+     carry further. Edge and text come from tokens, and the solid-hue bar
+     repeats the course-list dot, so colour is never the only signal. */
   :global(.share-block) {
+    --course-fill: var(--c-brand-soft);
+    --course-hue: var(--c-brand-2);
+    position: relative;
     border-radius: var(--radius-sm);
-    border: 1px solid;
-    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--c-border);
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+    padding: var(--space-1) var(--space-2) var(--space-1) 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -196,6 +209,20 @@ function timeLabel(slot: number) {
     overflow: hidden;
     z-index: 2;
     margin: 1px;
+  }
+  :global(html.dark .share-block) {
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+  }
+  :global(.share-block)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--course-hue);
   }
   :global(.share-block__code) {
     font-family: var(--font-mono);
@@ -233,10 +260,13 @@ function timeLabel(slot: number) {
     border-radius: var(--radius-lg);
   }
 
+  /* Colour key. Saturated enough for the dark grey; on the light surface the
+     token ring holds its edge. It repeats what the code beside it says. */
   :global(.share-course__dot) {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: var(--radius-full);
+    box-shadow: inset 0 0 0 1px var(--c-border);
     flex-shrink: 0;
   }
 
@@ -414,7 +444,9 @@ function timeLabel(slot: number) {
         const row = Math.round(startSlot) + 2;
         const el = document.createElement("div");
         el.className = "share-block";
-        el.style.cssText = `grid-column:${col};grid-row:${row}/span ${span};background:linear-gradient(${c.bg}, ${c.bg}), linear-gradient(${c.bg}, ${c.bg}), var(--c-bg);border-color:${c.border}`;
+        el.style.cssText = `grid-column:${col};grid-row:${row}/span ${span}`;
+        el.style.setProperty("--course-fill", c.bg);
+        el.style.setProperty("--course-hue", solidHue(c.bg));
         el.innerHTML = `<span class="share-block__code">${s.code}</span><span class="share-block__room">${s.section.room}</span>`;
         shareGrid.appendChild(el);
       }

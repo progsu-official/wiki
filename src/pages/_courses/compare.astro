@@ -339,12 +339,22 @@ function isHourSlot(slot: number) {
     border-top: 1px solid var(--c-divider);
   }
 
-  /* ── Course blocks (dynamically created — :global needed) ── */
+  /* ── Course blocks (dynamically created — :global needed) ──
+     Same compositing as the scheduler grid: the catalog palette is dark-theme
+     pastel at low alpha, so the fill is layered over the grid's own surface
+     until the block is opaque — three passes on the light ground, two on the
+     dark grey. Edge and text come from tokens. */
   :global(.cmp-block) {
+    --course-fill: var(--c-brand-soft);
+    --course-hue: var(--c-brand-2);
     position: absolute;
     box-sizing: border-box;
-    border: 1px solid;
-    padding: 1px 4px;
+    border: 1px solid var(--c-border);
+    padding: 1px 4px 1px 6px;
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -353,11 +363,35 @@ function isHourSlot(slot: number) {
     gap: 0;
     overflow: hidden;
     z-index: 2;
-    transition: opacity var(--duration-fast) var(--ease);
+  }
+  :global(html.dark .cmp-block) {
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+  }
+  :global(.cmp-block)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--course-hue);
   }
 
+  /* Shared vs unique is carried by the edge and the fill weight, not by
+     dimming the whole block — the code label has to stay readable in both. */
   :global(.cmp-block--shared) {
-    opacity: 0.5;
+    border-style: dashed;
+    background:
+      linear-gradient(var(--course-fill), var(--course-fill)),
+      linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+  }
+  :global(html.dark .cmp-block--shared) {
+    background: linear-gradient(var(--course-fill), var(--course-fill)), var(--c-bg);
+  }
+  :global(.cmp-block--shared)::before {
+    opacity: 0.55;
   }
 
   :global(.cmp-block--unique) {
@@ -486,14 +520,7 @@ function isHourSlot(slot: number) {
 </style>
 
 <script>
-  import {
-    DAYS,
-    START_HOUR,
-    subjectColors,
-    courseColor,
-    toSlot,
-    fmtTime,
-  } from "../../scripts/courseCatalog";
+  import { DAYS, START_HOUR, courseColor, toSlot, fmtTime } from "../../scripts/courseCatalog";
   import * as store from "../../scripts/scheduleStore";
   import type { ResolvedEntry, ScheduleData } from "../../scripts/scheduleStore";
 
@@ -513,6 +540,11 @@ function isHourSlot(slot: number) {
 
   function fmtT(h: number, m: number) {
     return fmtTime(h, m);
+  }
+  // The catalog palette is authored as translucent fills; the solid hue is what
+  // reads as a colour key at marker size in both themes.
+  function solidHue(fill: string) {
+    return fill.replace(/rgba\(([^)]+),\s*[\d.]+\)/, "rgb($1)");
   }
   function fmtMins(mins: number) {
     return fmtT(Math.floor(mins / 60), mins % 60);
@@ -655,8 +687,8 @@ function isHourSlot(slot: number) {
       el.style.top = `${y}px`;
       el.style.width = `${w}px`;
       el.style.height = `${h}px`;
-      el.style.background = `linear-gradient(${b.color.bg}, ${b.color.bg}), linear-gradient(${b.color.bg}, ${b.color.bg}), var(--c-bg)`;
-      el.style.borderColor = b.color.border;
+      el.style.setProperty("--course-fill", b.color.bg);
+      el.style.setProperty("--course-hue", solidHue(b.color.bg));
       el.setAttribute(
         "aria-label",
         `${b.entry.code}${b.isShared ? " (in both schedules)" : " (unique to this schedule)"}`

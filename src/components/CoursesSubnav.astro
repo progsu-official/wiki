@@ -48,19 +48,46 @@ const tabs = [
     font-weight: 500;
     color: var(--c-text-2);
     text-decoration: none;
-    border-bottom: 2px solid transparent;
     margin-bottom: -1px;
-    transition:
-      color var(--duration-fast) var(--ease),
-      border-color var(--duration-fast) var(--ease);
+    transition: color var(--duration-fast) var(--ease);
   }
+
+  /* The active indicator is a positioned bar, not a border: a border cannot
+     carry the accent gradient. */
+  .csub__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--grad-accent-line);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease);
+  }
+
   .csub__link:hover {
     color: var(--c-text-1);
   }
+  .csub__link:hover::after {
+    opacity: 0.35;
+  }
+
   .csub__link.is-active {
     color: var(--c-brand-1);
-    border-bottom-color: var(--c-brand-2);
     font-weight: 600;
+  }
+  .csub__link.is-active::after,
+  .csub__link.is-active:hover::after {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .csub__link,
+    .csub__link::after {
+      transition: none;
+    }
   }
 
   @media (max-width: 640px) {

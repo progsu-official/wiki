@@ -35,6 +35,7 @@ const active = pathname === item.link;
   }
 
   .sb__link {
+    position: relative;
     display: block;
     padding: 6px 0;
     font-size: var(--text-sm);
@@ -54,9 +55,34 @@ const active = pathname === item.link;
     font-weight: 600;
   }
 
+  /* The marker sits in the gutter left of the label. On a nested item that is
+     exactly where the .sb__nested rule runs, so the segment beside the current
+     page lights up instead of a second line appearing. The label itself stays a
+     solid brand purple — 14px clipped to a gradient stops being readable. */
+  .sb__link.is-active::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: calc((var(--space-4) + 1px) * -1);
+    width: 2px;
+    border-radius: 1px;
+    background: var(--grad-accent-line);
+  }
+
   .sb__nested {
     margin: 0 0 0 var(--space-1);
     padding-left: var(--space-4);
     border-left: 1px solid var(--c-divider);
+  }
+
+  /* The sidebar is a touch drawer below 960px, so rows need the 44px target.
+     Above it, it's a pointer-driven rail and keeps vue's tighter density. */
+  @media (max-width: 959px) {
+    .sb__link,
+    .sb__home,
+    .sb__group-title {
+      padding-block: var(--space-3);
+    }
   }
 </style>

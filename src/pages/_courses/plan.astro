@@ -287,13 +287,17 @@ import PlanWiring from "../../components/courses/PlanWiring.astro";
       group.appendChild(list);
       groupsEl.appendChild(group);
     }
-
-    groupsEl.addEventListener("click", (e) => {
-      const btn = (e.target as HTMLElement).closest("[data-remove]") as HTMLElement | null;
-      if (!btn) return;
-      plan.toggle(btn.dataset.remove!);
-    });
   }
+
+  // groupsEl is stable — only its innerHTML is replaced — so this is delegated
+  // once here rather than inside render(), which onChange re-invokes. Registering
+  // it per render stacked a listener each time, and a single "remove" click then
+  // toggled the course N times: removed and re-added on every even render.
+  groupsEl.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest("[data-remove]") as HTMLElement | null;
+    if (!btn) return;
+    plan.toggle(btn.dataset.remove!);
+  });
 
   plan.onChange(render);
   render();

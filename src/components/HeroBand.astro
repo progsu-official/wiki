@@ -27,11 +27,13 @@ const hasActions = Astro.slots.has("default");
 
 <style>
   .hero {
-    /* The page-coloured inner ring of the global focus token disappears
-       against the band, so the ring inverts for anything focused in here. */
-    --focus-ring: 0 0 0 2px var(--grad-stop-2), 0 0 0 4px var(--c-text-inverse-1);
     padding-block: var(--space-32);
   }
+
+  /* The band bottoms out on its darkest stop, which now sits darker than the
+     grey page under it — the seam reads as a fade rather than an edge. A
+     hairline closes the band deliberately. `.brand-band` supplies the
+     positioning and the inverted focus ring. */
 
   .hero__inner {
     display: flex;

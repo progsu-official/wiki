@@ -172,6 +172,9 @@ function isActive(href: string): boolean {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
+    /* Every link carries the padding so the active one's underline costs no
+       height and the row never shifts when the page changes. */
+    padding-block: 4px;
     font-size: 14px;
     font-weight: 500;
     color: var(--c-text-2);
@@ -180,9 +183,15 @@ function isActive(href: string): boolean {
   .navbar__link:hover {
     color: var(--c-text-1);
   }
+  /* The underline is drawn as a background, the way .prose a does it — a
+     text-decoration can't hold a gradient, and the label has to stay solid. */
   .navbar__link.is-active {
     color: var(--c-brand-1);
     font-weight: 600;
+    background-image: var(--grad-accent-line);
+    background-repeat: no-repeat;
+    background-size: 100% 2px;
+    background-position: 0 100%;
   }
 
   .navbar__external {
@@ -219,7 +228,7 @@ function isActive(href: string): boolean {
     border: none;
     border-radius: var(--radius-full);
     background: transparent;
-    color: var(--c-text-3);
+    color: var(--c-text-2);
     font-family: var(--font-body);
     cursor: pointer;
     transition:
@@ -307,6 +316,10 @@ function isActive(href: string): boolean {
       min-height: 44px;
       font-size: 15px;
       border-bottom: 1px solid var(--c-divider);
+    }
+    /* A full-row underline would sit on top of the row divider. */
+    .navbar__links.is-open .navbar__link.is-active {
+      background-image: none;
     }
     .navbar__links.is-open .navbar__link:last-child {
       border-bottom: none;
