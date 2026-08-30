@@ -5,6 +5,7 @@ import mdx from "@astrojs/mdx";
 import { remarkWikilinks } from "./src/lib/remark-wikilinks.mjs";
 import { remarkMermaid } from "./src/lib/remark-mermaid.mjs";
 import { remarkCallouts } from "./src/lib/remark-callouts.mjs";
+import { remarkDemoteHeadings } from "./src/lib/remark-demote-headings.mjs";
 
 // Every guide is a symlink into the vault submodule. If it isn't checked out,
 // the collection silently comes back empty and we'd ship a wiki with no guides.
@@ -27,7 +28,7 @@ const labelLanguage = {
 export default defineConfig({
   integrations: [tailwind(), mdx()],
   markdown: {
-    remarkPlugins: [remarkWikilinks, remarkMermaid, remarkCallouts],
+    remarkPlugins: [remarkDemoteHeadings, remarkWikilinks, remarkMermaid, remarkCallouts],
     shikiConfig: {
       // Code blocks stay dark in both themes, so one theme is enough.
       theme: "vitesse-dark",

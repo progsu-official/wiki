@@ -29,10 +29,8 @@ const norm = (s: string) =>
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 const lead = headings[0];
-const leadRepeatsTitle = lead?.depth === 1 && norm(lead.text) === norm(entry.data.title);
+const leadRepeatsTitle = !!lead && norm(lead.text) === norm(entry.data.title);
 const body = leadRepeatsTitle ? headings.slice(1) : headings;
-const shift = body.some((h) => h.depth === 1);
-const toc = shift ? body.map((h) => ({ ...h, depth: h.depth + 1 })) : body;
 
 const updated = entry.data.updated.toLocaleDateString("en-US", {
   year: "numeric",
@@ -47,47 +45,33 @@ const meta = `${entry.data.readTime} · by ${entry.data.author.name} · updated 
 
 <DocsLayout
   title={entry.data.title}
-  headings={toc}
+  headings={body}
   editSlug={entry.slug}
   updated={entry.data.updated}
 >
   <PageHeader title={entry.data.title} meta={meta} tags={entry.data.tags} />
 
-  <div
-    class:list={[
-      "prose",
-      "guide-body",
-      { "guide-body--drop-lead": leadRepeatsTitle, "guide-body--sections": shift },
-    ]}
-  >
+  <div class:list={["prose", "guide-body", { "guide-body--drop-lead": leadRepeatsTitle }]}>
     <Content />
   </div>
 </DocsLayout>
 
 <style>
-  /* The lede heading only repeats what the page head already says. */
-  .guide-body.prose.guide-body--drop-lead > :global(h1:first-child) {
-    display: none;
-  }
-
-  /* With it hidden, whatever follows becomes the first thing on the page and
-     should sit flush under the head rule rather than under a second one. */
-  .guide-body.prose.guide-body--drop-lead > :global(h1:first-child + *) {
+  /* A guide that opens on a section heading shouldn't draw a second rule
+     immediately under the page head's. */
+  .guide-body.prose > :global(h2:first-child) {
     margin-top: 0;
     padding-top: 0;
     border-top: none;
   }
 
-  /* Guides that use `#` for their sections: read those as h2s would read. */
-  .guide-body.prose.guide-body--sections > :global(h1) {
-    font-size: 24px;
-    line-height: 32px;
-    margin: 48px 0 16px;
-    padding-top: 24px;
-    border-top: 1px solid var(--c-divider);
+  /* The lede heading only repeats what the page head already says. */
+  .guide-body.prose.guide-body--drop-lead > :global(h2:first-child) {
+    display: none;
   }
 
-  .guide-body.prose.guide-body--sections > :global(h1:first-child) {
+  /* With it hidden, whatever follows becomes the first thing on the page. */
+  .guide-body.prose.guide-body--drop-lead > :global(h2:first-child + *) {
     margin-top: 0;
     padding-top: 0;
     border-top: none;
