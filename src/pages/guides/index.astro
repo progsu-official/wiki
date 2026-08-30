@@ -10,7 +10,7 @@ const countFor = (category: string) => allGuides.filter((g) => g.data.category =
 
 <Layout title="Guides">
   <PageHeader
-    eyebrow="Guides"
+    eyebrow="guides"
     headline="everything you need<br>to break in."
     subline="Signed, dated, and written by people who've been through it."
   />
@@ -21,10 +21,10 @@ const countFor = (category: string) => allGuides.filter((g) => g.data.category =
       <CategoryCard
         title="zero to hero"
         href="/guides/zero-to-hero"
-        description="Start here. CS fundamentals, math intuition, and the first principles that make everything else click."
+        description="start here. CS fundamentals, math intuition, and the first principles that make everything else click."
         count={countFor("zero-to-hero")}
         variant="featured"
-        eyebrow="Start here"
+        eyebrow="start here"
       />
     </div>
 
@@ -39,7 +39,7 @@ const countFor = (category: string) => allGuides.filter((g) => g.data.category =
       <CategoryCard
         title="career"
         href="/guides/career"
-        description="Resumes, timelines, offer negotiation, and how to navigate the hiring process."
+        description="resumes, timelines, offer negotiation, and how to navigate the hiring process."
         count={countFor("career")}
       />
     </div>
@@ -48,13 +48,13 @@ const countFor = (category: string) => allGuides.filter((g) => g.data.category =
       <CategoryCard
         title="networking"
         href="/guides/networking"
-        description="Cold outreach, LinkedIn, warm intros, and building real relationships that lead somewhere."
+        description="cold outreach, LinkedIn, warm intros, and building real relationships that lead somewhere."
         count={countFor("networking")}
       />
       <CategoryCard
         title="misc"
         href="/guides/misc"
-        description="Tools, productivity, and everything else worth knowing."
+        description="tools, productivity, and everything else worth knowing."
         count={countFor("misc")}
       />
     </div>

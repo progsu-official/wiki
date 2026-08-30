@@ -30,7 +30,7 @@ const breadcrumbs = [
 
 <ContentLayout title={entry.data.title} breadcrumbs={breadcrumbs} headings={headings} accent={categoryMeta.accent}>
   <PageHeader
-    eyebrow={categoryMeta.label}
+    eyebrow={categoryMeta.label.toLowerCase()}
     headline={entry.data.title}
     subline={`${entry.data.readTime} · by ${entry.data.author.name} · updated ${entry.data.updated.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
   />

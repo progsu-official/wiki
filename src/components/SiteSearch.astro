@@ -187,11 +187,11 @@
 
     let html = "";
     if (containerMatches.length > 0) {
-      html += `<li class="sitesearch-group-label">CATEGORIES</li>`;
+      html += `<li class="sitesearch-group-label">categories</li>`;
       containerMatches.forEach((c, i) => (html += itemHtml(c, i)));
     }
     if (pageMatches.length > 0) {
-      html += `<li class="sitesearch-group-label">GUIDES</li>`;
+      html += `<li class="sitesearch-group-label">guides</li>`;
       pageMatches.forEach((p, i) => (html += itemHtml(p, containerMatches.length + i)));
     }
     results.innerHTML = html;
