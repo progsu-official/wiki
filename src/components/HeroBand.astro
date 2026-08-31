@@ -1,18 +1,66 @@
 ---
 interface Props {
   eyebrow?: string;
-  /** Rendered as HTML so the headline can carry its own <br>. */
+  /** Rendered as HTML so the headline can carry its own <br> and accent span. */
   title: string;
   subtitle?: string;
 }
 
 const { eyebrow, title, subtitle } = Astro.props;
 const hasActions = Astro.slots.has("default");
+const hasMeta = Astro.slots.has("meta");
 ---
 
 <section class="brand-band hero">
+  {/* Routes that light up one after another — the roadmap this wiki is about. */}
+  <div class="hero__bg" aria-hidden="true">
+    <span class="hero__aurora hero__aurora--1"></span>
+    <span class="hero__aurora hero__aurora--2"></span>
+
+    <svg class="hero__routes" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+      <g class="hero__lines">
+        <path
+          class="hero__line"
+          pathLength="1000"
+          d="M-60 500 C 180 500 260 384 470 372 S 800 296 1260 186"></path>
+        <path
+          class="hero__line"
+          pathLength="1000"
+          d="M-60 140 C 220 140 300 252 560 268 S 900 344 1260 436"></path>
+        <path
+          class="hero__line"
+          pathLength="1000"
+          d="M-60 300 C 260 300 400 212 640 202 S 980 250 1260 300"></path>
+      </g>
+
+      <g class="hero__pulses">
+        <path
+          class="hero__pulse"
+          pathLength="1000"
+          d="M-60 500 C 180 500 260 384 470 372 S 800 296 1260 186"></path>
+        <path
+          class="hero__pulse"
+          pathLength="1000"
+          d="M-60 140 C 220 140 300 252 560 268 S 900 344 1260 436"></path>
+        <path
+          class="hero__pulse"
+          pathLength="1000"
+          d="M-60 300 C 260 300 400 212 640 202 S 980 250 1260 300"></path>
+      </g>
+    </svg>
+
+    <span class="hero__veil"></span>
+  </div>
+
   <div class="hero__inner container">
-    {eyebrow && <p class="hero__eyebrow">{eyebrow}</p>}
+    {
+      eyebrow && (
+        <p class="hero__eyebrow">
+          <span class="hero__dot" aria-hidden="true" />
+          {eyebrow}
+        </p>
+      )
+    }
     <h1 class="hero__title" set:html={title} />
     {subtitle && <p class="hero__subtitle">{subtitle}</p>}
     {
@@ -22,15 +70,116 @@ const hasActions = Astro.slots.has("default");
         </div>
       )
     }
+    {
+      hasMeta && (
+        <p class="hero__meta">
+          <slot name="meta" />
+        </p>
+      )
+    }
   </div>
 </section>
 
 <style>
   .hero {
-    padding-block: var(--space-24);
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-24) var(--space-20);
   }
 
+  /* ── Moving ground ── */
+
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero__aurora {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .hero__aurora--1 {
+    top: -46%;
+    left: -12%;
+    width: 820px;
+    height: 820px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.5), rgba(124, 58, 237, 0) 68%);
+    animation: hero-drift-1 26s ease-in-out infinite alternate;
+  }
+  .hero__aurora--2 {
+    right: -18%;
+    bottom: -60%;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.34), rgba(168, 85, 247, 0) 66%);
+    animation: hero-drift-2 34s ease-in-out infinite alternate;
+  }
+
+  @keyframes hero-drift-1 {
+    to {
+      transform: translate3d(90px, 60px, 0) scale(1.12);
+    }
+  }
+  @keyframes hero-drift-2 {
+    to {
+      transform: translate3d(-110px, -50px, 0) scale(1.08);
+    }
+  }
+
+  .hero__routes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    /* The lines fade out before the band's closing hairline. */
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+  }
+
+  .hero__line {
+    stroke: rgba(216, 180, 254, 0.16);
+    stroke-width: 1.25;
+  }
+
+  /* A short dash travelling the same path reads as a signal moving along it. */
+  .hero__pulse {
+    stroke: rgba(240, 219, 255, 0.85);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 55 945;
+    animation: hero-pulse 9s linear infinite;
+  }
+  .hero__pulse:nth-child(2) {
+    animation-delay: 3s;
+  }
+  .hero__pulse:nth-child(3) {
+    animation-delay: 6s;
+  }
+
+  @keyframes hero-pulse {
+    from {
+      stroke-dashoffset: 1000;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Darkens the middle so the headline never competes with the artwork. */
+  .hero__veil {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(58% 54% at 50% 48%, rgba(20, 16, 33, 0.66), transparent 72%);
+  }
+
+  /* ── Content ── */
+
   .hero__inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -38,11 +187,38 @@ const hasActions = Astro.slots.has("default");
   }
 
   .hero .hero__eyebrow {
-    margin: 0 0 var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-5);
+    padding: 6px 14px 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.07);
     font-size: var(--text-sm);
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: var(--tracking-normal);
-    color: var(--c-text-inverse-3);
+    color: var(--c-text-inverse-2);
+    animation: hero-rise 700ms var(--ease-out) both;
+  }
+
+  .hero__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d8b4fe;
+    box-shadow: 0 0 0 0 rgba(216, 180, 254, 0.55);
+    animation: hero-ping 2.6s ease-out infinite;
+  }
+
+  @keyframes hero-ping {
+    0% {
+      box-shadow: 0 0 0 0 rgba(216, 180, 254, 0.5);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 9px rgba(216, 180, 254, 0);
+    }
   }
 
   .hero .hero__title {
@@ -52,6 +228,31 @@ const hasActions = Astro.slots.has("default");
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
     color: var(--c-text-inverse-1);
+    animation: hero-rise 700ms var(--ease-out) 80ms both;
+  }
+
+  /* Set via set:html from the page, so it sits outside this file's scoping. */
+  .hero__title :global(.hero__accent) {
+    background: linear-gradient(
+      100deg,
+      #d8b4fe 12%,
+      #c084fc 32%,
+      #f5d0fe 50%,
+      #c084fc 68%,
+      #d8b4fe 88%
+    );
+    background-size: 240% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: hero-sheen 8s linear infinite;
+  }
+
+  @keyframes hero-sheen {
+    to {
+      background-position: -240% 0;
+    }
   }
 
   .hero .hero__subtitle {
@@ -60,6 +261,7 @@ const hasActions = Astro.slots.has("default");
     font-size: var(--text-lg);
     line-height: var(--leading-normal);
     color: var(--c-text-inverse-2);
+    animation: hero-rise 700ms var(--ease-out) 160ms both;
   }
 
   .hero__actions {
@@ -68,11 +270,61 @@ const hasActions = Astro.slots.has("default");
     justify-content: center;
     gap: var(--space-4);
     margin-top: var(--space-8);
+    animation: hero-rise 700ms var(--ease-out) 240ms both;
+  }
+
+  .hero .hero__meta {
+    margin: var(--space-6) 0 0;
+    font-size: var(--text-sm);
+    color: var(--c-text-inverse-3);
+    animation: hero-rise 700ms var(--ease-out) 320ms both;
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   @media (max-width: 768px) {
     .hero {
       padding-block: var(--space-16);
+    }
+
+    /* The headline's own <br> is set for the wide measure. */
+    .hero__title :global(br) {
+      display: none;
+    }
+
+    .hero__veil {
+      background: radial-gradient(90% 52% at 50% 48%, rgba(20, 16, 33, 0.7), transparent 78%);
+    }
+  }
+
+  @media (max-width: 640px) {
+    /* .hero__inner centres its children, so the row has to claim the width
+       before a full-bleed button inside it can take it. */
+    .hero__actions {
+      align-self: stretch;
+    }
+  }
+
+  /* Ambient motion is decoration; pin every layer to a good static frame. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero__aurora--1,
+    .hero__aurora--2,
+    .hero__pulse,
+    .hero__dot {
+      animation: none;
+    }
+
+    .hero__pulse {
+      opacity: 0;
     }
   }
 </style>

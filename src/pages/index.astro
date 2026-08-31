@@ -4,7 +4,11 @@ import Layout from "../layouts/Layout.astro";
 import HeroBand from "../components/HeroBand.astro";
 import FeatureCard from "../components/FeatureCard.astro";
 
-const guides = await getCollection("guides");
+// roadmap-by-year is frontmatter-only — it exists so wikilinks resolve, and it
+// renders as a card index rather than a guide, so it isn't counted.
+const guides = (await getCollection("guides")).filter(
+  (g) => g.slug !== "zero-to-hero/roadmap-by-year"
+);
 const countFor = (category: string) => guides.filter((g) => g.data.category === category).length;
 
 const categories = [
@@ -48,20 +52,23 @@ const categories = [
 >
   <HeroBand
     eyebrow="an open wiki · by progsu"
-    title="the open wiki for<br>breaking into tech."
+    title={'the open wiki for <br><span class="hero__accent">breaking into tech.</span>'}
     subtitle="written by gsu students who have already broken in."
   >
-    <a class="btn btn--alt btn--lg" href="/guides/zero-to-hero/getting-started">
-      start reading →
-    </a>
+    <a class="btn btn--alt btn--lg" href="/guides"> start reading → </a>
+
+    <Fragment slot="meta">
+      <span class="num">{guides.length}</span> guides across
+      <span class="num">{categories.length}</span> topics — free to read, open to edit.
+    </Fragment>
   </HeroBand>
 
-  <section class="features">
+  <section class="topics">
     <div class="container">
-      <div class="features__inner">
-        <h2 class="features__heading">browse by topic</h2>
+      <div class="topics__inner">
+        <h2 class="topics__heading">browse by topic</h2>
 
-        <div class="features__grid">
+        <div class="topics__grid" id="topics-grid">
           {
             categories.map((category) => (
               <FeatureCard
@@ -120,19 +127,33 @@ const categories = [
       </div>
     </div>
   </section>
+
+  {/* is:inline keeps this out of the hoisted bundle, so it stays a fallback. */}
+  <noscript>
+    <style is:inline>
+      .topics__grid > * {
+        opacity: 1 !important;
+      }
+    </style>
+  </noscript>
 </Layout>
 
 <style>
-  .features {
-    padding-block: var(--space-24);
+  .num {
+    font-family: var(--font-mono);
+    color: var(--c-text-inverse-2);
   }
 
-  .features__inner {
+  .topics {
+    padding-block: var(--space-20) var(--space-24);
+  }
+
+  .topics__inner {
     max-width: var(--page-width-wide);
     margin-inline: auto;
   }
 
-  .features__heading {
+  .topics__heading {
     margin: 0 0 var(--space-8);
     font-size: var(--text-2xl);
     font-weight: 600;
@@ -140,20 +161,54 @@ const categories = [
     color: var(--c-text-1);
   }
 
-  .features__grid {
+  .topics__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: var(--space-5);
   }
 
+  /* The cards arrive in reading order as the section scrolls in. Only the
+     pre-reveal opacity lives here — the rise itself is an animation with
+     backwards fill, so nothing lingers to fight the card's hover lift. */
+  .topics__grid:not(.is-in) > :global(.card) {
+    opacity: 0;
+  }
+
+  .topics__grid.is-in > :global(.card) {
+    animation: card-rise 600ms var(--ease-out) backwards;
+  }
+  .topics__grid.is-in > :global(.card:nth-child(2)) {
+    animation-delay: 70ms;
+  }
+  .topics__grid.is-in > :global(.card:nth-child(3)) {
+    animation-delay: 140ms;
+  }
+  .topics__grid.is-in > :global(.card:nth-child(4)) {
+    animation-delay: 210ms;
+  }
+  .topics__grid.is-in > :global(.card:nth-child(5)) {
+    animation-delay: 280ms;
+  }
+
+  @keyframes card-rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   @media (min-width: 1080px) {
-    .features__grid {
+    .topics__grid {
       grid-template-columns: repeat(3, 1fr);
     }
   }
 
   @media (max-width: 640px) {
-    .features {
+    .topics {
       padding-block: var(--space-16);
     }
 
@@ -163,4 +218,34 @@ const categories = [
       min-height: 44px;
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topics__grid:not(.is-in) > :global(.card) {
+      opacity: 1;
+    }
+  }
 </style>
+
+<script>
+  const grid = document.getElementById("topics-grid");
+
+  if (grid) {
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (still || !("IntersectionObserver" in window)) {
+      grid.classList.add("is-in");
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            grid.classList.add("is-in");
+            observer.disconnect();
+          }
+        },
+        { rootMargin: "0px" }
+      );
+      observer.observe(grid);
+    }
+  }
+</script>

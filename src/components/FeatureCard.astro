@@ -56,4 +56,19 @@ const hasIcon = Astro.slots.has("icon");
     line-height: 20px;
     color: var(--c-text-2);
   }
+
+  /* The icon tile takes the accent on hover — the card's own lift and gradient
+     hairline come from .card--link in global.css. */
+  .feature .card__icon {
+    transition:
+      background var(--duration-normal) var(--ease),
+      box-shadow var(--duration-normal) var(--ease),
+      color var(--duration-normal) var(--ease);
+  }
+
+  .feature:hover .card__icon {
+    background: var(--grad-accent);
+    box-shadow: 0 6px 16px var(--c-brand-soft);
+    color: #fff;
+  }
 </style>
