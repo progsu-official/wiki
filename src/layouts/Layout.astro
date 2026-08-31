@@ -76,9 +76,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu
       <slot />
     </main>
 
-    <div class:list={["layout-foot", { "layout-foot--sidebar": sidebar }]}>
-      <Footer />
-    </div>
+    {
+      /* A sidebar page renders its own footer inside the content column,
+        so it lines up with the article instead of running under the rails. */
+    }
+    {!sidebar && <Footer />}
     <SiteSearch />
 
     <div
@@ -132,27 +134,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu
       @media (max-width: 768px) {
         .layout-main:not(.layout-main--bleed) {
           padding: var(--space-10) var(--page-gutter) var(--space-16);
-        }
-      }
-
-      /* The sidebar is position:fixed and spans the full viewport height, so it
-         covers anything laid out at x=0 — including the footer, which is a
-         sibling of <main> and never saw .doc__main's padding.
-
-         Only the LEFT offset is mirrored from .doc__main. The footer paints a
-         band (--c-bg-alt plus a top border), and padding sits inside the
-         background box, so a padding-right would end the band short of the
-         viewport and leave a strip of page background down the right edge.
-         The band has to bleed; its content is constrained by .container. */
-      @media (min-width: 960px) {
-        .layout-foot--sidebar {
-          padding-left: var(--sidebar-width);
-        }
-      }
-
-      @media (min-width: 1440px) {
-        .layout-foot--sidebar {
-          padding-left: calc((100vw - var(--layout-max-width)) / 2 + var(--sidebar-width));
         }
       }
     </style>

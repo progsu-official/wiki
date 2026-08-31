@@ -11,11 +11,22 @@ const guideLinks = [
 
 const progsuLinks = [{ label: "progsu.com", href: "https://progsu.com" }, ...SOCIAL_LINKS];
 
+interface Props {
+  /**
+   * Render inside a docs content column rather than as a full-bleed band.
+   * The column already constrains the width, so the container and the
+   * background band both come off.
+   */
+  contained?: boolean;
+}
+
+const { contained = false } = Astro.props;
+
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer" role="contentinfo">
-  <div class="container">
+<footer class:list={["site-footer", { "site-footer--contained": contained }]} role="contentinfo">
+  <div class:list={[{ container: !contained }]}>
     <div class="site-footer__top">
       <div class="site-footer__brand">
         <a href="/" class="site-footer__wordmark">
@@ -74,6 +85,14 @@ const year = new Date().getFullYear();
     background: var(--c-bg-alt);
     padding-block: var(--space-12);
     margin-top: auto;
+  }
+
+  /* In a docs column the footer is not a band: it shares the article's
+     measure and its ground, separated only by the rule above it. */
+  .site-footer--contained {
+    background: none;
+    padding-block: var(--space-10) 0;
+    margin-top: var(--space-16);
   }
 
   .site-footer__top {

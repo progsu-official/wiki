@@ -3,6 +3,7 @@ import Layout from "./Layout.astro";
 import Sidebar from "../components/Sidebar.astro";
 import Aside from "../components/Aside.astro";
 import DocFooter from "../components/DocFooter.astro";
+import Footer from "../components/Footer.astro";
 import { getGuideNav } from "../lib/guideNav";
 
 interface Props {
@@ -79,6 +80,10 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
             </div>
           )
         }
+
+        <div class="doc__sitefoot">
+          <Footer contained />
+        </div>
       </div>
     </div>
   </div>
@@ -210,6 +215,13 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
   }
 
   .doc__content {
+    min-width: 0;
+  }
+
+  /* Column 1 is the article measure; with an aside present that keeps the
+     footer clear of the rail instead of spanning underneath it. */
+  .doc__sitefoot {
+    grid-column: 1;
     min-width: 0;
   }
 
