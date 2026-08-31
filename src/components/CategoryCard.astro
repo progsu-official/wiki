@@ -217,7 +217,13 @@ const countLabel = `${count} ${count === 1 ? "guide" : "guides"}`;
     opacity: 1;
   }
 
-  .cat--featured .cat__sheen::before {
+  /* Two identical bands run the same crossing half a cycle apart, so one is
+     always on the slab: the outgoing band clears the right edge only after the
+     next has entered from the left. Both ends of the travel park the band
+     fully outside the card, where overflow:hidden clips it — that, rather than
+     a fade, is what keeps the loop point invisible. */
+  .cat--featured .cat__sheen::before,
+  .cat--featured .cat__sheen::after {
     content: "";
     position: absolute;
     top: -60%;
@@ -232,24 +238,22 @@ const countLabel = `${count} ${count === 1 ? "guide" : "guides"}`;
       rgba(255, 255, 255, 0.04) 62%,
       rgba(255, 255, 255, 0) 100%
     );
-    transform: translate3d(0, 0, 0) rotate(16deg);
+    transform: translate3d(-60%, 0, 0) rotate(16deg);
     will-change: transform;
-    animation: cat-sheen 11s ease-in-out infinite;
+    animation: cat-sheen 13s linear infinite;
+  }
+
+  .cat--featured .cat__sheen::after {
+    animation-delay: -6.5s;
   }
 
   @keyframes cat-sheen {
     0% {
-      transform: translate3d(0, 0, 0) rotate(16deg);
-      opacity: 0;
+      transform: translate3d(-60%, 0, 0) rotate(16deg);
     }
-    8%,
-    36% {
-      opacity: 1;
-    }
-    46%,
+    72%,
     100% {
-      transform: translate3d(420%, 0, 0) rotate(16deg);
-      opacity: 0;
+      transform: translate3d(460%, 0, 0) rotate(16deg);
     }
   }
 
@@ -345,8 +349,12 @@ const countLabel = `${count} ${count === 1 ? "guide" : "guides"}`;
 
     .cat--featured .cat__sheen::before {
       animation: none;
-      opacity: 1;
       transform: translate3d(215%, 0, 0) rotate(16deg);
+    }
+
+    /* One parked highlight, not two stacked on the same spot. */
+    .cat--featured .cat__sheen::after {
+      display: none;
     }
   }
 
