@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import HeroBand from "../components/HeroBand.astro";
 import FeatureCard from "../components/FeatureCard.astro";
+import { getGuideNav } from "../lib/guideNav";
 
 // roadmap-by-year is frontmatter-only — it exists so wikilinks resolve, and it
 // renders as a card index rather than a guide, so it isn't counted.
@@ -10,6 +11,18 @@ const guides = (await getCollection("guides")).filter(
   (g) => g.slug !== "zero-to-hero/roadmap-by-year"
 );
 const countFor = (category: string) => guides.filter((g) => g.data.category === category).length;
+
+// The hero rail is the roadmap in curated order, read off guideNav the same
+// way the roadmap index does — so a reordered or renamed year follows here
+// instead of drifting out of sync.
+const { flat } = await getGuideNav();
+const years = flat
+  .filter((item) => item.link.startsWith("/guides/zero-to-hero/roadmap-by-year/"))
+  .map((item) => ({
+    // "freshman year" → "freshman"; the rail's own label carries the rest.
+    label: item.text.toLowerCase().replace(/\s+year$/, ""),
+    href: item.link,
+  }));
 
 const categories = [
   {
@@ -54,6 +67,8 @@ const categories = [
     eyebrow="an open wiki · by progsu"
     title={'the open wiki for <br><span class="hero__accent">breaking into tech.</span>'}
     subtitle="written by gsu students who have already broken in."
+    railLabel="roadmap by year"
+    waypoints={years}
   >
     <a class="btn btn--alt btn--lg" href="/guides"> start reading → </a>
 

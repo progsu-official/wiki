@@ -1,52 +1,38 @@
 ---
+interface Waypoint {
+  label: string;
+  href: string;
+}
+
 interface Props {
   eyebrow?: string;
   /** Rendered as HTML so the headline can carry its own <br> and accent span. */
   title: string;
   subtitle?: string;
+  /** The rail along the foot of the hero. Omitted, the rail doesn't render. */
+  railLabel?: string;
+  waypoints?: Waypoint[];
 }
 
-const { eyebrow, title, subtitle } = Astro.props;
+const { eyebrow, title, subtitle, railLabel, waypoints = [] } = Astro.props;
 const hasActions = Astro.slots.has("default");
 const hasMeta = Astro.slots.has("meta");
+const hasRail = waypoints.length > 0;
 ---
 
 <section class="brand-band hero">
-  {/* Routes that light up one after another — the roadmap this wiki is about. */}
   <div class="hero__bg" aria-hidden="true">
     <span class="hero__aurora hero__aurora--1"></span>
     <span class="hero__aurora hero__aurora--2"></span>
 
+    {
+      /* Texture, not motion: the routes hold the empty thirds while the rail
+        below keeps the page's one travelling light to itself. */
+    }
     <svg class="hero__routes" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
-      <g class="hero__lines">
-        <path
-          class="hero__line"
-          pathLength="1000"
-          d="M-60 500 C 180 500 260 384 470 372 S 800 296 1260 186"></path>
-        <path
-          class="hero__line"
-          pathLength="1000"
-          d="M-60 140 C 220 140 300 252 560 268 S 900 344 1260 436"></path>
-        <path
-          class="hero__line"
-          pathLength="1000"
-          d="M-60 300 C 260 300 400 212 640 202 S 980 250 1260 300"></path>
-      </g>
-
-      <g class="hero__pulses">
-        <path
-          class="hero__pulse"
-          pathLength="1000"
-          d="M-60 500 C 180 500 260 384 470 372 S 800 296 1260 186"></path>
-        <path
-          class="hero__pulse"
-          pathLength="1000"
-          d="M-60 140 C 220 140 300 252 560 268 S 900 344 1260 436"></path>
-        <path
-          class="hero__pulse"
-          pathLength="1000"
-          d="M-60 300 C 260 300 400 212 640 202 S 980 250 1260 300"></path>
-      </g>
+      <path class="hero__line" d="M-60 500 C 180 500 260 384 470 372 S 800 296 1260 186"></path>
+      <path class="hero__line" d="M-60 140 C 220 140 300 252 560 268 S 900 344 1260 436"></path>
+      <path class="hero__line" d="M-60 300 C 260 300 400 212 640 202 S 980 250 1260 300"></path>
     </svg>
 
     <span class="hero__veil"></span>
@@ -78,13 +64,42 @@ const hasMeta = Astro.slots.has("meta");
       )
     }
   </div>
+
+  {
+    hasRail && (
+      <nav class="hero__rail" aria-label={railLabel}>
+        <div class="container">
+          {railLabel && <p class="hero__rail-label">{railLabel}</p>}
+
+          {/* list-style: none drops list semantics in Safari, and the count
+              and the order are the point here. */}
+          <ol class="hero__years" role="list" style={`--count:${waypoints.length}`}>
+            <span class="hero__track" aria-hidden="true" />
+            {waypoints.map((point) => (
+              <li>
+                <a class="hero__year" href={point.href}>
+                  <span class="hero__node" aria-hidden="true" />
+                  {point.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </nav>
+    )
+  }
 </section>
 
 <style>
   .hero {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    /* svh so mobile browser chrome can't push the rail out of view. */
+    min-height: calc(100vh - var(--nav-height));
+    min-height: calc(100svh - var(--nav-height));
     overflow: hidden;
-    padding-block: var(--space-24) var(--space-20);
+    padding-block: var(--space-16) var(--space-12);
   }
 
   /* ── Moving ground ── */
@@ -101,20 +116,43 @@ const hasMeta = Astro.slots.has("meta");
     will-change: transform;
   }
   .hero__aurora--1 {
-    top: -46%;
-    left: -12%;
-    width: 820px;
-    height: 820px;
+    top: -30%;
+    left: -14%;
+    width: min(72vw, 980px);
+    aspect-ratio: 1;
     background: radial-gradient(circle, rgba(124, 58, 237, 0.5), rgba(124, 58, 237, 0) 68%);
     animation: hero-drift-1 26s ease-in-out infinite alternate;
   }
   .hero__aurora--2 {
-    right: -18%;
-    bottom: -60%;
-    width: 900px;
-    height: 900px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.34), rgba(168, 85, 247, 0) 66%);
+    right: -16%;
+    bottom: -26%;
+    width: min(78vw, 1060px);
+    aspect-ratio: 1;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.36), rgba(168, 85, 247, 0) 66%);
     animation: hero-drift-2 34s ease-in-out infinite alternate;
+  }
+
+  .hero__routes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    /* Faded off at both ends: clear of the navbar above, and clear of the rail
+       below so the two line systems never read as one broken line. */
+    mask-image: linear-gradient(to bottom, transparent 2%, #000 20%, #000 58%, transparent 82%);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 2%,
+      #000 20%,
+      #000 58%,
+      transparent 82%
+    );
+  }
+
+  .hero__line {
+    stroke: rgba(216, 180, 254, 0.16);
+    stroke-width: 1.25;
   }
 
   @keyframes hero-drift-1 {
@@ -128,51 +166,11 @@ const hasMeta = Astro.slots.has("meta");
     }
   }
 
-  .hero__routes {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    fill: none;
-    /* The lines fade out before the band's closing hairline. */
-    mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
-  }
-
-  .hero__line {
-    stroke: rgba(216, 180, 254, 0.16);
-    stroke-width: 1.25;
-  }
-
-  /* A short dash travelling the same path reads as a signal moving along it. */
-  .hero__pulse {
-    stroke: rgba(240, 219, 255, 0.85);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-dasharray: 55 945;
-    animation: hero-pulse 9s linear infinite;
-  }
-  .hero__pulse:nth-child(2) {
-    animation-delay: 3s;
-  }
-  .hero__pulse:nth-child(3) {
-    animation-delay: 6s;
-  }
-
-  @keyframes hero-pulse {
-    from {
-      stroke-dashoffset: 1000;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-
   /* Darkens the middle so the headline never competes with the artwork. */
   .hero__veil {
     position: absolute;
     inset: 0;
-    background: radial-gradient(58% 54% at 50% 48%, rgba(20, 16, 33, 0.66), transparent 72%);
+    background: radial-gradient(58% 46% at 50% 42%, rgba(20, 16, 33, 0.66), transparent 72%);
   }
 
   /* ── Content ── */
@@ -180,9 +178,11 @@ const hasMeta = Astro.slots.has("meta");
   .hero__inner {
     position: relative;
     z-index: 1;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
   }
 
@@ -291,9 +291,129 @@ const hasMeta = Astro.slots.has("meta");
     }
   }
 
+  /* ── The rail ──
+     Four years, in order, sitting on one line. It anchors the foot of a
+     full-height hero with the only sequence the wiki actually has, and it
+     tells a first-year that the path is longer than one summer. */
+
+  .hero__rail {
+    position: relative;
+    z-index: 1;
+    animation: hero-rise 700ms var(--ease-out) 420ms both;
+  }
+
+  .hero .hero__rail-label {
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
+    color: var(--c-text-inverse-3);
+    text-align: center;
+  }
+
+  .hero__years {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--count, 4), minmax(0, 1fr));
+    margin: 0 auto;
+    padding: 0;
+    max-width: var(--page-width-wide);
+    list-style: none;
+  }
+
+  /* The hairline the nodes sit on, faded out before it reaches either end so
+     the path reads as continuing past the screen. The box is 120px tall and
+     pulled back up over its own centre: the hairline is one layer sized to
+     100% x 1px, and the height is headroom the travelling glow needs — at 1px
+     it would be clipped to a bright dash. */
+  .hero__track {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    right: 0;
+    height: 120px;
+    margin-top: -60px;
+    pointer-events: none;
+    background-image:
+      radial-gradient(
+        closest-side,
+        rgba(240, 219, 255, 0.5),
+        rgba(216, 180, 254, 0.12) 45%,
+        rgba(216, 180, 254, 0) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(216, 180, 254, 0) 0%,
+        rgba(216, 180, 254, 0.24) 12%,
+        rgba(216, 180, 254, 0.24) 88%,
+        rgba(216, 180, 254, 0) 100%
+      );
+    background-repeat: no-repeat;
+    background-size:
+      240px 120px,
+      100% 1px;
+    background-position:
+      -240px center,
+      0 center;
+    /* One travelling light, no dwell: it re-enters on the left at the instant
+       it clears the right, so the loop point never reads as a stop. */
+    animation: hero-travel 13s linear infinite;
+  }
+
+  @keyframes hero-travel {
+    to {
+      background-position:
+        calc(100% + 240px) center,
+        0 center;
+    }
+  }
+
+  .hero__year {
+    display: flex;
+    width: max-content;
+    margin-inline: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding-bottom: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--c-text-inverse-2);
+    text-decoration: none;
+    transition: color var(--duration-normal) var(--ease);
+  }
+
+  .hero__node {
+    position: relative;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(216, 180, 254, 0.5);
+    box-shadow: 0 0 0 4px rgba(216, 180, 254, 0.08);
+    transition:
+      background var(--duration-normal) var(--ease),
+      box-shadow var(--duration-normal) var(--ease);
+  }
+
+  .hero__year:hover,
+  .hero__year:focus-visible {
+    color: var(--c-text-inverse-1);
+  }
+
+  .hero__year:hover .hero__node,
+  .hero__year:focus-visible .hero__node {
+    background: #f0dbff;
+    box-shadow: 0 0 0 6px rgba(216, 180, 254, 0.18);
+  }
+
+  .hero__year:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-md);
+  }
+
   @media (max-width: 768px) {
     .hero {
-      padding-block: var(--space-16);
+      padding-block: var(--space-12) var(--space-8);
     }
 
     /* The headline's own <br> is set for the wide measure. */
@@ -302,7 +422,18 @@ const hasMeta = Astro.slots.has("meta");
     }
 
     .hero__veil {
-      background: radial-gradient(90% 52% at 50% 48%, rgba(20, 16, 33, 0.7), transparent 78%);
+      background: radial-gradient(90% 44% at 50% 42%, rgba(20, 16, 33, 0.7), transparent 78%);
+    }
+
+    /* Four columns of 9px text is unreadable; the rail folds to two rows and
+       the hairline steps aside rather than cutting between them. */
+    .hero__years {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+
+    .hero__track {
+      display: none;
     }
   }
 
@@ -318,13 +449,16 @@ const hasMeta = Astro.slots.has("meta");
   @media (prefers-reduced-motion: reduce) {
     .hero__aurora--1,
     .hero__aurora--2,
-    .hero__pulse,
-    .hero__dot {
+    .hero__dot,
+    .hero__title :global(.hero__accent) {
       animation: none;
     }
 
-    .hero__pulse {
-      opacity: 0;
+    .hero__track {
+      animation: none;
+      background-position:
+        62% center,
+        0 center;
     }
   }
 </style>
