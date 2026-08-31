@@ -18,7 +18,7 @@ function isActive(href: string): boolean {
 
 <a href="#main-content" class="skip-link">skip to content</a>
 
-<header class="navbar" id="site-navbar" role="banner">
+<header class="navbar" role="banner">
   <div class="navbar__inner container">
     <a href="/" class="navbar__brand">
       <span class="navbar__brand-name">progsu</span>
@@ -126,12 +126,7 @@ function isActive(href: string): boolean {
     /* The shell reserves exactly 64px, so the border must sit inside it. */
     box-sizing: border-box;
     background: var(--c-bg);
-    /* Held transparent so the rule can appear on scroll without a height shift. */
-    border-bottom: 1px solid transparent;
-    transition: border-color var(--duration-normal) var(--ease);
-  }
-  .navbar.is-scrolled {
-    border-bottom-color: var(--c-divider);
+    border-bottom: 1px solid var(--c-divider);
   }
 
   .navbar__inner {
@@ -303,7 +298,8 @@ function isActive(href: string): boolean {
       display: flex;
       flex-direction: column;
       position: absolute;
-      top: 100%;
+      /* Not 100%: that lands on the padding box and covers the header hairline. */
+      top: var(--nav-height);
       left: 0;
       right: 0;
       background: var(--c-bg);
@@ -396,17 +392,8 @@ function isActive(href: string): boolean {
 </style>
 
 <script>
-  const navbar = document.getElementById("site-navbar");
   const toggle = document.getElementById("nav-toggle");
   const menu = document.getElementById("nav-menu");
-
-  if (navbar) {
-    const onScroll = () => {
-      navbar.classList.toggle("is-scrolled", window.scrollY > 0);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-  }
 
   if (toggle && menu) {
     const setOpen = (open: boolean) => {
