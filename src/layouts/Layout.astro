@@ -15,9 +15,20 @@ interface Props {
   wide?: boolean;
   /** Drops the container entirely, for full-bleed landing pages. */
   fullBleed?: boolean;
+  /**
+   * The page renders a fixed sidebar rail. The footer sits outside <main>, so
+   * it has to be inset by the same amount or the rail covers it.
+   */
+  sidebar?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION, wide = false, fullBleed = false } = Astro.props;
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  wide = false,
+  fullBleed = false,
+  sidebar = false,
+} = Astro.props;
 
 const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu.com");
@@ -65,7 +76,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu
       <slot />
     </main>
 
-    <Footer />
+    <div class:list={["layout-foot", { "layout-foot--sidebar": sidebar }]}>
+      <Footer />
+    </div>
     <SiteSearch />
 
     <div
@@ -119,6 +132,23 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu
       @media (max-width: 768px) {
         .layout-main:not(.layout-main--bleed) {
           padding: var(--space-10) var(--page-gutter) var(--space-16);
+        }
+      }
+
+      /* The sidebar is position:fixed and spans the full viewport height, so it
+         covers anything laid out at x=0 — including the footer, which is a
+         sibling of <main> and never saw .doc__main's padding. These mirror
+         .doc__main's offsets exactly; the two must stay in step. */
+      @media (min-width: 960px) {
+        .layout-foot--sidebar {
+          padding-left: var(--sidebar-width);
+        }
+      }
+
+      @media (min-width: 1440px) {
+        .layout-foot--sidebar {
+          padding-left: calc((100vw - var(--layout-max-width)) / 2 + var(--sidebar-width));
+          padding-right: calc((100vw - var(--layout-max-width)) / 2);
         }
       }
     </style>
