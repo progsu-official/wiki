@@ -43,12 +43,7 @@ const updated = entry.data.updated.toLocaleDateString("en-US", {
 const meta = `${entry.data.readTime} · by ${entry.data.author.name} · updated ${updated}`;
 ---
 
-<DocsLayout
-  title={entry.data.title}
-  headings={body}
-  editSlug={entry.slug}
-  updated={entry.data.updated}
->
+<DocsLayout title={entry.data.title} headings={body} updated={entry.data.updated}>
   <PageHeader title={entry.data.title} meta={meta} tags={entry.data.tags} />
 
   <div class:list={["prose", "guide-body", { "guide-body--drop-lead": leadRepeatsTitle }]}>

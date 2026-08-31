@@ -3,19 +3,16 @@ import Layout from "./Layout.astro";
 import Sidebar from "../components/Sidebar.astro";
 import Aside from "../components/Aside.astro";
 import DocFooter from "../components/DocFooter.astro";
-import Footer from "../components/Footer.astro";
 import { getGuideNav } from "../lib/guideNav";
 
 interface Props {
   title: string;
   description?: string;
   headings?: { depth: number; slug: string; text: string }[];
-  /** Guide slug, e.g. "career/resume-guide" — drives the edit-on-github link. */
-  editSlug?: string;
   updated?: Date;
 }
 
-const { title, description, headings = [], editSlug, updated } = Astro.props;
+const { title, description, headings = [], updated } = Astro.props;
 
 const { flat } = await getGuideNav();
 const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
@@ -23,10 +20,6 @@ const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
 const index = flat.findIndex((item) => item.link === pathname);
 const prev = index > 0 ? flat[index - 1] : null;
 const next = index !== -1 && index < flat.length - 1 ? flat[index + 1] : null;
-
-const editUrl = editSlug
-  ? `https://github.com/progsu-official/vault/edit/main/${editSlug}.md`
-  : undefined;
 
 const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
 ---
@@ -70,7 +63,7 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
       <div class:list={["doc__grid", { "doc__grid--with-aside": hasAside }]}>
         <article class="doc__content">
           <slot />
-          <DocFooter prev={prev} next={next} editUrl={editUrl} updated={updated} />
+          <DocFooter prev={prev} next={next} updated={updated} />
         </article>
 
         {
@@ -80,10 +73,6 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
             </div>
           )
         }
-
-        <div class="doc__sitefoot">
-          <Footer contained />
-        </div>
       </div>
     </div>
   </div>
@@ -215,13 +204,6 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
   }
 
   .doc__content {
-    min-width: 0;
-  }
-
-  /* Column 1 is the article measure; with an aside present that keeps the
-     footer clear of the rail instead of spanning underneath it. */
-  .doc__sitefoot {
-    grid-column: 1;
     min-width: 0;
   }
 

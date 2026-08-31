@@ -1,22 +1,11 @@
 ---
 import SocialRow from "./SocialRow.astro";
 
-interface Props {
-  /**
-   * Render inside a docs content column rather than as a full-bleed band.
-   * The column already constrains the width, so the container and the
-   * background band both come off.
-   */
-  contained?: boolean;
-}
-
-const { contained = false } = Astro.props;
-
 const year = new Date().getFullYear();
 ---
 
-<footer class:list={["site-footer", { "site-footer--contained": contained }]} role="contentinfo">
-  <div class:list={[{ container: !contained }]}>
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
     <div class="site-footer__row">
       <p class="site-footer__legal">&copy; {year} progsu &middot; built by progsu</p>
       <SocialRow />
@@ -32,14 +21,6 @@ const year = new Date().getFullYear();
     margin-top: auto;
   }
 
-  /* In a docs column the footer is not a band: it shares the article's
-     measure and its ground, separated only by the rule above it. */
-  .site-footer--contained {
-    background: none;
-    padding-block: var(--space-6) 0;
-    margin-top: var(--space-16);
-  }
-
   .site-footer__row {
     display: flex;
     align-items: center;
@@ -53,8 +34,6 @@ const year = new Date().getFullYear();
     color: var(--c-text-2);
   }
 
-  /* Keyed low: the contained footer sits in a 688px column, so it must not
-     stack until the row genuinely runs out of room. */
   @media (max-width: 480px) {
     .site-footer__row {
       flex-direction: column;

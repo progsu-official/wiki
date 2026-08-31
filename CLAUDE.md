@@ -43,7 +43,7 @@ Existing tokens live in [src/styles/global.css](src/styles/global.css). Use them
 
 **Layouts**
 - [Layout.astro](src/layouts/Layout.astro) — the shell: head, theme bootstrap, navbar, footer, search modal. Props `title`, `description`, `wide`, `fullBleed`.
-- [DocsLayout.astro](src/layouts/DocsLayout.astro) — the three-column docs shell. Use it for every guide page; it supplies the sidebar, the "on this page" rail, the mobile drawer, and prev/next + edit-on-github. Props `title`, `description`, `headings`, `editSlug`, `updated`.
+- [DocsLayout.astro](src/layouts/DocsLayout.astro) — the three-column docs shell. Use it for every guide page; it supplies the sidebar, the "on this page" rail, the mobile drawer, and the prev/next footer. Props `title`, `description`, `headings`, `updated`.
 
 **Components**
 - [PageHeader.astro](src/components/PageHeader.astro) — `title` + `intro` for index pages, `title` + `meta` + `tags` for articles

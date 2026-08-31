@@ -15,10 +15,7 @@ interface Props {
   wide?: boolean;
   /** Drops the container entirely, for full-bleed landing pages. */
   fullBleed?: boolean;
-  /**
-   * The page renders a fixed sidebar rail. The footer sits outside <main>, so
-   * it has to be inset by the same amount or the rail covers it.
-   */
+  /** The page renders a fixed sidebar rail and carries no site footer. */
   sidebar?: boolean;
 }
 
@@ -76,10 +73,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://wiki.progsu
       <slot />
     </main>
 
-    {
-      /* A sidebar page renders its own footer inside the content column,
-        so it lines up with the article instead of running under the rails. */
-    }
+    {/* Docs pages end on their own prev/next footer, with no site band below. */}
     {!sidebar && <Footer />}
     <SiteSearch />
 
