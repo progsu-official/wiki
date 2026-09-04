@@ -24,7 +24,7 @@ const next = index !== -1 && index < flat.length - 1 ? flat[index + 1] : null;
 const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
 ---
 
-<Layout title={title} description={description} fullBleed sidebar>
+<Layout title={title} description={description} fullBleed>
   <div class="doc">
     <div class="doc__localnav">
       <button

@@ -13,9 +13,10 @@
 <style>
   /* Sized off the viewport height as well as its width: the hero crops the
      sphere at the dashed rule, and tying the diameter to the available height
-     keeps roughly the same slice of it visible on a laptop and a tall monitor. */
+     keeps roughly the same slice of it visible on a laptop and a tall monitor.
+     The host can override --globe-size when it has a narrower box in mind. */
   .globe {
-    width: min(84vw, 62vh, 600px);
+    width: var(--globe-size, min(84vw, 62vh, 600px));
     aspect-ratio: 1;
   }
 

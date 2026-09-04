@@ -2,7 +2,6 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import HeroBand from "../components/HeroBand.astro";
-import FeatureCard from "../components/FeatureCard.astro";
 
 // roadmap-by-year is frontmatter-only — it exists so wikilinks resolve, and it
 // renders as a card index rather than a guide, so it isn't counted.
@@ -30,38 +29,22 @@ const recent = [...guides]
     href: `/guides/${guide.slug}`,
   }));
 
-const categories = [
-  {
-    slug: "zero-to-hero",
-    title: "zero to hero",
-    text: "start here. what to do first, in what order, and how to get from no experience to a first internship.",
-    icon: "route",
-  },
-  {
-    slug: "career",
-    title: "career",
-    text: "resumes, applications, interviews, and what to do once an offer is on the table.",
-    icon: "briefcase",
-  },
-  {
-    slug: "technical",
-    title: "technical",
-    text: "data structures, leetcode, and how to prepare for a coding interview without burning out.",
-    icon: "code",
-  },
-  {
-    slug: "networking",
-    title: "networking",
-    text: "cold emails, linkedin, referrals, and the atlanta events worth showing up to.",
-    icon: "people",
-  },
-  {
-    slug: "misc",
-    title: "misc",
-    text: "tools, note-taking, and the useful things that didn't fit anywhere else.",
-    icon: "bookmark",
-  },
-] as const;
+const topics = ["zero-to-hero", "career", "technical", "networking", "misc"].map((slug) => ({
+  title: slug.replace(/-/g, " "),
+  href: `/guides/${slug}`,
+  count: countFor(slug),
+}));
+
+// Stubbed until there's a feed to read from. One event is the whole shape the
+// hero's right column needs today.
+const year = new Date().getFullYear();
+
+const upcoming = {
+  name: "Hacklanta II",
+  when: "oct 9 – 11",
+  href: "https://hacklanta.dev/",
+  cta: "event details",
+};
 ---
 
 <Layout
@@ -73,200 +56,24 @@ const categories = [
     eyebrow="an open wiki · by progsu"
     title={'the open wiki for <br><span class="hero__accent">breaking into tech.</span>'}
     subtitle="written by gsu students who have already broken in."
+    topicsLabel="browse"
+    topics={topics}
+    eventLabel="up next"
+    event={upcoming}
     railLabel="recently updated"
     recent={recent}
+    colophon={`© ${year} progsu`}
   >
     <a class="btn btn--brand btn--lg" href="/guides"> start reading → </a>
-
-    <Fragment slot="meta">
-      <span class="num">{guides.length}</span> guides across
-      <span class="num">{categories.length}</span> topics — free to read, open to edit.
-    </Fragment>
   </HeroBand>
-
-  <section class="topics">
-    <div class="container">
-      <div class="topics__inner">
-        <h2 class="topics__heading">browse by topic</h2>
-
-        <div class="topics__grid" id="topics-grid">
-          {
-            categories.map((category) => (
-              <FeatureCard
-                title={category.title}
-                text={category.text}
-                href={`/guides/${category.slug}`}
-                count={countFor(category.slug)}
-              >
-                <svg
-                  slot="icon"
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  {category.icon === "route" && (
-                    <Fragment>
-                      <circle cx="6" cy="19" r="3" />
-                      <circle cx="18" cy="5" r="3" />
-                      <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
-                    </Fragment>
-                  )}
-                  {category.icon === "briefcase" && (
-                    <Fragment>
-                      <rect x="2" y="7" width="20" height="14" rx="2" />
-                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                    </Fragment>
-                  )}
-                  {category.icon === "code" && (
-                    <Fragment>
-                      <path d="m16 18 6-6-6-6" />
-                      <path d="m8 6-6 6 6 6" />
-                    </Fragment>
-                  )}
-                  {category.icon === "people" && (
-                    <Fragment>
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <path d="M16 3.3a4 4 0 0 1 0 7.4" />
-                      <path d="M19 15.1a4 4 0 0 1 3 3.9v2" />
-                    </Fragment>
-                  )}
-                  {category.icon === "bookmark" && (
-                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                  )}
-                </svg>
-              </FeatureCard>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* is:inline keeps this out of the hoisted bundle, so it stays a fallback. */}
-  <noscript>
-    <style is:inline>
-      .topics__grid > * {
-        opacity: 1 !important;
-      }
-    </style>
-  </noscript>
 </Layout>
 
 <style>
-  .num {
-    font-family: var(--font-mono);
-    color: var(--c-text-inverse-2);
-  }
-
-  .topics {
-    padding-block: var(--space-20) var(--space-24);
-  }
-
-  .topics__inner {
-    max-width: var(--page-width-wide);
-    margin-inline: auto;
-  }
-
-  .topics__heading {
-    margin: 0 0 var(--space-8);
-    font-size: var(--text-2xl);
-    font-weight: 600;
-    letter-spacing: var(--tracking-tight);
-    color: var(--c-text-1);
-  }
-
-  .topics__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--space-5);
-  }
-
-  /* The cards arrive in reading order as the section scrolls in. Only the
-     pre-reveal opacity lives here — the rise itself is an animation with
-     backwards fill, so nothing lingers to fight the card's hover lift. */
-  .topics__grid:not(.is-in) > :global(.card) {
-    opacity: 0;
-  }
-
-  .topics__grid.is-in > :global(.card) {
-    animation: card-rise 600ms var(--ease-out) backwards;
-  }
-  .topics__grid.is-in > :global(.card:nth-child(2)) {
-    animation-delay: 70ms;
-  }
-  .topics__grid.is-in > :global(.card:nth-child(3)) {
-    animation-delay: 140ms;
-  }
-  .topics__grid.is-in > :global(.card:nth-child(4)) {
-    animation-delay: 210ms;
-  }
-  .topics__grid.is-in > :global(.card:nth-child(5)) {
-    animation-delay: 280ms;
-  }
-
-  @keyframes card-rise {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @media (min-width: 1080px) {
-    .topics__grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
   @media (max-width: 640px) {
-    .topics {
-      padding-block: var(--space-16);
-    }
-
     /* Mobile hit target: the hero button goes full width. */
     .btn--lg {
       width: 100%;
       min-height: 44px;
     }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .topics__grid:not(.is-in) > :global(.card) {
-      opacity: 1;
-    }
-  }
 </style>
-
-<script>
-  const grid = document.getElementById("topics-grid");
-
-  if (grid) {
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (still || !("IntersectionObserver" in window)) {
-      grid.classList.add("is-in");
-    } else {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
-            grid.classList.add("is-in");
-            observer.disconnect();
-          }
-        },
-        { rootMargin: "0px" }
-      );
-      observer.observe(grid);
-    }
-  }
-</script>

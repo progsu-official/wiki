@@ -7,20 +7,53 @@ interface RecentGuide {
   href: string;
 }
 
+interface Topic {
+  title: string;
+  href: string;
+  count: number;
+}
+
+interface UpcomingEvent {
+  name: string;
+  when: string;
+  href: string;
+  cta: string;
+}
+
 interface Props {
   eyebrow?: string;
   /** Rendered as HTML so the headline can carry its own <br> and accent span. */
   title: string;
   subtitle?: string;
+  /** The left flank of the stage. Omitted, the column doesn't render. */
+  topicsLabel?: string;
+  topics?: Topic[];
+  /** The right flank. One event today; a feed replaces it later. */
+  eventLabel?: string;
+  event?: UpcomingEvent;
   /** The rail along the foot of the hero. Omitted, the rail doesn't render. */
   railLabel?: string;
   recent?: RecentGuide[];
+  /** Sits in the hero's bottom corner for pages that carry no site footer. */
+  colophon?: string;
 }
 
-const { eyebrow, title, subtitle, railLabel, recent = [] } = Astro.props;
+const {
+  eyebrow,
+  title,
+  subtitle,
+  topicsLabel,
+  topics = [],
+  eventLabel,
+  event,
+  railLabel,
+  recent = [],
+  colophon,
+} = Astro.props;
 const hasActions = Astro.slots.has("default");
-const hasMeta = Astro.slots.has("meta");
+const hasTopics = topics.length > 0;
 const hasRail = recent.length > 0;
+const eventIsExternal = Boolean(event && /^https?:\/\//.test(event.href));
 ---
 
 <section class="brand-band hero">
@@ -59,17 +92,75 @@ const hasRail = recent.length > 0;
         </div>
       )
     }
+  </div>
+
+  {
+    /* The stage fills whatever height the copy leaves: the sphere in the
+      middle track, and the two things a visitor most likely came for in the
+      space either side of it — where to start reading, and what's on. */
+  }
+  <div class="hero__stage">
     {
-      hasMeta && (
-        <p class="hero__meta">
-          <slot name="meta" />
-        </p>
+      hasTopics && (
+        <nav class="hero__topics" aria-label={topicsLabel}>
+          {topicsLabel && <p class="hero__flank-label">{topicsLabel}</p>}
+
+          <ul class="hero__topic-list" role="list">
+            {topics.map((topic) => (
+              <li>
+                <a class="hero__topic" href={topic.href}>
+                  <span class="hero__topic-name">{topic.title}</span>
+                  <span class="hero__topic-count">
+                    {topic.count}
+                    <span class="sr-only">{topic.count === 1 ? " guide" : " guides"}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       )
     }
 
     <div class="hero__globe">
       <HeroGlobe />
     </div>
+
+    {
+      event && (
+        <aside class="hero__events" aria-label={eventLabel}>
+          {eventLabel && <p class="hero__flank-label">{eventLabel}</p>}
+
+          <div class="hero__event">
+            <p class="hero__event-name">{event.name}</p>
+            <p class="hero__event-when">{event.when}</p>
+            <a
+              class="btn btn--ghost btn--sm hero__event-cta"
+              href={event.href}
+              {...(eventIsExternal ? { target: "_blank", rel: "noopener" } : {})}
+            >
+              {event.cta}
+              {eventIsExternal && (
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M7 17 17 7" />
+                  <path d="M8 7h9v9" />
+                </svg>
+              )}
+            </a>
+          </div>
+        </aside>
+      )
+    }
   </div>
 
   {
@@ -97,6 +188,8 @@ const hasRail = recent.length > 0;
       </nav>
     )
   }
+
+  {colophon && <p class="hero__colophon">{colophon}</p>}
 </section>
 
 <style>
@@ -108,6 +201,15 @@ const hasRail = recent.length > 0;
     --hero-lift: #1c1c20;
     --hero-mark: rgba(255, 255, 255, 0.14);
     --hero-dot: rgba(255, 255, 255, 0.055);
+    /* Quieter than the sheet's own marks: the topic rules divide a list, they
+       aren't part of the drawing. */
+    --hero-hair: rgba(255, 255, 255, 0.09);
+
+    /* The accent the eyebrow dot and the headline already carry, named so the
+       event panel can tint itself without a third copy of the hex. */
+    --hero-accent: #c084fc;
+    --hero-accent-wash: rgba(192, 132, 252, 0.09);
+    --hero-accent-line: rgba(192, 132, 252, 0.3);
 
     /* The column the rules bound — the same width the rail spans, so the
        rail's hairline ends exactly on them. */
@@ -195,10 +297,12 @@ const hasRail = recent.length > 0;
 
   /* ── Content ── */
 
+  /* The copy is only as tall as it needs to be; the stage below it takes the
+     rest, so the sphere grows into whatever height is going spare. */
   .hero__inner {
     position: relative;
     z-index: 1;
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -225,7 +329,7 @@ const hasRail = recent.length > 0;
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #c084fc;
+    background: var(--hero-accent);
   }
 
   .hero .hero__title {
@@ -240,7 +344,7 @@ const hasRail = recent.length > 0;
 
   /* Set via set:html from the page, so it sits outside this file's scoping. */
   .hero__title :global(.hero__accent) {
-    color: #c084fc;
+    color: var(--hero-accent);
   }
 
   .hero .hero__subtitle {
@@ -261,11 +365,36 @@ const hasRail = recent.length > 0;
     animation: hero-rise 700ms var(--ease-out) 240ms both;
   }
 
-  .hero .hero__meta {
-    margin: var(--space-5) 0 0;
+  /* ── The stage ──
+     Three tracks under the copy. The flanks are fixed so the sphere gets
+     whatever is left, and they hang from the top of the stage rather than
+     centring in it — they read as columns of a page, not as floating panels. */
+
+  /* Narrow enough and the margins are a sliver, so the flanks tuck inside the
+     rules and share the column with the sphere. The wide case below moves them
+     out onto the dot field where there's room for them. */
+  .hero__stage {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: var(--page-width-wide);
+    margin-top: var(--space-8);
+    margin-inline: auto;
+    padding-inline: var(--space-6);
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr) 15rem;
+    gap: var(--space-8);
+    text-align: left;
+  }
+
+  .hero .hero__flank-label {
+    margin: 0 0 var(--space-4);
     font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-transform: lowercase;
     color: var(--c-text-inverse-3);
-    animation: hero-rise 700ms var(--ease-out) 320ms both;
   }
 
   /* The sphere is bigger than the space left for it. It's anchored to the top
@@ -273,12 +402,12 @@ const hasRail = recent.length > 0;
      rather than sitting in the hero like an illustration. */
   .hero__globe {
     position: relative;
-    flex: 1;
-    align-self: stretch;
     min-height: 0;
-    margin-top: var(--space-6);
     overflow: hidden;
-    animation: hero-rise 900ms var(--ease-out) 420ms both;
+    /* 100% is the middle track, so the sphere fits between the flanks instead
+       of being sized off the viewport as it was when it had the row alone. */
+    --globe-size: min(100%, 62vh, 600px);
+    animation: hero-rise 900ms var(--ease-out) 320ms both;
   }
 
   .hero__globe > :global(.globe) {
@@ -286,6 +415,105 @@ const hasRail = recent.length > 0;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
+  }
+
+  /* ── Topics ──
+     A table of contents, not a set of cards: name, count, hairline. Whatever
+     brought a visitor here, the whole wiki is one glance away. */
+
+  .hero__topics {
+    animation: hero-rise 700ms var(--ease-out) 400ms both;
+  }
+
+  .hero__topic-list {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hero-hair);
+    list-style: none;
+  }
+
+  .hero .hero__topic {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--hero-hair);
+    text-decoration: none;
+    transition: color var(--duration-normal) var(--ease);
+  }
+
+  /* The row nudges rather than growing an arrow: the count already owns the
+     right edge, and there's nowhere for a marker to go that doesn't shove it. */
+  .hero__topic-name {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--c-text-inverse-2);
+    transition:
+      color var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
+  }
+
+  .hero__topic-count {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--c-text-inverse-3);
+    transition: color var(--duration-normal) var(--ease);
+  }
+
+  .hero__topic:hover .hero__topic-name,
+  .hero__topic:focus-visible .hero__topic-name {
+    color: var(--c-text-inverse-1);
+    transform: translateX(2px);
+  }
+
+  .hero__topic:hover .hero__topic-count,
+  .hero__topic:focus-visible .hero__topic-count {
+    color: var(--c-text-inverse-2);
+  }
+
+  .hero__topic:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-md);
+  }
+
+  /* ── What's on ──
+     One event today. The panel is the shape a feed will fill, so the column
+     doesn't have to be redrawn when it's wired up. */
+
+  .hero__events {
+    animation: hero-rise 700ms var(--ease-out) 440ms both;
+  }
+
+  /* The one thing in the hero that is time-sensitive, so it's the one thing
+     that carries the accent rather than the sheet's neutral greys. */
+  .hero__event {
+    padding: var(--space-5);
+    border: 1px solid var(--hero-accent-line);
+    border-radius: var(--radius-lg);
+    background: var(--hero-accent-wash);
+  }
+
+  .hero .hero__event-name {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--c-text-inverse-1);
+  }
+
+  .hero .hero__event-when {
+    margin: var(--space-2) 0 var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--hero-accent);
+  }
+
+  .hero__event-cta {
+    width: 100%;
   }
 
   @keyframes hero-rise {
@@ -369,11 +597,135 @@ const hasRail = recent.length > 0;
     border-radius: var(--radius-md);
   }
 
+  /* ── Colophon ──
+     The homepage carries no site footer, so the copyright it would have held
+     tucks into the hero instead. Narrow, that's a quiet line under the rail. */
+
+  .hero .hero__colophon {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--page-width-wide);
+    margin: var(--space-6) auto 0;
+    padding-inline: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--c-text-inverse-3);
+    animation: hero-rise 700ms var(--ease-out) 560ms both;
+  }
+
   /* Below the wide column the margins are a sliver — too thin to read as a
      dot field, so the sheet keeps only its rules and ticks. */
   @media (max-width: 1152px) {
     .hero__margin {
       display: none;
+    }
+  }
+
+  /* ── The wide case ──
+     Past 1600px the margins the rules leave are wide enough to hold the flanks
+     outright, so they move out onto the dot field and the sphere gets the whole
+     column to itself. The tracks are the margins exactly — no padding on the
+     grid, because a percentage track resolves against the content box and the
+     rules resolve against the border box, and they have to agree. Each flank
+     then hangs off its rule rather than off the window edge. */
+  @media (min-width: 1600px) {
+    .hero__stage {
+      max-width: none;
+      margin-inline: 0;
+      padding-inline: 0;
+      grid-template-columns: var(--hero-edge) minmax(0, 1fr) var(--hero-edge);
+      gap: 0;
+      /* Static so the flanks below resolve against .hero rather than the row. */
+      position: static;
+    }
+
+    /* Taking the flanks out of flow vacates their cells, and auto-placement
+       would drop the sphere into the empty left margin. */
+    .hero__globe {
+      grid-column: 2;
+    }
+
+    /* The margins run the full height of the sheet, but the stage is only the
+       strip the copy leaves — hung off it, the lists pooled at the bottom of all
+       that space. Out of the row they centre on the hero instead. Auto margins
+       rather than a translate, because hero-rise ends on `transform: none` and
+       would drop a centring transform on its last frame. */
+    .hero__topics,
+    .hero__events {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 1;
+      height: fit-content;
+      /* Uncapped, a 2560px monitor would stretch the list across 700px. */
+      max-width: 19rem;
+    }
+
+    .hero__topics {
+      left: 0;
+      right: calc(100% - var(--hero-edge));
+      margin-block: auto;
+      /* Takes up the slack the cap leaves, so the list hangs off the rule
+         rather than drifting out to the window edge on a wide monitor. */
+      margin-left: auto;
+      padding-inline: var(--space-6) var(--space-10);
+    }
+
+    .hero__events {
+      left: calc(100% - var(--hero-edge));
+      right: 0;
+      margin-block: auto;
+      margin-right: auto;
+      padding-inline: var(--space-10) var(--space-6);
+    }
+
+    /* Into the corner the margin leaves below the topic list, on the same left
+       edge as it — the bottom padding matches the hero's own. */
+    .hero .hero__colophon {
+      position: absolute;
+      left: 0;
+      right: calc(100% - var(--hero-edge));
+      bottom: 0;
+      width: auto;
+      max-width: 19rem;
+      margin: 0 0 0 auto;
+      padding: 0 var(--space-10) var(--space-8) var(--space-6);
+    }
+  }
+
+  /* The wide column stops growing at 1152px, so from here down the flanks are
+     eating the sphere rather than the page giving them room. */
+  @media (max-width: 1200px) {
+    .hero__stage {
+      grid-template-columns: 13rem minmax(0, 1fr) 13rem;
+      gap: var(--space-6);
+    }
+  }
+
+  /* Below this the middle track is too narrow to read as a globe at all. The
+     flanks take the row as a pair, and the copy that's left centres in the
+     height the sphere was holding open. */
+  @media (max-width: 1000px) {
+    .hero__globe {
+      display: none;
+    }
+
+    .hero__stage {
+      flex: 0 0 auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-8);
+    }
+
+    /* Half a tablet is far more width than one event needs, and a pill stretched
+       across it stops reading as a button. */
+    .hero__event {
+      max-width: 20rem;
+    }
+
+    /* With no sphere to grow, the slack goes back to the copy above. */
+    .hero__inner {
+      flex: 1;
+      justify-content: center;
     }
   }
 
@@ -385,18 +737,6 @@ const hasRail = recent.length > 0;
     /* The headline's own <br> is set for the wide measure. */
     .hero__title :global(br) {
       display: none;
-    }
-
-    /* A three-line headline and a folded rail leave the sphere about 90px of a
-       100svh hero — a smudge rather than a globe. Better nothing: the rules and
-       ticks still carry the sheet. With it gone the copy has no counterweight,
-       so it centres in the space instead of hanging from the top. */
-    .hero__globe {
-      display: none;
-    }
-
-    .hero__inner {
-      justify-content: center;
     }
 
     /* Three columns leaves each title about 20 characters a line. The strip
@@ -413,6 +753,14 @@ const hasRail = recent.length > 0;
     .hero__actions {
       align-self: stretch;
     }
+
+    /* Side by side, the topic rows lose their counts to the wrap and the event
+       panel's date runs under its own name. One column each. */
+    .hero__stage {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+      margin-top: var(--space-10);
+    }
   }
 
   /* The globe is the hero's only ambient motion; the entrances are the site's
@@ -422,10 +770,17 @@ const hasRail = recent.length > 0;
     .hero__title,
     .hero__subtitle,
     .hero__actions,
-    .hero__meta,
     .hero__globe,
-    .hero__rail {
+    .hero__topics,
+    .hero__events,
+    .hero__rail,
+    .hero__colophon {
       animation: none;
+    }
+
+    .hero__topic:hover .hero__topic-name,
+    .hero__topic:focus-visible .hero__topic-name {
+      transform: none;
     }
   }
 </style>
