@@ -1,6 +1,9 @@
 ---
-interface Waypoint {
-  label: string;
+import HeroGlobe from "./HeroGlobe.astro";
+
+interface RecentGuide {
+  title: string;
+  category: string;
   href: string;
 }
 
@@ -11,38 +14,38 @@ interface Props {
   subtitle?: string;
   /** The rail along the foot of the hero. Omitted, the rail doesn't render. */
   railLabel?: string;
-  waypoints?: Waypoint[];
+  recent?: RecentGuide[];
 }
 
-const { eyebrow, title, subtitle, railLabel, waypoints = [] } = Astro.props;
+const { eyebrow, title, subtitle, railLabel, recent = [] } = Astro.props;
 const hasActions = Astro.slots.has("default");
 const hasMeta = Astro.slots.has("meta");
-const hasRail = waypoints.length > 0;
+const hasRail = recent.length > 0;
 ---
 
 <section class="brand-band hero">
+  {
+    /* The drafting sheet: two rules bounding the column, a dot field in the
+      margins they leave behind, and ticks on the corners. The rules land on
+      the same 1104px column the rail spans, so the marks read as one drawing
+      rather than as decoration laid over the content. */
+  }
   <div class="hero__bg" aria-hidden="true">
-    <span class="hero__aurora hero__aurora--1"></span>
-    <span class="hero__aurora hero__aurora--2"></span>
+    <span class="hero__margin hero__margin--l"></span>
+    <span class="hero__margin hero__margin--r"></span>
 
-    {
-      /* Texture, not motion: the routes hold the empty thirds while the rail
-        below keeps the page's one travelling light to itself. */
-    }
-    <svg class="hero__routes" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
-      <path class="hero__line" d="M-60 500 C 180 500 260 384 470 372 S 800 296 1260 186"></path>
-      <path class="hero__line" d="M-60 140 C 220 140 300 252 560 268 S 900 344 1260 436"></path>
-      <path class="hero__line" d="M-60 300 C 260 300 400 212 640 202 S 980 250 1260 300"></path>
-    </svg>
+    <span class="hero__rule hero__rule--l"></span>
+    <span class="hero__rule hero__rule--r"></span>
 
-    <span class="hero__veil"></span>
+    <span class="hero__tick hero__tick--l"></span>
+    <span class="hero__tick hero__tick--r"></span>
   </div>
 
   <div class="hero__inner container">
     {
       eyebrow && (
         <p class="hero__eyebrow">
-          <span class="hero__dot" aria-hidden="true" />
+          <span class="hero__dot" />
           {eyebrow}
         </p>
       )
@@ -63,27 +66,33 @@ const hasRail = waypoints.length > 0;
         </p>
       )
     }
+
+    <div class="hero__globe">
+      <HeroGlobe />
+    </div>
   </div>
 
   {
     hasRail && (
       <nav class="hero__rail" aria-label={railLabel}>
+        <span class="hero__tick hero__tick--l" aria-hidden="true" />
+        <span class="hero__tick hero__tick--r" aria-hidden="true" />
+
         <div class="container">
           {railLabel && <p class="hero__rail-label">{railLabel}</p>}
 
-          {/* list-style: none drops list semantics in Safari, and the count
-              and the order are the point here. */}
-          <ol class="hero__years" role="list" style={`--count:${waypoints.length}`}>
-            <span class="hero__track" aria-hidden="true" />
-            {waypoints.map((point) => (
+          {/* list-style: none drops list semantics in Safari, and how many
+              guides are on offer is part of what the strip is saying. */}
+          <ul class="hero__recent" role="list" style={`--count:${recent.length}`}>
+            {recent.map((guide) => (
               <li>
-                <a class="hero__year" href={point.href}>
-                  <span class="hero__node" aria-hidden="true" />
-                  {point.label}
+                <a class="hero__recent-link" href={guide.href}>
+                  <span class="hero__recent-category">{guide.category}</span>
+                  <span class="hero__recent-title">{guide.title}</span>
                 </a>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </nav>
     )
@@ -92,6 +101,22 @@ const hasRail = waypoints.length > 0;
 
 <style>
   .hero {
+    /* A fixed dark slab in both themes, so the marks and the globe keep one
+       set of values. The greys are the dark theme's own --c-bg-alt/--c-bg-soft,
+       pinned here because the hero must not flip with the page. */
+    --hero-ground: #101012;
+    --hero-lift: #1c1c20;
+    --hero-mark: rgba(255, 255, 255, 0.14);
+    --hero-dot: rgba(255, 255, 255, 0.055);
+
+    /* The column the rules bound — the same width the rail spans, so the
+       rail's hairline ends exactly on them. */
+    --hero-column: min(var(--page-width-wide), 100% - var(--space-6) * 2);
+    --hero-edge: calc((100% - var(--hero-column)) / 2);
+
+    /* .brand-band pins this to the retired gradient's darkest stop. */
+    --focus-ring: 0 0 0 2px var(--hero-ground), 0 0 0 4px rgba(255, 255, 255, 0.9);
+
     position: relative;
     display: flex;
     flex-direction: column;
@@ -99,10 +124,14 @@ const hasRail = waypoints.length > 0;
     min-height: calc(100vh - var(--nav-height));
     min-height: calc(100svh - var(--nav-height));
     overflow: hidden;
-    padding-block: var(--space-16) var(--space-12);
+    padding-block: var(--space-10) var(--space-8);
+    background:
+      radial-gradient(ellipse 90% 70% at 50% -8%, var(--hero-lift), transparent 70%),
+      var(--hero-ground);
+    background-color: var(--hero-ground);
   }
 
-  /* ── Moving ground ── */
+  /* ── The sheet ── */
 
   .hero__bg {
     position: absolute;
@@ -110,67 +139,58 @@ const hasRail = waypoints.length > 0;
     pointer-events: none;
   }
 
-  .hero__aurora {
+  /* Dots live outside the rules only: the reading column stays clean and the
+     texture reads as the sheet the drawing sits on. */
+  .hero__margin {
     position: absolute;
-    border-radius: 50%;
-    will-change: transform;
+    top: 0;
+    bottom: 0;
+    width: var(--hero-edge);
+    background-image: radial-gradient(var(--hero-dot) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
-  .hero__aurora--1 {
-    top: -30%;
-    left: -14%;
-    width: min(72vw, 980px);
-    aspect-ratio: 1;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.5), rgba(124, 58, 237, 0) 68%);
-    animation: hero-drift-1 26s ease-in-out infinite alternate;
+  .hero__margin--l {
+    left: 0;
   }
-  .hero__aurora--2 {
-    right: -16%;
-    bottom: -26%;
-    width: min(78vw, 1060px);
-    aspect-ratio: 1;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.36), rgba(168, 85, 247, 0) 66%);
-    animation: hero-drift-2 34s ease-in-out infinite alternate;
+  .hero__margin--r {
+    right: 0;
   }
 
-  .hero__routes {
+  .hero__rule {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    fill: none;
-    /* Faded off at both ends: clear of the navbar above, and clear of the rail
-       below so the two line systems never read as one broken line. */
-    mask-image: linear-gradient(to bottom, transparent 2%, #000 20%, #000 58%, transparent 82%);
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 2%,
-      #000 20%,
-      #000 58%,
-      transparent 82%
-    );
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed var(--hero-mark);
+  }
+  .hero__rule--l {
+    left: var(--hero-edge);
+  }
+  .hero__rule--r {
+    right: var(--hero-edge);
   }
 
-  .hero__line {
-    stroke: rgba(216, 180, 254, 0.16);
-    stroke-width: 1.25;
-  }
-
-  @keyframes hero-drift-1 {
-    to {
-      transform: translate3d(90px, 60px, 0) scale(1.12);
-    }
-  }
-  @keyframes hero-drift-2 {
-    to {
-      transform: translate3d(-110px, -50px, 0) scale(1.08);
-    }
-  }
-
-  /* Darkens the middle so the headline never competes with the artwork. */
-  .hero__veil {
+  /* A registration mark on each corner of the block the rules bound: the top
+     pair sits under the navbar, the bottom pair on the rail's dashed rule. */
+  .hero__tick {
     position: absolute;
-    inset: 0;
-    background: radial-gradient(58% 46% at 50% 42%, rgba(20, 16, 33, 0.66), transparent 72%);
+    top: 0;
+    width: 11px;
+    height: 11px;
+    margin: -5px 0 0 -5px;
+    background-image: linear-gradient(var(--hero-mark) 0 0), linear-gradient(var(--hero-mark) 0 0);
+    background-size:
+      11px 1px,
+      1px 11px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .hero__tick--l {
+    left: var(--hero-edge);
+  }
+  .hero__tick--r {
+    right: var(--hero-edge);
+    margin-right: -5px;
+    margin-left: 0;
   }
 
   /* ── Content ── */
@@ -182,7 +202,6 @@ const hasRail = waypoints.length > 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
   }
 
@@ -206,19 +225,7 @@ const hasRail = waypoints.length > 0;
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #d8b4fe;
-    box-shadow: 0 0 0 0 rgba(216, 180, 254, 0.55);
-    animation: hero-ping 2.6s ease-out infinite;
-  }
-
-  @keyframes hero-ping {
-    0% {
-      box-shadow: 0 0 0 0 rgba(216, 180, 254, 0.5);
-    }
-    70%,
-    100% {
-      box-shadow: 0 0 0 9px rgba(216, 180, 254, 0);
-    }
+    background: #c084fc;
   }
 
   .hero .hero__title {
@@ -233,26 +240,7 @@ const hasRail = waypoints.length > 0;
 
   /* Set via set:html from the page, so it sits outside this file's scoping. */
   .hero__title :global(.hero__accent) {
-    background: linear-gradient(
-      100deg,
-      #d8b4fe 12%,
-      #c084fc 32%,
-      #f5d0fe 50%,
-      #c084fc 68%,
-      #d8b4fe 88%
-    );
-    background-size: 240% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: hero-sheen 8s linear infinite;
-  }
-
-  @keyframes hero-sheen {
-    to {
-      background-position: -240% 0;
-    }
+    color: #c084fc;
   }
 
   .hero .hero__subtitle {
@@ -269,15 +257,35 @@ const hasRail = waypoints.length > 0;
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--space-4);
-    margin-top: var(--space-8);
+    margin-top: var(--space-6);
     animation: hero-rise 700ms var(--ease-out) 240ms both;
   }
 
   .hero .hero__meta {
-    margin: var(--space-6) 0 0;
+    margin: var(--space-5) 0 0;
     font-size: var(--text-sm);
     color: var(--c-text-inverse-3);
     animation: hero-rise 700ms var(--ease-out) 320ms both;
+  }
+
+  /* The sphere is bigger than the space left for it. It's anchored to the top
+     of this box and clipped at the bottom, so the world runs on past the rule
+     rather than sitting in the hero like an illustration. */
+  .hero__globe {
+    position: relative;
+    flex: 1;
+    align-self: stretch;
+    min-height: 0;
+    margin-top: var(--space-6);
+    overflow: hidden;
+    animation: hero-rise 900ms var(--ease-out) 420ms both;
+  }
+
+  .hero__globe > :global(.globe) {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   @keyframes hero-rise {
@@ -292,123 +300,81 @@ const hasRail = waypoints.length > 0;
   }
 
   /* ── The rail ──
-     Four years, in order, sitting on one line. It anchors the foot of a
-     full-height hero with the only sequence the wiki actually has, and it
-     tells a first-year that the path is longer than one summer. */
+     The three most recently touched guides, one per category. It anchors the
+     foot of a full-height hero, and it shows a first-time visitor that the
+     wiki is both alive and wider than whatever brought them here. */
 
   .hero__rail {
     position: relative;
     z-index: 1;
-    animation: hero-rise 700ms var(--ease-out) 420ms both;
+    padding-top: var(--space-6);
+    border-top: 1px dashed var(--hero-mark);
+    animation: hero-rise 700ms var(--ease-out) 500ms both;
   }
 
   .hero .hero__rail-label {
-    margin: 0 0 var(--space-6);
+    max-width: var(--page-width-wide);
+    margin: 0 auto var(--space-5);
+    padding-inline: var(--space-6);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-wide);
     text-transform: lowercase;
     color: var(--c-text-inverse-3);
-    text-align: center;
   }
 
-  .hero__years {
-    position: relative;
+  .hero__recent {
     display: grid;
-    grid-template-columns: repeat(var(--count, 4), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
+    gap: var(--space-6);
     margin: 0 auto;
-    padding: 0;
+    /* The rules land on this block's outer edge; the gutter keeps the text
+       off them. */
+    padding-inline: var(--space-6);
     max-width: var(--page-width-wide);
     list-style: none;
   }
 
-  /* The hairline the nodes sit on, faded out before it reaches either end so
-     the path reads as continuing past the screen. The box is 120px tall and
-     pulled back up over its own centre: the hairline is one layer sized to
-     100% x 1px, and the height is headroom the travelling glow needs — at 1px
-     it would be clipped to a bright dash. */
-  .hero__track {
-    position: absolute;
-    top: 4px;
-    left: 0;
-    right: 0;
-    height: 120px;
-    margin-top: -60px;
-    pointer-events: none;
-    background-image:
-      radial-gradient(
-        closest-side,
-        rgba(240, 219, 255, 0.5),
-        rgba(216, 180, 254, 0.12) 45%,
-        rgba(216, 180, 254, 0) 100%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(216, 180, 254, 0) 0%,
-        rgba(216, 180, 254, 0.24) 12%,
-        rgba(216, 180, 254, 0.24) 88%,
-        rgba(216, 180, 254, 0) 100%
-      );
-    background-repeat: no-repeat;
-    background-size:
-      240px 120px,
-      100% 1px;
-    background-position:
-      -240px center,
-      0 center;
-    /* One travelling light, no dwell: it re-enters on the left at the instant
-       it clears the right, so the loop point never reads as a stop. */
-    animation: hero-travel 13s linear infinite;
-  }
-
-  @keyframes hero-travel {
-    to {
-      background-position:
-        calc(100% + 240px) center,
-        0 center;
-    }
-  }
-
-  .hero__year {
+  /* Titles are left-aligned rather than centred under the hero: they run to
+     two lines at this measure, and centred ragged wrapping reads as an
+     accident. Flush left they behave like the index this strip is. */
+  .hero .hero__recent-link {
     display: flex;
-    width: max-content;
-    margin-inline: auto;
     flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
-    padding-bottom: var(--space-1);
-    font-size: var(--text-sm);
-    color: var(--c-text-inverse-2);
+    gap: var(--space-2);
     text-decoration: none;
     transition: color var(--duration-normal) var(--ease);
   }
 
-  .hero__node {
-    position: relative;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: rgba(216, 180, 254, 0.5);
-    box-shadow: 0 0 0 4px rgba(216, 180, 254, 0.08);
-    transition:
-      background var(--duration-normal) var(--ease),
-      box-shadow var(--duration-normal) var(--ease);
+  .hero__recent-title {
+    font-size: var(--text-base);
+    font-weight: 500;
+    line-height: var(--leading-normal);
+    color: var(--c-text-inverse-2);
+    transition: color var(--duration-normal) var(--ease);
   }
 
-  .hero__year:hover,
-  .hero__year:focus-visible {
+  .hero__recent-category {
+    font-size: var(--text-sm);
+    color: var(--c-text-inverse-3);
+  }
+
+  .hero__recent-link:hover .hero__recent-title,
+  .hero__recent-link:focus-visible .hero__recent-title {
     color: var(--c-text-inverse-1);
   }
 
-  .hero__year:hover .hero__node,
-  .hero__year:focus-visible .hero__node {
-    background: #f0dbff;
-    box-shadow: 0 0 0 6px rgba(216, 180, 254, 0.18);
-  }
-
-  .hero__year:focus-visible {
+  .hero__recent-link:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
     border-radius: var(--radius-md);
+  }
+
+  /* Below the wide column the margins are a sliver — too thin to read as a
+     dot field, so the sheet keeps only its rules and ticks. */
+  @media (max-width: 1152px) {
+    .hero__margin {
+      display: none;
+    }
   }
 
   @media (max-width: 768px) {
@@ -421,19 +387,23 @@ const hasRail = waypoints.length > 0;
       display: none;
     }
 
-    .hero__veil {
-      background: radial-gradient(90% 44% at 50% 42%, rgba(20, 16, 33, 0.7), transparent 78%);
-    }
-
-    /* Four columns of 9px text is unreadable; the rail folds to two rows and
-       the hairline steps aside rather than cutting between them. */
-    .hero__years {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-6);
-    }
-
-    .hero__track {
+    /* A three-line headline and a folded rail leave the sphere about 90px of a
+       100svh hero — a smudge rather than a globe. Better nothing: the rules and
+       ticks still carry the sheet. With it gone the copy has no counterweight,
+       so it centres in the space instead of hanging from the top. */
+    .hero__globe {
       display: none;
+    }
+
+    .hero__inner {
+      justify-content: center;
+    }
+
+    /* Three columns leaves each title about 20 characters a line. The strip
+       stacks instead, which also keeps every row a comfortable tap target. */
+    .hero__recent {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
     }
   }
 
@@ -445,20 +415,17 @@ const hasRail = waypoints.length > 0;
     }
   }
 
-  /* Ambient motion is decoration; pin every layer to a good static frame. */
+  /* The globe is the hero's only ambient motion; the entrances are the site's
+     ordinary arrival and stop on their own. */
   @media (prefers-reduced-motion: reduce) {
-    .hero__aurora--1,
-    .hero__aurora--2,
-    .hero__dot,
-    .hero__title :global(.hero__accent) {
+    .hero__eyebrow,
+    .hero__title,
+    .hero__subtitle,
+    .hero__actions,
+    .hero__meta,
+    .hero__globe,
+    .hero__rail {
       animation: none;
-    }
-
-    .hero__track {
-      animation: none;
-      background-position:
-        62% center,
-        0 center;
     }
   }
 </style>

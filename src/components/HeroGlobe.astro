@@ -1,0 +1,150 @@
+---
+/**
+ * The hero's dotted sphere. Purely decorative: it carries no information the
+ * copy doesn't already give, so it's hidden from assistive tech and the page
+ * reads identically when WebGL is unavailable.
+ */
+---
+
+<div class="globe" aria-hidden="true">
+  <canvas class="globe__canvas"></canvas>
+</div>
+
+<style>
+  /* Sized off the viewport height as well as its width: the hero crops the
+     sphere at the dashed rule, and tying the diameter to the available height
+     keeps roughly the same slice of it visible on a laptop and a tall monitor. */
+  .globe {
+    width: min(84vw, 62vh, 600px);
+    aspect-ratio: 1;
+  }
+
+  .globe__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import createGlobe from "cobe";
+
+  const host = document.querySelector<HTMLElement>(".globe");
+  let canvas = host?.querySelector("canvas");
+
+  if (host && canvas) {
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const options = {
+      theta: 0.3,
+      mapSamples: 16000,
+      mapBrightness: 6,
+      // Flat, evenly-lit and barely shaded: a drawing of a globe rather than a
+      // render of a planet. The terminator a lit sphere gets would leave half
+      // the disc empty, and the dots are the point.
+      mapBaseBrightness: 0.05,
+      baseColor: [0.486, 0.227, 0.929] as [number, number, number],
+      markerColor: [0.847, 0.706, 0.996] as [number, number, number],
+      glowColor: [0.06, 0.05, 0.09] as [number, number, number],
+      // Atlanta — the one mark on the sphere that isn't geography.
+      markers: [{ location: [33.749, -84.388] as [number, number], size: 0.06 }],
+      diffuse: 1,
+      dark: 0.9,
+      // cobe leaves ~10% padding inside the canvas by default, which lands here
+      // as a dead band between the copy and the sphere.
+      scale: 1.2,
+      // v2 renders on demand rather than driving its own loop, so a still
+      // globe stops drawing early — and its last frame has to survive
+      // compositing.
+      context: { preserveDrawingBuffer: still },
+    };
+
+    let globe: ReturnType<typeof createGlobe> | null = null;
+    let frame = 0;
+    let phi = 0;
+    let visible = true;
+
+    const build = () => {
+      // Below the mobile breakpoint the hero hides the sphere outright, so
+      // there is no box to size a context to and nothing to draw.
+      const size = host.clientWidth;
+      if (!size) {
+        globe?.destroy();
+        globe = null;
+        return;
+      }
+
+      // cobe tears the context down with WEBGL_lose_context, and a canvas that
+      // has lost its context hands back the same dead one forever — so a
+      // rebuild gets a fresh element, not just a fresh globe.
+      if (globe) {
+        globe.destroy();
+        const fresh = canvas!.cloneNode() as HTMLCanvasElement;
+        canvas!.replaceWith(fresh);
+        canvas = fresh;
+      }
+
+      globe = createGlobe(canvas!, {
+        ...options,
+        phi,
+        width: size,
+        height: size,
+        devicePixelRatio: window.devicePixelRatio || 1,
+      });
+    };
+
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    };
+
+    // ~35s a turn. Slow enough to read as ambient rather than as an animation.
+    const spin = () => {
+      if (!globe) return stop();
+      phi += 0.003;
+      globe.update({ phi });
+      frame = requestAnimationFrame(spin);
+    };
+
+    // cobe decodes its map texture asynchronously, so the frames drawn in the
+    // first moments carry the markers but no land. A spinning globe fills
+    // itself in; a still one has to be held open long enough to catch up.
+    const warmUp = () => {
+      const until = performance.now() + 1500;
+      const draw = () => {
+        if (!globe) return stop();
+        globe.update({ phi });
+        if (performance.now() < until) frame = requestAnimationFrame(draw);
+        else frame = 0;
+      };
+      stop();
+      frame = requestAnimationFrame(draw);
+    };
+
+    const run = () => {
+      if (still) return warmUp();
+      if (!frame && globe && visible) frame = requestAnimationFrame(spin);
+    };
+
+    build();
+    run();
+
+    if (!still) {
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        visible ? run() : stop();
+      }).observe(host);
+    }
+
+    // The diameter is a viewport formula, so a resize needs a new context —
+    // cobe fixes its buffers at creation. phi carries over, so it doesn't jump.
+    let resize: ReturnType<typeof setTimeout>;
+    window.addEventListener("resize", () => {
+      clearTimeout(resize);
+      resize = setTimeout(() => {
+        build();
+        run();
+      }, 200);
+    });
+  }
+</script>
