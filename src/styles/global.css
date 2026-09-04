@@ -1114,6 +1114,22 @@ pre.astro-code:hover .code-copy,
   height: auto;
 }
 
+/* Labels are real <p>s inside a foreignObject, so the prose measure reaches
+   them. Mermaid sized that box at 24px a line; prose's 28px spills a two-line
+   label out of it and clips the second line. */
+.mermaid-diagram .nodeLabel p,
+.mermaid-diagram .edgeLabel p {
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Mermaid measures the label outside this cascade and rounds, landing a pixel
+   or two under what Inter actually paints — enough to shave the last letter,
+   since a foreignObject clips at its own edge. The node box has the room. */
+.mermaid-diagram foreignObject {
+  overflow: visible;
+}
+
 .mermaid-diagram a {
   text-decoration: none;
   cursor: pointer;

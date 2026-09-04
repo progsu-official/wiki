@@ -308,3 +308,122 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     });
   }
 </script>
+
+<script>
+  // Mermaid is ~1MB, so it only loads on the pages that actually hold a diagram.
+  const diagrams = [...document.querySelectorAll<HTMLElement>(".mermaid-diagram")];
+
+  if (diagrams.length > 0) {
+    const { default: mermaid } = await import("mermaid");
+
+    // Read fresh every time: the theme toggle rewrites these on <html>, and the
+    // colours below get baked into the SVG rather than referenced from it.
+    const token = (name: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+    const configure = () =>
+      mermaid.initialize({
+        startOnLoad: false,
+        // Diagrams come from our own vault, and clickable nodes need real hrefs.
+        securityLevel: "loose",
+        theme: "base",
+        fontFamily: token("--font-body"),
+        // useMaxWidth would scale a wide diagram down to the column and shrink the
+        // text past legibility; render at native size and pick a fitting direction.
+        flowchart: { curve: "basis", padding: 16, useMaxWidth: false },
+        themeVariables: {
+          // Nodes take --c-bg so they read against the panel's --c-bg-soft. The
+          // obvious --c-bg-mute is the one pairing to avoid: the clickable labels
+          // are --c-brand-1, which lands at 4.41:1 on mute in dark.
+          background: token("--c-bg-soft"),
+          primaryColor: token("--c-bg"),
+          mainBkg: token("--c-bg"),
+          secondaryColor: token("--c-bg-mute"),
+          tertiaryColor: token("--c-bg-soft"),
+          primaryBorderColor: token("--c-border"),
+          nodeBorder: token("--c-border"),
+          primaryTextColor: token("--c-text-1"),
+          nodeTextColor: token("--c-text-1"),
+          textColor: token("--c-text-2"),
+          lineColor: token("--c-text-3"),
+          edgeLabelBackground: token("--c-bg-soft"),
+        },
+      });
+
+    // A horizontal flowchart is short but wide, a vertical one tall but narrow.
+    // Rather than force either, try the direction the diagram asks for and fall
+    // back to vertical when it would need sideways scrolling at this width.
+    const HORIZONTAL = /^(\s*flowchart\s+)(LR|RL)\b/m;
+    let seq = 0;
+
+    const naturalWidth = (svg: string) => {
+      const vb = /viewBox="[\d.\-]+ [\d.\-]+ ([\d.]+) [\d.]+"/.exec(svg);
+      return vb ? parseFloat(vb[1]) : 0;
+    };
+
+    // clientWidth still counts the panel's padding, which the diagram can't use.
+    const roomFor = (el: HTMLElement) => {
+      const cs = getComputedStyle(el);
+      return el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    };
+
+    const paint = (el: HTMLElement, svg: string, bind?: (e: Element) => void) => {
+      el.innerHTML = svg;
+      bind?.(el);
+      el.dataset.rendered = "true";
+    };
+
+    async function draw(el: HTMLElement, source: string) {
+      if (HORIZONTAL.test(source)) {
+        const wide = await mermaid.render(`mermaid-diagram-${seq++}`, source);
+        if (naturalWidth(wide.svg) <= roomFor(el)) {
+          paint(el, wide.svg, wide.bindFunctions);
+          el.dataset.direction = "horizontal";
+          return;
+        }
+        source = source.replace(HORIZONTAL, "$1TD");
+      }
+      const tall = await mermaid.render(`mermaid-diagram-${seq++}`, source);
+      paint(el, tall.svg, tall.bindFunctions);
+      el.dataset.direction = "vertical";
+    }
+
+    const render = () => {
+      configure();
+      return Promise.all(
+        diagrams.map(async (el) => {
+          const source = el.dataset.diagram;
+          if (!source || !el.isConnected) return;
+          try {
+            await draw(el, source);
+          } catch {
+            // A malformed diagram shouldn't leave a broken slot mid-article.
+            el.remove();
+          }
+        })
+      );
+    };
+
+    await render();
+
+    // Re-evaluate the direction when the available width changes.
+    let resizeTimer: number;
+    let lastWidth = window.innerWidth;
+    window.addEventListener("resize", () => {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(render, 150);
+    });
+
+    // The palette is baked into the SVG, so a theme flip needs a repaint. Watch
+    // the class rather than the toggle button: the shell can set it too.
+    let theme = document.documentElement.classList.contains("dark");
+    new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains("dark");
+      if (isDark === theme) return;
+      theme = isDark;
+      render();
+    }).observe(document.documentElement, { attributeFilter: ["class"] });
+  }
+</script>
