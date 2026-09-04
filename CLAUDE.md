@@ -29,7 +29,7 @@ Existing tokens live in [src/styles/global.css](src/styles/global.css). Use them
 
 - **Theme:** light by default, dark via the `dark` class on `<html>`. Every color comes from a `--c-*` token so both themes work. Never hardcode `#fff`/`#000` for a surface or text.
 - **One contrast trap:** `--c-brand-1` on `--c-bg-mute` is 4.41:1 in dark — just under AA. Nothing pairs them today; use `--c-text-1`/`--c-text-2` on mute surfaces.
-- **The gradient is a special occasion.** `--grad-brand` (`#3d2377` → `#141021`) is only ever used full-bleed, on a `.brand-band`. Ordinary accents use the solid ramp (`--c-brand-1/2/3`) so long reading pages stay calm. Inside a band, text uses `--c-text-inverse-*`.
+- **`.brand-band` is the dark slab, not the gradient.** It is the one full-bleed surface that stays dark in both themes and carries `--c-text-inverse-*` text. The homepage hero is its only user, and it grounds itself in grey (`#101012`), not `--grad-brand`. The navbar is the ramp's other user: it composes `--grad-stop-2/3` directly into a mostly-flat dark purple bar. `--grad-brand` and `--grad-brand-linear` themselves still render nowhere. Ordinary accents use the solid ramp (`--c-brand-1/2/3`) so long reading pages stay calm.
 - **Surfaces:** flat. `--c-bg-soft` fill, `--c-divider` hairline, `--shadow-*` for elevation. No glass, no blur. (`.surface-glass` survives only as a compat alias for a flat card.)
 - **Type:** Inter everywhere, 600 for headings. Mono (`--font-mono`) only for genuinely technical strings — course codes, CRNs, times, counts.
 - **Whitespace:** generous. Spacing scale tokens (`--space-*`) only.

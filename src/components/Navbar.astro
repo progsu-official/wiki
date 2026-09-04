@@ -119,14 +119,27 @@ function isActive(href: string): boolean {
 
 <style>
   .navbar {
+    /* The brand ramp's two dark stops, not the full gradient: the bar holds
+       flat --grad-stop-2 across the first half and only then leans toward
+       --grad-stop-3. The last stop sits past the box at 130%, so the right
+       edge lands short of the near-black end and stays purple. */
+    --nav-mark: rgba(255, 255, 255, 0.14);
+    --focus-ring: 0 0 0 2px var(--grad-stop-2), 0 0 0 4px rgba(255, 255, 255, 0.9);
+
     position: sticky;
     top: 0;
     z-index: var(--z-nav);
     height: var(--nav-height);
     /* The shell reserves exactly 64px, so the border must sit inside it. */
     box-sizing: border-box;
-    background: var(--c-bg);
-    border-bottom: 1px solid var(--c-divider);
+    background: linear-gradient(
+      100deg,
+      var(--grad-stop-2) 0%,
+      var(--grad-stop-2) 55%,
+      var(--grad-stop-3) 130%
+    );
+    background-color: var(--grad-stop-2);
+    border-bottom: 1px solid var(--nav-mark);
   }
 
   .navbar__inner {
@@ -145,16 +158,16 @@ function isActive(href: string): boolean {
     font-size: 16px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--c-text-1);
+    color: var(--c-text-inverse-1);
     white-space: nowrap;
     flex-shrink: 0;
   }
   .navbar__brand:hover {
-    color: var(--c-text-1);
+    color: var(--c-text-inverse-1);
   }
   .navbar__brand-sep,
   .navbar__brand-sub {
-    color: var(--c-text-3);
+    color: var(--c-text-inverse-3);
     font-weight: 500;
   }
 
@@ -172,25 +185,27 @@ function isActive(href: string): boolean {
     padding-block: 4px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--c-text-2);
+    color: var(--c-text-inverse-2);
     transition: color var(--duration-fast) var(--ease);
   }
   .navbar__link:hover {
-    color: var(--c-text-1);
+    color: var(--c-text-inverse-1);
   }
   /* The underline is drawn as a background, the way .prose a does it — a
-     text-decoration can't hold a gradient, and the label has to stay solid. */
+     text-decoration can't be inset off the text the way this needs to be.
+     --grad-accent-line is purple on purple here, so the active link takes the
+     lavender .brand-band already gives its links. */
   .navbar__link.is-active {
-    color: var(--c-brand-1);
+    color: #d8b4fe;
     font-weight: 600;
-    background-image: var(--grad-accent-line);
+    background-image: linear-gradient(#d8b4fe 0 0);
     background-repeat: no-repeat;
     background-size: 100% 2px;
     background-position: 0 100%;
   }
 
   .navbar__external {
-    color: var(--c-text-3);
+    color: var(--c-text-inverse-3);
     flex-shrink: 0;
   }
 
@@ -206,7 +221,7 @@ function isActive(href: string): boolean {
     display: none;
     width: 1px;
     height: 24px;
-    background: var(--c-divider);
+    background: var(--nav-mark);
     margin-inline: var(--space-4);
     flex-shrink: 0;
   }
@@ -223,7 +238,7 @@ function isActive(href: string): boolean {
     border: none;
     border-radius: var(--radius-full);
     background: transparent;
-    color: var(--c-text-2);
+    color: var(--c-text-inverse-2);
     font-family: var(--font-body);
     cursor: pointer;
     transition:
@@ -231,8 +246,8 @@ function isActive(href: string): boolean {
       color var(--duration-fast) var(--ease);
   }
   .navbar__search:hover {
-    color: var(--c-text-1);
-    background: var(--c-bg-soft);
+    color: var(--c-text-inverse-1);
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .navbar__search-icon {
@@ -260,12 +275,12 @@ function isActive(href: string): boolean {
     border: none;
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--c-text-2);
+    color: var(--c-text-inverse-2);
     cursor: pointer;
     transition: color var(--duration-fast) var(--ease);
   }
   .navbar__toggle:hover {
-    color: var(--c-text-1);
+    color: var(--c-text-inverse-1);
   }
 
   .navbar__bar {
@@ -302,8 +317,10 @@ function isActive(href: string): boolean {
       top: var(--nav-height);
       left: 0;
       right: 0;
-      background: var(--c-bg);
-      border-bottom: 1px solid var(--c-divider);
+      /* Flat, not the gradient: a 64px slice of the ramp restarted below the
+         bar would read as a seam. The darkest stop is the bar's own foot. */
+      background: var(--grad-stop-2);
+      border-bottom: 1px solid var(--nav-mark);
       box-shadow: var(--shadow-lg);
       padding: var(--space-2) var(--space-6) var(--space-4);
     }
@@ -311,7 +328,7 @@ function isActive(href: string): boolean {
     .navbar__links.is-open .navbar__link {
       min-height: 44px;
       font-size: 15px;
-      border-bottom: 1px solid var(--c-divider);
+      border-bottom: 1px solid var(--nav-mark);
     }
     /* A full-row underline would sit on top of the row divider. */
     .navbar__links.is-open .navbar__link.is-active {
@@ -355,10 +372,10 @@ function isActive(href: string): boolean {
       height: 32px;
       justify-content: flex-start;
       padding: 0 var(--space-2) 0 var(--space-3);
-      background: var(--c-bg-soft);
+      background: rgba(255, 255, 255, 0.08);
     }
     .navbar__search:hover {
-      background: var(--c-bg-mute);
+      background: rgba(255, 255, 255, 0.16);
     }
 
     .navbar__search-label {
@@ -374,10 +391,10 @@ function isActive(href: string): boolean {
       min-width: 24px;
       height: 20px;
       padding: 0 var(--space-1);
-      border: 1px solid var(--c-divider);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: var(--radius-sm);
-      background: var(--c-bg);
-      color: var(--c-text-3);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--c-text-inverse-3);
       font-family: var(--font-mono);
       font-size: 11px;
       line-height: 1;
@@ -388,6 +405,20 @@ function isActive(href: string): boolean {
     .navbar__social {
       display: block;
     }
+  }
+
+  /* ── Shared children ──
+     ThemeToggle and SocialRow are built on the page tokens, and SocialRow is
+     the footer's as well. Both are re-grounded here instead of edited, so the
+     purple stops at this bar. */
+  .navbar :global(.theme-toggle),
+  .navbar :global(.social-row__link) {
+    color: var(--c-text-inverse-2);
+  }
+  .navbar :global(.theme-toggle:hover),
+  .navbar :global(.social-row__link:hover) {
+    color: var(--c-text-inverse-1);
+    background: rgba(255, 255, 255, 0.1);
   }
 </style>
 
