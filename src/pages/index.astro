@@ -26,6 +26,7 @@ const recent = [...guides]
     // Titles stay as written, the way every other guide listing renders them.
     title: guide.data.title,
     category: guide.data.category.replace(/-/g, " "),
+    updated: guide.data.updated,
     href: `/guides/${guide.slug}`,
   }));
 
@@ -58,7 +59,7 @@ const upcoming = {
     subtitle="written by gsu students who have already broken in."
     topicsLabel="browse"
     topics={topics}
-    eventLabel="up next"
+    eventLabel="upcoming progsu events"
     event={upcoming}
     railLabel="recently updated"
     recent={recent}

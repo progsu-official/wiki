@@ -5,6 +5,7 @@ interface RecentGuide {
   title: string;
   category: string;
   href: string;
+  updated: Date;
 }
 
 interface Topic {
@@ -54,6 +55,16 @@ const hasActions = Astro.slots.has("default");
 const hasTopics = topics.length > 0;
 const hasRail = recent.length > 0;
 const eventIsExternal = Boolean(event && /^https?:\/\//.test(event.href));
+
+// Frontmatter dates are UTC midnight; formatting them locally renders the
+// previous day anywhere west of UTC.
+const shortDate = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 ---
 
 <section class="brand-band hero">
@@ -178,7 +189,10 @@ const eventIsExternal = Boolean(event && /^https?:\/\//.test(event.href));
             {recent.map((guide) => (
               <li>
                 <a class="hero__recent-link" href={guide.href}>
-                  <span class="hero__recent-category">{guide.category}</span>
+                  <span class="hero__recent-meta">
+                    <span>{guide.category}</span>
+                    <time datetime={guide.updated.toISOString()}>{shortDate(guide.updated)}</time>
+                  </span>
                   <span class="hero__recent-title">{guide.title}</span>
                 </a>
               </li>
@@ -581,9 +595,21 @@ const eventIsExternal = Boolean(event && /^https?:\/\//.test(event.href));
     transition: color var(--duration-normal) var(--ease);
   }
 
-  .hero__recent-category {
+  /* Category and date read as one quiet line above the title, the way the
+     eyebrow separates its halves. */
+  .hero__recent-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
     font-size: var(--text-sm);
+    text-transform: lowercase;
     color: var(--c-text-inverse-3);
+  }
+
+  .hero__recent-meta time::before {
+    content: "·";
+    margin-right: var(--space-2);
   }
 
   .hero__recent-link:hover .hero__recent-title,
