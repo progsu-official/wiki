@@ -29,7 +29,7 @@
         id="sitesearch-input"
         class="sitesearch-input"
         type="text"
-        placeholder="search guides and categories"
+        placeholder="search all guides"
         autocomplete="off"
         spellcheck="false"
       />
@@ -165,9 +165,6 @@
   }
 
   :global(.sitesearch-item) {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-3);
     padding: var(--space-3);
     border-radius: var(--radius-md);
     cursor: pointer;
@@ -175,6 +172,32 @@
   :global(.sitesearch-item.active) {
     background: var(--c-brand-soft);
     color: var(--c-brand-1);
+  }
+
+  :global(.sitesearch-item-row) {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  /* A body hit shows where it matched; a title hit has nothing to add. */
+  :global(.sitesearch-item-snippet) {
+    margin: var(--space-1) 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--c-text-3);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  /* The active row already sits on --c-brand-soft, so a highlight can't use a
+     fill to stand out. Weight plus a lift to --c-text-1 reads on both. */
+  :global(.sitesearch-item-snippet mark) {
+    background: none;
+    color: var(--c-text-1);
+    font-weight: 600;
   }
 
   :global(.sitesearch-item-title) {
@@ -221,11 +244,28 @@
 </style>
 
 <script>
+  type Section = { heading: string; slug: string; text: string };
   type Container = { type: "container"; title: string; href: string };
-  type Page = { type: "page"; title: string; href: string; category: string; tags: string[] };
+  type Page = {
+    type: "page";
+    title: string;
+    href: string;
+    category: string;
+    tags: string[];
+    sections: Section[];
+  };
+
+  // What actually gets rendered: an entry plus, for a body hit, where it hit.
+  type Hit = { href: string; title: string; meta: string; snippet: string | null };
+
+  const SNIPPET_LEN = 140;
+  const SNIPPET_LEAD = 48;
 
   let data: { containers: Container[]; pages: Page[] } | null = null;
-  let flat: (Container | Page)[] = [];
+  // Lowercased haystacks, built once on load so typing never re-lowercases the
+  // whole corpus. Parallel to data.pages / each page's sections.
+  let pageHay: { title: string; meta: string; body: string; sections: string[] }[] = [];
+  let flat: Hit[] = [];
   let activeIndex = 0;
 
   const backdrop = document.getElementById("sitesearch-backdrop")!;
@@ -236,28 +276,183 @@
     if (data) return;
     const res = await fetch("/search-index.json");
     data = await res.json();
+    pageHay = data!.pages.map((p) => {
+      const sections = p.sections.map((s) => `${s.heading} ${s.text}`.toLowerCase());
+      return {
+        title: p.title.toLowerCase(),
+        meta: [p.title, p.category, ...p.tags].join(" ").toLowerCase(),
+        body: sections.join(" "),
+        sections,
+      };
+    });
   }
 
-  function includes(text: string, q: string) {
-    return text.toLowerCase().includes(q);
+  const isWordChar = (ch: string | undefined) => !!ch && /[a-z0-9]/.test(ch);
+
+  function* occurrences(hay: string, term: string) {
+    for (let i = hay.indexOf(term); i !== -1; i = hay.indexOf(term, i + 1)) yield i;
+  }
+
+  /** 3 = whole word, 2 = starts a word, 1 = buried inside one. */
+  function matchQuality(hay: string, term: string, at: number) {
+    const opensWord = !isWordChar(hay[at - 1]);
+    const closesWord = !isWordChar(hay[at + term.length]);
+    return opensWord && closesWord ? 3 : opensWord ? 2 : 1;
+  }
+
+  /** The best tier `term` reaches anywhere in `hay`, or 0 if it's absent. */
+  function quality(hay: string, term: string) {
+    let best = 0;
+    for (const at of occurrences(hay, term)) {
+      best = Math.max(best, matchQuality(hay, term, at));
+      if (best === 3) break;
+    }
+    return best;
+  }
+
+  function esc(text: string) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /**
+   * Escape `text`, wrapping matched terms in <mark>. Only the best tier a term
+   * reaches in this text gets marked: with "start" all over the guides, a
+   * snippet found for "star" should point at STAR, not light up every "start"
+   * that happens to share the window.
+   */
+  function mark(text: string, terms: string[]) {
+    const lower = text.toLowerCase();
+    const spans: [number, number][] = [];
+    for (const term of terms) {
+      const floor = quality(lower, term);
+      if (floor === 0) continue;
+      for (const at of occurrences(lower, term)) {
+        if (matchQuality(lower, term, at) >= floor) spans.push([at, at + term.length]);
+      }
+    }
+    if (spans.length === 0) return esc(text);
+
+    spans.sort((a, b) => a[0] - b[0]);
+    let html = "";
+    let cursor = 0;
+    for (const [start, end] of spans) {
+      if (start < cursor) {
+        // overlapping terms ("star" inside "stars") — extend the open mark
+        if (end > cursor) {
+          html = html.slice(0, -"</mark>".length) + esc(text.slice(cursor, end)) + "</mark>";
+          cursor = end;
+        }
+        continue;
+      }
+      html += esc(text.slice(cursor, start)) + "<mark>" + esc(text.slice(start, end)) + "</mark>";
+      cursor = end;
+    }
+    return html + esc(text.slice(cursor));
+  }
+
+  /** A window of `text` around the best term match, cut on word boundaries. */
+  function excerpt(text: string, terms: string[]) {
+    const lower = text.toLowerCase();
+    let at = -1;
+    let bestQuality = 0;
+    for (const term of terms) {
+      for (const i of occurrences(lower, term)) {
+        const q = matchQuality(lower, term, i);
+        if (q > bestQuality || (q === bestQuality && at !== -1 && i < at)) {
+          bestQuality = q;
+          at = i;
+        }
+      }
+    }
+    if (at === -1) at = 0;
+
+    let start = Math.max(0, at - SNIPPET_LEAD);
+    if (start > 0) {
+      const space = text.indexOf(" ", start);
+      if (space !== -1 && space < at) start = space + 1;
+    }
+    let end = Math.min(text.length, start + SNIPPET_LEN);
+    if (end < text.length) {
+      const space = text.lastIndexOf(" ", end);
+      if (space > at) end = space;
+    }
+
+    const head = start > 0 ? "…" : "";
+    const tail = end < text.length ? "…" : "";
+    return head + text.slice(start, end).trim() + tail;
+  }
+
+  const FIELD_TITLE = 3;
+  const FIELD_META = 2;
+  const FIELD_BODY = 1;
+
+  /** Where a term hit, scored so that match quality outweighs which field it hit. */
+  const tier = (q: number, field: number) => (q === 0 ? 0 : q * 10 + field);
+
+  /**
+   * Score a page against every term, or null if any term is missing entirely.
+   * Quality dominates the field on purpose: a whole-word "STAR" in a guide's
+   * body is the answer someone wanted, not "star" buried inside the title
+   * "Getting started". A page only gets a snippet when its title, category
+   * and tags don't already account for every term.
+   */
+  function scorePage(page: Page, i: number, terms: string[]) {
+    const hay = pageHay[i];
+    let relevance = 0;
+    for (const term of terms) {
+      const best = Math.max(
+        tier(quality(hay.title, term), FIELD_TITLE),
+        tier(quality(hay.meta, term), FIELD_META),
+        tier(quality(hay.body, term), FIELD_BODY)
+      );
+      if (best === 0) return null;
+      relevance += best;
+    }
+
+    if (terms.every((t) => quality(hay.meta, t) > 0)) return { relevance, section: null };
+
+    let best = -1;
+    let bestScore = 0;
+    hay.sections.forEach((text, s) => {
+      const score = terms.reduce((n, t) => n + quality(text, t), 0);
+      if (score > bestScore) {
+        bestScore = score;
+        best = s;
+      }
+    });
+    return { relevance, section: best === -1 ? null : page.sections[best] };
   }
 
   function render(query: string) {
     if (!data) return;
-    const q = query.trim().toLowerCase();
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
-    const containerMatches = q
-      ? data.containers.filter((c) => includes(c.title, q))
-      : data.containers;
-    const pageMatches = q
-      ? data.pages.filter(
-          (p) =>
-            includes(p.title, q) || includes(p.category, q) || p.tags.some((t) => includes(t, q))
-        )
-      : data.pages;
+    const containers: Hit[] = data.containers
+      .filter((c) => terms.every((t) => c.title.toLowerCase().includes(t)))
+      .map((c) => ({ href: c.href, title: c.title, meta: "category", snippet: null }));
+
+    const scored = data.pages
+      .map((page, i) => ({ page, hit: terms.length ? scorePage(page, i, terms) : null }))
+      .filter(({ hit }) => !terms.length || hit !== null);
+
+    if (terms.length) scored.sort((a, b) => b.hit!.relevance - a.hit!.relevance);
+
+    const pages: Hit[] = scored.map(({ page, hit }) => {
+      const section = hit?.section ?? null;
+      return {
+        href: section?.slug ? `${page.href}#${section.slug}` : page.href,
+        title: page.title,
+        meta: page.category,
+        snippet: section ? excerpt(section.text, terms) : null,
+      };
+    });
 
     // containers (checkpoints) rank first, guide pages after
-    flat = [...containerMatches, ...pageMatches];
+    flat = [...containers, ...pages];
     activeIndex = 0;
 
     if (flat.length === 0) {
@@ -266,13 +461,13 @@
     }
 
     let html = "";
-    if (containerMatches.length > 0) {
+    if (containers.length > 0) {
       html += `<li class="sitesearch-group-label">categories</li>`;
-      containerMatches.forEach((c, i) => (html += itemHtml(c, i)));
+      containers.forEach((c, i) => (html += itemHtml(c, i, terms)));
     }
-    if (pageMatches.length > 0) {
+    if (pages.length > 0) {
       html += `<li class="sitesearch-group-label">guides</li>`;
-      pageMatches.forEach((p, i) => (html += itemHtml(p, containerMatches.length + i)));
+      pages.forEach((p, i) => (html += itemHtml(p, containers.length + i, terms)));
     }
     results.innerHTML = html;
 
@@ -282,19 +477,31 @@
         highlight();
       });
       el.addEventListener("click", () => {
-        window.location.href = el.dataset.href!;
+        go(el.dataset.href!);
       });
     });
 
     highlight();
   }
 
-  function itemHtml(entry: Container | Page, i: number) {
-    const meta = entry.type === "container" ? "category" : (entry as Page).category;
-    return `<li class="sitesearch-item" data-index="${i}" data-href="${entry.href}">
-      <span class="sitesearch-item-title">${entry.title}</span>
-      <span class="sitesearch-item-meta">${meta}</span>
+  function itemHtml(hit: Hit, i: number, terms: string[]) {
+    const snippet = hit.snippet
+      ? `<p class="sitesearch-item-snippet">${mark(hit.snippet, terms)}</p>`
+      : "";
+    return `<li class="sitesearch-item" data-index="${i}" data-href="${esc(hit.href)}">
+      <div class="sitesearch-item-row">
+        <span class="sitesearch-item-title">${esc(hit.title)}</span>
+        <span class="sitesearch-item-meta">${esc(hit.meta)}</span>
+      </div>
+      ${snippet}
     </li>`;
+  }
+
+  /* An in-page anchor doesn't reload, so the modal has to get out of the way
+     itself or it sits over the section the reader just jumped to. */
+  function go(href: string) {
+    closeSiteSearch();
+    window.location.href = href;
   }
 
   function highlight() {
@@ -334,7 +541,7 @@
     } else if (e.key === "Enter") {
       e.preventDefault();
       const target = flat[activeIndex];
-      if (target) window.location.href = target.href;
+      if (target) go(target.href);
     }
   });
 
