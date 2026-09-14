@@ -2,6 +2,9 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import HeroBand from "../components/HeroBand.astro";
+import prizepicks from "../assets/events/prizepicks-internship.png";
+import fallKickoff from "../assets/events/fall-kickoff-carnival.png";
+import hacklanta from "../assets/events/hacklanta-26.png";
 
 // roadmap-by-year is frontmatter-only — it exists so wikilinks resolve, and it
 // renders as a card index rather than a guide, so it isn't counted.
@@ -36,16 +39,32 @@ const topics = ["zero-to-hero", "career", "technical", "networking", "misc"].map
   count: countFor(slug),
 }));
 
-// Stubbed until there's a feed to read from. One event is the whole shape the
-// hero's right column needs today.
+// Stubbed until there's a feed to read from. Every row goes to the members
+// site, which is where the flyers' own QR codes point.
 const year = new Date().getFullYear();
 
-const upcoming = {
-  name: "Hacklanta II",
-  when: "oct 9 – 11",
-  href: "https://hacklanta.dev/",
-  cta: "event details",
-};
+// The when line runs to two rows at the column's width. It breaks between the
+// date, the time and the room — the nbsp keeps it from breaking through one.
+const events = [
+  {
+    name: "prizepicks internship event",
+    when: "sep 15 · 5–8 pm · psc 101",
+    href: "https://members.progsu.com/events",
+    image: prizepicks,
+  },
+  {
+    name: "fall kickoff carnival",
+    when: "sep 17 · 5:30 pm · urban life lobby",
+    href: "https://members.progsu.com/events",
+    image: fallKickoff,
+  },
+  {
+    name: "hacklanta '26",
+    when: "oct 9 – 11",
+    href: "https://members.progsu.com/events",
+    image: hacklanta,
+  },
+];
 ---
 
 <Layout
@@ -60,7 +79,7 @@ const upcoming = {
     topicsLabel="browse"
     topics={topics}
     eventLabel="upcoming progsu events"
-    event={upcoming}
+    events={events}
     railLabel="recently updated"
     recent={recent}
     colophon={`© ${year} progsu`}

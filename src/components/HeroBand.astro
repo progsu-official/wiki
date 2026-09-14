@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import HeroGlobe from "./HeroGlobe.astro";
 
 interface RecentGuide {
@@ -18,7 +19,8 @@ interface UpcomingEvent {
   name: string;
   when: string;
   href: string;
-  cta: string;
+  /** The event's own flyer or logo, cropped square for the row. */
+  image: ImageMetadata;
 }
 
 interface Props {
@@ -29,9 +31,9 @@ interface Props {
   /** The left flank of the stage. Omitted, the column doesn't render. */
   topicsLabel?: string;
   topics?: Topic[];
-  /** The right flank. One event today; a feed replaces it later. */
+  /** The right flank. Omitted, the column doesn't render. */
   eventLabel?: string;
-  event?: UpcomingEvent;
+  events?: UpcomingEvent[];
   /** The rail along the foot of the hero. Omitted, the rail doesn't render. */
   railLabel?: string;
   recent?: RecentGuide[];
@@ -46,15 +48,16 @@ const {
   topicsLabel,
   topics = [],
   eventLabel,
-  event,
+  events = [],
   railLabel,
   recent = [],
   colophon,
 } = Astro.props;
 const hasActions = Astro.slots.has("default");
 const hasTopics = topics.length > 0;
+const hasEvents = events.length > 0;
 const hasRail = recent.length > 0;
-const eventIsExternal = Boolean(event && /^https?:\/\//.test(event.href));
+const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 // Frontmatter dates are UTC midnight; formatting them locally renders the
 // previous day anywhere west of UTC.
@@ -138,37 +141,48 @@ const shortDate = (date: Date) =>
     </div>
 
     {
-      event && (
+      hasEvents && (
         <aside class="hero__events" aria-label={eventLabel}>
           {eventLabel && <p class="hero__flank-label">{eventLabel}</p>}
 
-          <div class="hero__event">
-            <p class="hero__event-name">{event.name}</p>
-            <p class="hero__event-when">{event.when}</p>
-            <a
-              class="btn btn--ghost btn--sm hero__event-cta"
-              href={event.href}
-              {...(eventIsExternal ? { target: "_blank", rel: "noopener" } : {})}
-            >
-              {event.cta}
-              {eventIsExternal && (
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
+          <ul class="hero__event-list" role="list">
+            {events.map((event) => (
+              <li>
+                <a
+                  class="hero__event"
+                  href={event.href}
+                  {...(isExternal(event.href) ? { target: "_blank", rel: "noopener" } : {})}
                 >
-                  <path d="M7 17 17 7" />
-                  <path d="M8 7h9v9" />
-                </svg>
-              )}
-            </a>
-          </div>
+                  {/* The row's own text names the link, so alt would only say
+                      it twice to a screen reader. */}
+                  <Image class="hero__event-art" src={event.image} alt="" width={112} />
+
+                  <span class="hero__event-text">
+                    <span class="hero__event-name">{event.name}</span>
+                    <span class="hero__event-when">{event.when}</span>
+                  </span>
+
+                  {isExternal(event.href) && (
+                    <svg
+                      class="hero__event-out"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
         </aside>
       )
     }
@@ -220,10 +234,8 @@ const shortDate = (date: Date) =>
     --hero-hair: rgba(255, 255, 255, 0.09);
 
     /* The accent the eyebrow dot and the headline already carry, named so the
-       event panel can tint itself without a third copy of the hex. */
+       event dates can pick it up without a third copy of the hex. */
     --hero-accent: #c084fc;
-    --hero-accent-wash: rgba(192, 132, 252, 0.09);
-    --hero-accent-line: rgba(192, 132, 252, 0.3);
 
     /* The column the rules bound — the same width the rail spans, so the
        rail's hairline ends exactly on them. */
@@ -494,40 +506,89 @@ const shortDate = (date: Date) =>
   }
 
   /* ── What's on ──
-     One event today. The panel is the shape a feed will fill, so the column
-     doesn't have to be redrawn when it's wired up. */
+     The topics flank's twin: the same hairlines and the same quiet brightening,
+     so the two margins read as a pair of columns rather than a list facing a
+     card. Each row carries the event's own flyer. */
 
   .hero__events {
     animation: hero-rise 700ms var(--ease-out) 440ms both;
   }
 
-  /* The one thing in the hero that is time-sensitive, so it's the one thing
-     that carries the accent rather than the sheet's neutral greys. */
-  .hero__event {
-    padding: var(--space-5);
-    border: 1px solid var(--hero-accent-line);
-    border-radius: var(--radius-lg);
-    background: var(--hero-accent-wash);
+  .hero__event-list {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hero-hair);
+    list-style: none;
+  }
+
+  .hero .hero__event {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--hero-hair);
+    text-decoration: none;
+  }
+
+  /* Square and cropped from the top, so a 4:5 poster and a square logo make
+     one even column of tiles — and the top is where each keeps its identity:
+     the PrizePicks wordmark, the carnival's tent, the whole hacklanta lockup. */
+  .hero__event-art {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .hero__event-text {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-1);
   }
 
   .hero .hero__event-name {
-    margin: 0;
-    font-size: var(--text-lg);
-    font-weight: 600;
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-tight);
-    color: var(--c-text-inverse-1);
+    font-size: var(--text-base);
+    font-weight: 500;
+    line-height: var(--leading-snug);
+    color: var(--c-text-inverse-2);
+    transition: color var(--duration-normal) var(--ease);
   }
 
+  /* The one thing in the hero that is time-sensitive, so it's the one thing
+     that carries the accent rather than the sheet's neutral greys. */
   .hero .hero__event-when {
-    margin: var(--space-2) 0 var(--space-5);
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
     color: var(--hero-accent);
   }
 
-  .hero__event-cta {
-    width: 100%;
+  /* Where the topic rows keep their count. Every event so far lives on another
+     site, and the row shouldn't have to be clicked to find that out. */
+  .hero__event-out {
+    flex-shrink: 0;
+    margin-left: auto;
+    color: var(--c-text-inverse-3);
+    transition: color var(--duration-normal) var(--ease);
+  }
+
+  .hero__event:hover .hero__event-name,
+  .hero__event:focus-visible .hero__event-name {
+    color: var(--c-text-inverse-1);
+  }
+
+  .hero__event:hover .hero__event-out,
+  .hero__event:focus-visible .hero__event-out {
+    color: var(--c-text-inverse-2);
+  }
+
+  .hero__event:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-md);
   }
 
   @keyframes hero-rise {
@@ -742,9 +803,9 @@ const shortDate = (date: Date) =>
       gap: var(--space-8);
     }
 
-    /* Half a tablet is far more width than one event needs, and a pill stretched
-       across it stops reading as a button. */
-    .hero__event {
+    /* Half a tablet is far more width than these rows need, and a 56px tile
+       marooned from its date by a wide gap stops reading as one row. */
+    .hero__events {
       max-width: 20rem;
     }
 
