@@ -59,6 +59,44 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
       <Sidebar />
     </aside>
 
+    <button
+      class="doc__sb-collapse"
+      id="sb-collapse"
+      type="button"
+      aria-expanded="true"
+      aria-controls="doc-sidebar"
+      aria-label="collapse sidebar"
+    >
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M15 6 9 12l6 6"></path>
+      </svg>
+    </button>
+
+    {/* Runs before the sidebar paints so a returning visitor never sees the
+        expanded rail flash before it collapses. */}
+    <script is:inline>
+      (function () {
+        try {
+          if (
+            window.matchMedia("(min-width: 960px)").matches &&
+            localStorage.getItem("wiki-sidebar-collapsed") === "true"
+          ) {
+            document.currentScript.closest(".doc").classList.add("is-collapsed");
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <div class="doc__main">
       <div class:list={["doc__grid", { "doc__grid--with-aside": hasAside }]}>
         <article class="doc__content">
@@ -192,6 +230,12 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     background: var(--c-text-3);
   }
 
+  /* ── Desktop collapse ──────────────────────────────────── */
+
+  .doc__sb-collapse {
+    display: none;
+  }
+
   /* ── Content ───────────────────────────────────────────── */
 
   .doc__grid {
@@ -230,10 +274,67 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
 
     .doc__main {
       padding-left: var(--sidebar-width);
+      transition: padding-left var(--duration-normal) var(--ease);
     }
 
     .doc__grid {
       padding-top: var(--space-12);
+    }
+
+    .doc__sidebar {
+      transition:
+        width var(--duration-normal) var(--ease),
+        padding var(--duration-normal) var(--ease);
+    }
+
+    .doc__sb-collapse {
+      position: fixed;
+      top: calc(var(--nav-height) + var(--space-6));
+      left: calc(var(--sidebar-width) - 12px);
+      z-index: calc(var(--z-sticky) + 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-full);
+      background: var(--c-bg);
+      color: var(--c-text-2);
+      cursor: pointer;
+      transition:
+        left var(--duration-normal) var(--ease),
+        color var(--duration-fast) var(--ease),
+        border-color var(--duration-fast) var(--ease);
+    }
+
+    .doc__sb-collapse:hover {
+      color: var(--c-brand-1);
+      border-color: var(--c-brand-2);
+    }
+
+    .doc__sb-collapse svg {
+      transition: transform var(--duration-normal) var(--ease);
+    }
+
+    .doc.is-collapsed .doc__sb-collapse svg {
+      transform: rotate(180deg);
+    }
+
+    .doc.is-collapsed .doc__sidebar {
+      width: 0;
+      padding-inline: 0;
+      overflow: hidden;
+      border-right-color: transparent;
+    }
+
+    .doc.is-collapsed .doc__main {
+      padding-left: 0;
+    }
+
+    .doc.is-collapsed .doc__sb-collapse {
+      left: 12px;
     }
   }
 
@@ -265,6 +366,23 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     .doc__main {
       padding-left: calc((100vw - var(--layout-max-width)) / 2 + var(--sidebar-width));
       padding-right: calc((100vw - var(--layout-max-width)) / 2);
+    }
+
+    .doc__sb-collapse {
+      left: calc((100vw - var(--layout-max-width)) / 2 + var(--sidebar-width) - 12px);
+    }
+
+    .doc.is-collapsed .doc__sidebar {
+      width: 0;
+      padding-left: 0;
+    }
+
+    .doc.is-collapsed .doc__main {
+      padding-left: calc((100vw - var(--layout-max-width)) / 2);
+    }
+
+    .doc.is-collapsed .doc__sb-collapse {
+      left: calc((100vw - var(--layout-max-width)) / 2 + 12px);
     }
   }
 </style>
@@ -305,6 +423,24 @@ const hasAside = headings.some((h) => h.depth === 2 || h.depth === 3);
     const wide = window.matchMedia("(min-width: 960px)");
     wide.addEventListener("change", (e) => {
       if (e.matches) setOpen(false);
+    });
+  }
+
+  const collapseBtn = document.getElementById("sb-collapse");
+  const doc = document.querySelector(".doc");
+
+  if (collapseBtn && doc) {
+    const setCollapsed = (collapsed: boolean) => {
+      doc.classList.toggle("is-collapsed", collapsed);
+      collapseBtn.setAttribute("aria-expanded", String(!collapsed));
+      collapseBtn.setAttribute("aria-label", collapsed ? "expand sidebar" : "collapse sidebar");
+      try {
+        localStorage.setItem("wiki-sidebar-collapsed", String(collapsed));
+      } catch (e) {}
+    };
+
+    collapseBtn.addEventListener("click", () => {
+      setCollapsed(!doc.classList.contains("is-collapsed"));
     });
   }
 </script>

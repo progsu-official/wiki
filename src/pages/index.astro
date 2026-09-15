@@ -47,6 +47,12 @@ const year = new Date().getFullYear();
 // date, the time and the room — the nbsp keeps it from breaking through one.
 const events = [
   {
+    name: "hacklanta '26",
+    when: "oct 9 – 11",
+    href: "https://members.progsu.com/events",
+    image: hacklanta,
+  },
+  {
     name: "prizepicks internship event",
     when: "sep 15 · 5–8 pm · psc 101",
     href: "https://members.progsu.com/events",
@@ -58,13 +64,14 @@ const events = [
     href: "https://members.progsu.com/events",
     image: fallKickoff,
   },
-  {
-    name: "hacklanta '26",
-    when: "oct 9 – 11",
-    href: "https://members.progsu.com/events",
-    image: hacklanta,
-  },
 ];
+
+const eventsCta = {
+  label: "join the members platform →",
+  href: "https://members.progsu.com",
+  blurb:
+    "stay up to date on every progsu event and get placed into our exclusive recruiter pipeline.",
+};
 ---
 
 <Layout
@@ -80,6 +87,7 @@ const events = [
     topics={topics}
     eventLabel="upcoming progsu events"
     events={events}
+    eventsCta={eventsCta}
     railLabel="recently updated"
     recent={recent}
     colophon={`© ${year} progsu`}
