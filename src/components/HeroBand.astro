@@ -161,7 +161,10 @@ const shortDate = (date: Date) =>
             {events.map((event, i) => (
               <li>
                 <a
-                  class:list={["hero__event", { "hero__event--featured": i === 0 }]}
+                  class:list={[
+                    "hero__event",
+                    { "hero__event--featured": i === 0, "hero__event--last": i === events.length - 1 },
+                  ]}
                   href={event.href}
                   {...(isExternal(event.href) ? { target: "_blank", rel: "noopener" } : {})}
                 >
@@ -169,12 +172,7 @@ const shortDate = (date: Date) =>
 
                   {/* The row's own text names the link, so alt would only say
                       it twice to a screen reader. */}
-                  <Image
-                    class="hero__event-art"
-                    src={event.image}
-                    alt=""
-                    width={i === 0 ? 320 : 112}
-                  />
+                  <Image class="hero__event-art" src={event.image} alt="" width={320} />
 
                   <span class="hero__event-text">
                     <span class="hero__event-name">{event.name}</span>
@@ -208,11 +206,9 @@ const shortDate = (date: Date) =>
             eventsCta && (
               <div class="hero__events-cta">
                 {eventsCta.blurb && <p class="hero__events-cta-blurb">{eventsCta.blurb}</p>}
-                <a
-                  class="btn btn--brand btn--sm"
-                  href={eventsCta.href}
-                  {...(isExternal(eventsCta.href) ? { target: "_blank", rel: "noopener" } : {})}
-                >
+                {/* Same-tab on purpose: this is the one link in the flank meant
+                    to actually take you off the wiki, not just cite a source. */}
+                <a class="btn btn--brand btn--sm" href={eventsCta.href}>
                   {eventsCta.label}
                 </a>
               </div>
@@ -556,49 +552,41 @@ const shortDate = (date: Date) =>
     list-style: none;
   }
 
+  /* Every event gets the same banner card: a full-width poster over the
+     text, not a small logo tile in a row — the whole flank reads as a
+     stack of posters rather than a list. */
   .hero .hero__event {
     display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--hero-hair);
-    text-decoration: none;
-  }
-
-  /* Square and cropped from the top, so a 4:5 poster and a square logo make
-     one even column of tiles — and the top is where each keeps its identity:
-     the PrizePicks wordmark, the carnival's tent, the whole hacklanta lockup. */
-  .hero__event-art {
-    flex-shrink: 0;
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius-md);
-    object-fit: cover;
-    object-position: top;
-  }
-
-  /* The one event that gets the ad-banner treatment: a full-width poster
-     instead of a square logo tile, so it reads as the thing worth clicking
-     rather than another row in the list. */
-  .hero .hero__event--featured {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-3);
-    padding-bottom: var(--space-5);
-    border-bottom-width: 1px;
-    border-bottom-style: dashed;
-    border-bottom-color: var(--hero-mark);
+    padding: var(--space-4) 0;
+    border-bottom: 1px dashed var(--hero-mark);
+    text-decoration: none;
+  }
+
+  /* Last in the list sits right above the CTA, which already reads as its
+     own block below — a second rule there just doubles the one above it. */
+  .hero .hero__event--last {
+    border-bottom: none;
+    padding-bottom: var(--space-2);
+  }
+
+  /* Wide, not square: full width, shorter than the featured poster below. */
+  .hero__event-art {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    object-position: center;
   }
 
   /* The source flyer is a square lockup (rainbow arcs + wordmark) — matching
      the tile's aspect ratio to it means every crop shows the whole design
      instead of slicing through the text. */
   .hero__event--featured .hero__event-art {
-    width: 100%;
     aspect-ratio: 1;
-    height: auto;
-    border-radius: var(--radius-lg);
-    object-position: center;
   }
 
   .hero__event--featured .hero__event-name {
@@ -620,9 +608,6 @@ const shortDate = (date: Date) =>
     color: var(--hero-accent);
   }
 
-  /* No border here: the last row in the list already carries its own
-     hairline right above this, and a second rule on top of it just reads
-     as a double line. */
   .hero__events-cta {
     margin-top: var(--space-5);
   }
