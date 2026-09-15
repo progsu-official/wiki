@@ -12,25 +12,23 @@ const guides = (await getCollection("guides")).filter(
 );
 const countFor = (category: string) => guides.filter((g) => g.data.category === category).length;
 
-// The foot of the hero is the three most recently updated guides, one per
-// category. Sorted on date alone the top three are all zero-to-hero, and a
-// strip of neighbours says less about the wiki than a strip that spans it.
-const seenCategories = new Set<string>();
-const recent = [...guides]
-  .sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf())
-  .filter((guide) => {
-    if (seenCategories.has(guide.data.category)) return false;
-    seenCategories.add(guide.data.category);
-    return true;
-  })
-  .slice(0, 3)
-  .map((guide) => ({
+// The foot of the hero is a hand-picked strip, not a date sort: these are
+// the three guides worth putting in front of a first-time visitor.
+const RAIL_SLUGS = [
+  "zero-to-hero/getting-started",
+  "zero-to-hero/landing-your-first-internship",
+  "misc/second-brain-setup",
+];
+const recent = RAIL_SLUGS.map((slug) => {
+  const guide = guides.find((g) => g.slug === slug)!;
+  return {
     // Titles stay as written, the way every other guide listing renders them.
     title: guide.data.title,
     category: guide.data.category.replace(/-/g, " "),
     updated: guide.data.updated,
     href: `/guides/${guide.slug}`,
-  }));
+  };
+});
 
 const topics = ["zero-to-hero", "career", "technical", "networking", "misc"].map((slug) => ({
   title: slug.replace(/-/g, " "),
@@ -48,15 +46,16 @@ const events = [
   {
     name: "hacklanta '26",
     when: "oct 9 – 11",
-    href: "https://members.progsu.com/events",
+    href: "https://hacklanta.dev",
     image: hacklanta,
     blurb: "progsu's biggest event of the year: a weekend hackathon with a $20k prize pool. rsvp now, slots are limited.",
   },
   {
     name: "fall kickoff carnival",
     when: "sep 17 · 5:30 pm · urban life lobby",
-    href: "https://members.progsu.com/events",
+    href: "https://members.progsu.com/events/fall-kickoff-carnival",
     image: fallKickoff,
+    blurb: "$1,000 in prizes and a free macbook giveaway.",
   },
 ];
 
@@ -76,7 +75,7 @@ const eventsCta = {
   <HeroBand
     eyebrow="an open wiki · by progsu"
     title={'the open wiki for <br><span class="hero__accent">breaking into tech.</span>'}
-    subtitle="written by gsu students who have already broken in."
+    subtitle="knowledge from gsu students who landed offers in quant, big tech, research, and beyond. signed, dated, free. take what helps."
     topicsLabel="browse"
     topics={topics}
     eventLabel="upcoming progsu events"

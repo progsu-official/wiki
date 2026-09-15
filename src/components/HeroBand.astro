@@ -179,7 +179,7 @@ const shortDate = (date: Date) =>
                   <span class="hero__event-text">
                     <span class="hero__event-name">{event.name}</span>
                     <span class="hero__event-when">{event.when}</span>
-                    {i === 0 && event.blurb && <span class="hero__event-blurb">{event.blurb}</span>}
+                    {event.blurb && <span class="hero__event-blurb">{event.blurb}</span>}
                   </span>
 
                   {isExternal(event.href) && (
