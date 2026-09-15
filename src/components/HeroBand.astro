@@ -21,6 +21,8 @@ interface UpcomingEvent {
   href: string;
   /** The event's own flyer or logo, cropped square for the row. */
   image: ImageMetadata;
+  /** Only the first (featured) event renders this. */
+  blurb?: string;
 }
 
 interface EventsCta {
@@ -171,12 +173,13 @@ const shortDate = (date: Date) =>
                     class="hero__event-art"
                     src={event.image}
                     alt=""
-                    width={i === 0 ? 224 : 112}
+                    width={i === 0 ? 320 : 112}
                   />
 
                   <span class="hero__event-text">
                     <span class="hero__event-name">{event.name}</span>
                     <span class="hero__event-when">{event.when}</span>
+                    {i === 0 && event.blurb && <span class="hero__event-blurb">{event.blurb}</span>}
                   </span>
 
                   {isExternal(event.href) && (
@@ -260,7 +263,6 @@ const shortDate = (date: Date) =>
     --hero-ground: #101012;
     --hero-lift: #1c1c20;
     --hero-mark: rgba(255, 255, 255, 0.14);
-    --hero-dot: rgba(255, 255, 255, 0.055);
     /* Quieter than the sheet's own marks: the topic rules divide a list, they
        aren't part of the drawing. */
     --hero-hair: rgba(255, 255, 255, 0.09);
@@ -299,15 +301,16 @@ const shortDate = (date: Date) =>
     pointer-events: none;
   }
 
-  /* Dots live outside the rules only: the reading column stays clean and the
-     texture reads as the sheet the drawing sits on. */
+  /* Plain black margins outside the rules — no dot texture: past 1600px the
+     topics/events flanks sit directly on top of this space (below), and any
+     dot pattern there either shows through as noise behind their text or,
+     at this ground colour, is too faint to read as anything but a dead
+     black band. */
   .hero__margin {
     position: absolute;
     top: 0;
     bottom: 0;
     width: var(--hero-edge);
-    background-image: radial-gradient(var(--hero-dot) 1px, transparent 1px);
-    background-size: 24px 24px;
   }
   .hero__margin--l {
     left: 0;
@@ -587,15 +590,26 @@ const shortDate = (date: Date) =>
     border-bottom-color: var(--hero-mark);
   }
 
+  /* The source flyer is a square lockup (rainbow arcs + wordmark) — matching
+     the tile's aspect ratio to it means every crop shows the whole design
+     instead of slicing through the text. */
   .hero__event--featured .hero__event-art {
     width: 100%;
-    height: 112px;
+    aspect-ratio: 1;
+    height: auto;
     border-radius: var(--radius-lg);
+    object-position: center;
   }
 
   .hero__event--featured .hero__event-name {
     font-size: var(--text-lg);
     font-weight: 600;
+  }
+
+  .hero .hero__event-blurb {
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--c-text-inverse-3);
   }
 
   .hero__event-featured-tag {
@@ -606,10 +620,11 @@ const shortDate = (date: Date) =>
     color: var(--hero-accent);
   }
 
+  /* No border here: the last row in the list already carries its own
+     hairline right above this, and a second rule on top of it just reads
+     as a double line. */
   .hero__events-cta {
     margin-top: var(--space-5);
-    padding-top: var(--space-5);
-    border-top: 1px dashed var(--hero-mark);
   }
 
   .hero .hero__events-cta-blurb {
@@ -775,16 +790,6 @@ const shortDate = (date: Date) =>
     font-size: var(--text-sm);
     color: var(--c-text-inverse-3);
     animation: hero-rise 700ms var(--ease-out) 560ms both;
-  }
-
-  /* Below 1600px nothing lives in the margins the dot field marks out — the
-     flanks only move out onto it past that width (below). Short of that the
-     dots are too faint to read as texture and the strip just reads as a
-     dead black band, so the sheet keeps only its rules and ticks instead. */
-  @media (max-width: 1599px) {
-    .hero__margin {
-      display: none;
-    }
   }
 
   /* ── The wide case ──
