@@ -175,28 +175,29 @@ const shortDate = (date: Date) =>
                   <Image class="hero__event-art" src={event.image} alt="" width={320} />
 
                   <span class="hero__event-text">
-                    <span class="hero__event-name">{event.name}</span>
+                    <span class="hero__event-name-row">
+                      <span class="hero__event-name">{event.name}</span>
+                      {isExternal(event.href) && (
+                        <svg
+                          class="hero__event-out"
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M7 17 17 7" />
+                          <path d="M8 7h9v9" />
+                        </svg>
+                      )}
+                    </span>
                     <span class="hero__event-when">{event.when}</span>
                     {event.blurb && <span class="hero__event-blurb">{event.blurb}</span>}
                   </span>
-
-                  {isExternal(event.href) && (
-                    <svg
-                      class="hero__event-out"
-                      width="11"
-                      height="11"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M7 17 17 7" />
-                      <path d="M8 7h9v9" />
-                    </svg>
-                  )}
                 </a>
               </li>
             ))}
@@ -569,7 +570,7 @@ const shortDate = (date: Date) =>
      own block below — a second rule there just doubles the one above it. */
   .hero .hero__event--last {
     border-bottom: none;
-    padding-bottom: var(--space-2);
+    padding-bottom: 0;
   }
 
   /* Wide, not square: full width, shorter than the featured poster below. */
@@ -609,7 +610,7 @@ const shortDate = (date: Date) =>
   }
 
   .hero__events-cta {
-    margin-top: var(--space-5);
+    margin-top: var(--space-3);
   }
 
   .hero .hero__events-cta-blurb {
@@ -645,10 +646,19 @@ const shortDate = (date: Date) =>
 
   /* Where the topic rows keep their count. Every event so far lives on another
      site, and the row shouldn't have to be clicked to find that out. */
+  /* On the title's own line, not trailing the whole card — a card this
+     tall left it floating alone above the divider with nothing to anchor
+     it to. */
+  .hero__event-name-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
   .hero__event-out {
     flex-shrink: 0;
-    align-self: flex-end;
-    margin-left: auto;
     color: var(--c-text-inverse-3);
     transition: color var(--duration-normal) var(--ease);
   }
