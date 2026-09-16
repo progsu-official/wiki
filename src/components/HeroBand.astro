@@ -798,67 +798,49 @@ const shortDate = (date: Date) =>
      rules resolve against the border box, and they have to agree. Each flank
      then hangs off its rule rather than off the window edge. */
   @media (min-width: 1600px) {
+    /* Past 1600px the margins the rules leave are wide enough to hold the
+       flanks outright, so the grid's own edge columns take them instead of
+       the 15rem tracks used below this width — no position:absolute, no
+       centering against the hero's full height.
+
+       That absolute approach is what the flanks used before: pulled out of
+       the grid to hang on a decorative dot field that ran the sheet's full
+       height, centered against .hero because the stage no longer bounded
+       them. The dot field is gone, but more importantly, that centering had
+       no way to know where the rail below actually started — the stage's
+       own flow height only ever matched the globe, so a tall column (like
+       the two-poster events list) could center itself right past the
+       stage's bottom edge and into the rail's, silently eating its clicks.
+
+       A grid row doesn't have that gap: it's exactly as tall as its tallest
+       cell by construction, so the rail (a normal-flow sibling right after
+       the stage) can never start before every column has finished — no
+       matter how tall any one of them gets. */
     .hero__stage {
       max-width: none;
       margin-inline: 0;
       padding-inline: 0;
       grid-template-columns: var(--hero-edge) minmax(0, 1fr) var(--hero-edge);
       gap: 0;
-      /* Static so the flanks below resolve against .hero rather than the row. */
-      position: static;
     }
 
-    /* Taking the flanks out of flow vacates their cells, and auto-placement
-       would drop the sphere into the empty left margin. */
-    .hero__globe {
-      grid-column: 2;
-    }
-
-    /* The margins run the full height of the sheet, but the stage is only the
-       strip the copy leaves — hung off it, the lists pooled at the bottom of all
-       that space. Out of the row they centre on the hero instead. Auto margins
-       rather than a translate, because hero-rise ends on `transform: none` and
-       would drop a centring transform on its last frame. */
+    /* align-self, not the grid's own align-items: the globe's wrapper has
+       to keep stretching to the row's full height, zero intrinsic height of
+       its own, because its canvas child is positioned absolute and sized to
+       run past it — overflow:hidden clips that canvas to whatever height
+       the wrapper actually has, and a wrapper centered at its own zero
+       height clips away all of it. Only the text columns center. */
     .hero__topics,
     .hero__events {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      z-index: 1;
-      height: fit-content;
-      /* Uncapped, a 2560px monitor would stretch the list across 700px. */
-      max-width: 19rem;
+      align-self: center;
     }
 
     .hero__topics {
-      left: 0;
-      right: calc(100% - var(--hero-edge));
-      margin-block: auto;
-      /* Takes up the slack the cap leaves, so the list hangs off the rule
-         rather than drifting out to the window edge on a wide monitor. */
-      margin-left: auto;
       padding-inline: var(--space-6) var(--space-10);
     }
 
     .hero__events {
-      left: calc(100% - var(--hero-edge));
-      right: 0;
-      margin-block: auto;
-      margin-right: auto;
       padding-inline: var(--space-10) var(--space-6);
-    }
-
-    /* Into the corner the margin leaves below the topic list, on the same left
-       edge as it — the bottom padding matches the hero's own. */
-    .hero .hero__colophon {
-      position: absolute;
-      left: 0;
-      right: calc(100% - var(--hero-edge));
-      bottom: 0;
-      width: auto;
-      max-width: 19rem;
-      margin: 0 0 0 auto;
-      padding: 0 var(--space-10) var(--space-8) var(--space-6);
     }
   }
 
