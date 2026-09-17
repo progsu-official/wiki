@@ -123,31 +123,11 @@ const shortDate = (date: Date) =>
   {
     /* The stage fills whatever height the copy leaves: the sphere in the
       middle track, and the two things a visitor most likely came for in the
-      space either side of it — where to start reading, and what's on. */
+      space either side of it — where to start reading, and what's on. The
+      markup runs in the order a phone stacks them — sphere, events, topics —
+      and wider layouts place each one in its track. */
   }
   <div class="hero__stage">
-    {
-      hasTopics && (
-        <nav class="hero__topics" aria-label={topicsLabel}>
-          {topicsLabel && <p class="hero__flank-label">{topicsLabel}</p>}
-
-          <ul class="hero__topic-list" role="list">
-            {topics.map((topic) => (
-              <li>
-                <a class="hero__topic" href={topic.href}>
-                  <span class="hero__topic-name">{topic.title}</span>
-                  <span class="hero__topic-count">
-                    {topic.count}
-                    <span class="sr-only">{topic.count === 1 ? " guide" : " guides"}</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )
-    }
-
     <div class="hero__globe">
       <HeroGlobe />
     </div>
@@ -218,6 +198,28 @@ const shortDate = (date: Date) =>
             )
           }
         </aside>
+      )
+    }
+
+    {
+      hasTopics && (
+        <nav class="hero__topics" aria-label={topicsLabel}>
+          {topicsLabel && <p class="hero__flank-label">{topicsLabel}</p>}
+
+          <ul class="hero__topic-list" role="list">
+            {topics.map((topic) => (
+              <li>
+                <a class="hero__topic" href={topic.href}>
+                  <span class="hero__topic-name">{topic.title}</span>
+                  <span class="hero__topic-count">
+                    {topic.count}
+                    <span class="sr-only">{topic.count === 1 ? " guide" : " guides"}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       )
     }
   </div>
@@ -475,6 +477,22 @@ const shortDate = (date: Date) =>
     top: 0;
     left: 50%;
     transform: translateX(-50%);
+  }
+
+  /* The markup is in phone order; wherever the stage has tracks, the topics
+     take the left one. */
+  @media (min-width: 641px) {
+    .hero__topics {
+      grid-area: 1 / 1;
+    }
+
+    .hero__globe {
+      grid-area: 1 / 2;
+    }
+
+    .hero__events {
+      grid-area: 1 / 3;
+    }
   }
 
   /* ── Topics ──
@@ -927,6 +945,7 @@ const shortDate = (date: Date) =>
     /* Half a tablet is far more width than these rows need, and a 56px tile
        marooned from its date by a wide gap stops reading as one row. */
     .hero__events {
+      grid-area: 1 / 2;
       max-width: 20rem;
     }
 
@@ -936,8 +955,8 @@ const shortDate = (date: Date) =>
       justify-content: center;
     }
 
-    /* The stage ends on the members CTA now — this is the gap the sphere would
-       otherwise hold before the rule. */
+    /* Nothing in the stage runs down to the rule here, so the rail keeps the
+       gap the sphere would otherwise hold. */
     .hero__rail {
       margin-top: var(--space-10);
     }
@@ -977,6 +996,24 @@ const shortDate = (date: Date) =>
       padding-inline: var(--space-5);
     }
 
+    /* Back in, as a dome: the sphere keeps the gutter while the box runs edge
+       to edge, so the dashed crop reads like the rail's rule. A 2:1 window
+       onto a sphere just narrower than it shows a little over half, as the
+       desktop row does, and a landscape phone flattens it rather than letting
+       it fill the screen. */
+    .hero__globe {
+      display: block;
+      --globe-size: min(100% - var(--space-5) * 2, 62vh, 600px);
+      /* An item with a ratio only stretches when told to; otherwise the
+         height cap would narrow the box instead of flattening it. */
+      justify-self: stretch;
+      aspect-ratio: 2;
+      max-height: 40vh;
+      max-height: 40svh;
+      margin-inline: calc(var(--space-5) * -1);
+      border-bottom: 1px dashed var(--hero-mark);
+    }
+
     /* The margins the rules bound are as wide as the gutter now, so the rules
        would run straight down the text's edge. The rail's own rule stays as
        the divider. */
@@ -995,9 +1032,10 @@ const shortDate = (date: Date) =>
       padding-inline: var(--space-5);
     }
 
-    /* The cap is for sharing a row with the topics; alone, the list takes the
-       same width they do. */
+    /* The cap and the track are for sharing a row with the topics; alone, the
+       list takes its place in the stack and the same width they do. */
     .hero__events {
+      grid-area: auto;
       max-width: none;
     }
 

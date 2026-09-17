@@ -61,14 +61,20 @@
     };
 
     let globe: ReturnType<typeof createGlobe> | null = null;
+    let builtSize = 0;
     let frame = 0;
     let phi = 0;
     let visible = true;
 
     const build = () => {
-      // Below the mobile breakpoint the hero hides the sphere outright, so
-      // there is no box to size a context to and nothing to draw.
+      // A phone fires resize every time its address bar slides in or out, and
+      // the diameter doesn't change with it — only a new size needs a context.
       const size = host.clientWidth;
+      if (size === builtSize) return;
+      builtSize = size;
+
+      // At tablet widths the hero hides the sphere outright, so there is no
+      // box to size a context to and nothing to draw.
       if (!size) {
         globe?.destroy();
         globe = null;
@@ -90,7 +96,9 @@
         phi,
         width: size,
         height: size,
-        devicePixelRatio: window.devicePixelRatio || 1,
+        // A phone's 3x buys nothing a dotted sphere can show, and costs
+        // battery on every frame.
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       });
     };
 
