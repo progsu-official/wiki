@@ -155,53 +155,55 @@ const shortDate = (date: Date) =>
     {
       hasEvents && (
         <aside class="hero__events" aria-label={eventLabel}>
-          {eventLabel && <p class="hero__flank-label">{eventLabel}</p>}
+          <div class="hero__events-body">
+            {eventLabel && <p class="hero__flank-label">{eventLabel}</p>}
 
-          <ul class="hero__event-list" role="list">
-            {events.map((event, i) => (
-              <li>
-                <a
-                  class:list={[
-                    "hero__event",
-                    { "hero__event--featured": i === 0, "hero__event--last": i === events.length - 1 },
-                  ]}
-                  href={event.href}
-                  {...(isExternal(event.href) ? { target: "_blank", rel: "noopener" } : {})}
-                >
-                  {i === 0 && <span class="hero__event-featured-tag">biggest event</span>}
+            <ul class="hero__event-list" role="list">
+              {events.map((event, i) => (
+                <li>
+                  <a
+                    class:list={[
+                      "hero__event",
+                      { "hero__event--featured": i === 0, "hero__event--last": i === events.length - 1 },
+                    ]}
+                    href={event.href}
+                    {...(isExternal(event.href) ? { target: "_blank", rel: "noopener" } : {})}
+                  >
+                    {i === 0 && <span class="hero__event-featured-tag">biggest event</span>}
 
-                  {/* The row's own text names the link, so alt would only say
-                      it twice to a screen reader. */}
-                  <Image class="hero__event-art" src={event.image} alt="" width={320} />
+                    {/* The row's own text names the link, so alt would only say
+                        it twice to a screen reader. */}
+                    <Image class="hero__event-art" src={event.image} alt="" width={320} />
 
-                  <span class="hero__event-text">
-                    <span class="hero__event-name-row">
-                      <span class="hero__event-name">{event.name}</span>
-                      {isExternal(event.href) && (
-                        <svg
-                          class="hero__event-out"
-                          width="11"
-                          height="11"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M7 17 17 7" />
-                          <path d="M8 7h9v9" />
-                        </svg>
-                      )}
+                    <span class="hero__event-text">
+                      <span class="hero__event-name-row">
+                        <span class="hero__event-name">{event.name}</span>
+                        {isExternal(event.href) && (
+                          <svg
+                            class="hero__event-out"
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M7 17 17 7" />
+                            <path d="M8 7h9v9" />
+                          </svg>
+                        )}
+                      </span>
+                      <span class="hero__event-when">{event.when}</span>
+                      {event.blurb && <span class="hero__event-blurb">{event.blurb}</span>}
                     </span>
-                    <span class="hero__event-when">{event.when}</span>
-                    {event.blurb && <span class="hero__event-blurb">{event.blurb}</span>}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {
             eventsCta && (
@@ -610,8 +612,6 @@ const shortDate = (date: Date) =>
   }
 
   .hero__events-cta {
-    position: relative;
-    z-index: 2;
     margin-top: var(--space-6);
   }
 
@@ -792,55 +792,112 @@ const shortDate = (date: Date) =>
 
   /* ── The wide case ──
      Past 1600px the margins the rules leave are wide enough to hold the flanks
-     outright, so they move out onto the dot field and the sphere gets the whole
-     column to itself. The tracks are the margins exactly — no padding on the
-     grid, because a percentage track resolves against the content box and the
-     rules resolve against the border box, and they have to agree. Each flank
-     then hangs off its rule rather than off the window edge. */
-  @media (min-width: 1600px) {
-    /* Past 1600px the margins the rules leave are wide enough to hold the
-       flanks outright, so the grid's own edge columns take them instead of
-       the 15rem tracks used below this width — no position:absolute, no
-       centering against the hero's full height.
+     outright, so the sphere gets the whole column to itself. The hero becomes
+     one grid: the copy, the stage and the rail are its rows, the two margins
+     and the column between the rules its tracks. The tracks are the margins
+     exactly — no padding on the grid, because a percentage track resolves
+     against the content box and the rules resolve against the border box, and
+     they have to agree.
 
-       That absolute approach is what the flanks used before: pulled out of
-       the grid to hang on a decorative dot field that ran the sheet's full
-       height, centered against .hero because the stage no longer bounded
-       them. The dot field is gone, but more importantly, that centering had
-       no way to know where the rail below actually started — the stage's
-       own flow height only ever matched the globe, so a tall column (like
-       the two-poster events list) could center itself right past the
-       stage's bottom edge and into the rail's, silently eating its clicks.
+     Each margin then reads like the column beside it: a list above the rail's
+     rule, and one quiet line below it — the colophon on the left, the members
+     CTA on the right. Every row is as tall as what sits in it, so nothing in a
+     margin can run across the rule, and the rail can't cover a flank's clicks.
 
-       A grid row doesn't have that gap: it's exactly as tall as its tallest
-       cell by construction, so the rail (a normal-flow sibling right after
-       the stage) can never start before every column has finished — no
-       matter how tall any one of them gets. */
-    .hero__stage {
-      max-width: none;
-      margin-inline: 0;
-      padding-inline: 0;
+     Below 880px of height the event list has no room left above the rule, so
+     a short window keeps the narrower layout and scrolls instead. */
+  @media (min-width: 1600px) and (min-height: 880px) {
+    .hero {
+      display: grid;
       grid-template-columns: var(--hero-edge) minmax(0, 1fr) var(--hero-edge);
-      gap: 0;
+      grid-template-rows: auto 1fr auto;
     }
 
-    /* align-self, not the grid's own align-items: the globe's wrapper has
-       to keep stretching to the row's full height, zero intrinsic height of
-       its own, because its canvas child is positioned absolute and sized to
-       run past it — overflow:hidden clips that canvas to whatever height
-       the wrapper actually has, and a wrapper centered at its own zero
-       height clips away all of it. Only the text columns center. */
+    .hero__inner {
+      grid-area: 1 / 2;
+    }
+
+    /* Its own box would hold all three children to one row. */
+    .hero__stage {
+      display: contents;
+    }
+
+    .hero__globe {
+      grid-area: 2 / 2;
+      margin-top: var(--space-8);
+    }
+
+    .hero__rail {
+      grid-area: 3 / 1 / 4 / -1;
+    }
+
+    /* Above the rail, whose box runs under the margins too. */
     .hero__topics,
     .hero__events {
-      align-self: center;
+      z-index: 2;
+      width: 100%;
+      /* Uncapped, a 2560px monitor would stretch the list across 700px. */
+      max-width: 19rem;
     }
 
+    /* Hangs off the rule rather than drifting out to the window edge, and
+       keeps the event list's gap above the rail so the two centre as a pair. */
     .hero__topics {
+      grid-area: 1 / 1 / 3 / 2;
+      align-self: center;
+      justify-self: end;
+      margin-bottom: var(--space-6);
       padding-inline: var(--space-6) var(--space-10);
     }
 
     .hero__events {
+      grid-area: 1 / 3 / 4 / 4;
+      display: grid;
+      grid-template-rows: subgrid;
       padding-inline: var(--space-10) var(--space-6);
+    }
+
+    /* Sized by the rows, never sizing them: the list takes the height the copy
+       and the sphere leave above the rule, and the posters give way when that
+       isn't enough — scaled whole, never cropped further — so the rule stays
+       put and the hero never outgrows the window. */
+    .hero__events-body {
+      grid-row: 1 / 3;
+      contain: size;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-bottom: var(--space-6);
+    }
+
+    .hero__event-list,
+    .hero__event-list > li,
+    .hero .hero__event {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .hero__event-art {
+      width: auto;
+      max-width: 100%;
+      min-height: 0;
+    }
+
+    /* Level with the rail's label across the rule. */
+    .hero__events-cta {
+      grid-row: 3;
+      margin-top: 0;
+      padding-top: var(--space-6);
+    }
+
+    .hero .hero__colophon {
+      grid-area: 3 / 1;
+      align-self: end;
+      justify-self: end;
+      max-width: 19rem;
+      margin: 0;
+      padding-inline: var(--space-6) var(--space-10);
     }
   }
 
