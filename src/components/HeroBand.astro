@@ -935,6 +935,12 @@ const shortDate = (date: Date) =>
       flex: 1;
       justify-content: center;
     }
+
+    /* The stage ends on the members CTA now — this is the gap the sphere would
+       otherwise hold before the rule. */
+    .hero__rail {
+      margin-top: var(--space-10);
+    }
   }
 
   @media (max-width: 768px) {
@@ -968,6 +974,36 @@ const shortDate = (date: Date) =>
       grid-template-columns: 1fr;
       gap: var(--space-10);
       margin-top: var(--space-10);
+      padding-inline: var(--space-5);
+    }
+
+    /* The margins the rules bound are as wide as the gutter now, so the rules
+       would run straight down the text's edge. The rail's own rule stays as
+       the divider. */
+    .hero__rule,
+    .hero__tick {
+      display: none;
+    }
+
+    /* Everything on the site's phone gutter — the one the navbar sits on. */
+    .hero__recent,
+    .hero .hero__rail-label {
+      padding-inline: 0;
+    }
+
+    .hero .hero__colophon {
+      padding-inline: var(--space-5);
+    }
+
+    /* The cap is for sharing a row with the topics; alone, the list takes the
+       same width they do. */
+    .hero__events {
+      max-width: none;
+    }
+
+    /* Mobile hit target, as the page gives its own hero button. */
+    .hero__events-cta .btn {
+      min-height: 44px;
     }
   }
 

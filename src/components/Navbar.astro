@@ -342,6 +342,11 @@ function isActive(href: string): boolean {
     .navbar__links.is-open {
       padding-inline: var(--space-5);
     }
+
+    /* The bar has the height to spare for a full touch target. */
+    .navbar__brand {
+      min-height: 44px;
+    }
   }
 
   /* ── Desktop ── */
