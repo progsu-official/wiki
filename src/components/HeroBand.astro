@@ -550,6 +550,37 @@ const shortDate = (date: Date) =>
     transform: scaleX(1);
   }
 
+  /* A small brand tick opens each label, the same 2px line the rows fill
+     with, so the resting lists already hint at the hover. */
+  .hero .hero__topics .hero__flank-label::before,
+  .hero .hero__rail-label::before {
+    content: "";
+    display: inline-block;
+    width: var(--space-3);
+    height: 2px;
+    margin-right: var(--space-2);
+    vertical-align: middle;
+    background: var(--c-brand-2);
+  }
+
+  /* Hovered rows pick up a faint brand wash from the left, fading out before
+     it reaches the text on the right. */
+  .hero .hero__topic,
+  .hero .hero__recent-link {
+    background: linear-gradient(to right, var(--c-brand-softer), transparent 70%) no-repeat;
+    background-size: 0 100%;
+    transition-property: color, transform, background-size;
+    transition-duration: var(--duration-normal), var(--duration-normal), var(--duration-slow);
+    transition-timing-function: var(--ease), var(--ease), var(--ease-out);
+  }
+
+  .hero .hero__topic:hover,
+  .hero .hero__topic:focus-visible,
+  .hero .hero__recent-link:hover,
+  .hero .hero__recent-link:focus-visible {
+    background-size: 100% 100%;
+  }
+
   /* The row nudges rather than growing an arrow: the count already owns the
      right edge, and there's nowhere for a marker to go that doesn't shove it. */
   .hero__topic-name {
@@ -789,9 +820,6 @@ const shortDate = (date: Date) =>
     padding-top: var(--space-4);
     border-top: 1px solid var(--hero-hair);
     text-decoration: none;
-    transition:
-      color var(--duration-normal) var(--ease),
-      transform var(--duration-normal) var(--ease);
   }
 
   .hero .hero__recent-link::before {
@@ -1158,7 +1186,9 @@ const shortDate = (date: Date) =>
 
     /* The fill still shows, just without the sweep. */
     .hero .hero__topic::after,
-    .hero .hero__recent-link::before {
+    .hero .hero__recent-link::before,
+    .hero .hero__topic,
+    .hero .hero__recent-link {
       transition: none;
     }
   }
