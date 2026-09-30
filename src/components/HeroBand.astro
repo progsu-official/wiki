@@ -457,7 +457,9 @@ const shortDate = (date: Date) =>
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-wide);
     text-transform: lowercase;
-    color: var(--c-text-inverse-3);
+    /* The brand flips darker in light theme and this band stays dark in both,
+       so it's lifted toward white: about 6:1 on the band either way. */
+    color: color-mix(in srgb, var(--c-brand-2) 55%, var(--c-text-inverse-1));
   }
 
   /* The sphere is bigger than the space left for it. It's anchored to the top
@@ -550,17 +552,9 @@ const shortDate = (date: Date) =>
     transform: scaleX(1);
   }
 
-  /* The brand tokens flip darker in light theme, and this band stays dark in
-     both, so the labels lift the brand toward white rather than using it raw.
-     About 6:1 on the band either way. */
-  .hero .hero__topics .hero__flank-label,
-  .hero .hero__rail-label {
-    color: color-mix(in srgb, var(--c-brand-2) 55%, var(--c-text-inverse-1));
-  }
-
   /* A small brand tick opens each label, the same 2px line the rows fill
      with, so the resting lists already hint at the hover. */
-  .hero .hero__topics .hero__flank-label::before,
+  .hero .hero__flank-label::before,
   .hero .hero__rail-label::before {
     content: "";
     display: inline-block;
@@ -801,7 +795,9 @@ const shortDate = (date: Date) =>
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-wide);
     text-transform: lowercase;
-    color: var(--c-text-inverse-3);
+    /* The brand flips darker in light theme and this band stays dark in both,
+       so it's lifted toward white: about 6:1 on the band either way. */
+    color: color-mix(in srgb, var(--c-brand-2) 55%, var(--c-text-inverse-1));
   }
 
   .hero__recent {
