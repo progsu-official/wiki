@@ -919,6 +919,27 @@ const shortDate = (date: Date) =>
     }
   }
 
+  /* ── The laptop case ──
+     A 16:10 laptop (a MacBook, say) is too narrow or too short for the wide
+     layout, so the flanks share the row with the sphere. Full-width posters
+     made the events column the tallest thing in that row: the row outgrew
+     the window, the sphere sat whole in an empty box, and the column ran on
+     past the fold. Here the column keeps only what a glance needs — the
+     featured poster, scaled whole to the window, and each event's name and
+     date — so the row stays shorter than the sphere and the rule crops it. */
+  @media (min-width: 1001px) and (max-width: 1599px), (min-width: 1001px) and (max-height: 879px) {
+    .hero__event:not(.hero__event--featured) .hero__event-art,
+    .hero .hero__event-blurb {
+      display: none;
+    }
+
+    .hero__event--featured .hero__event-art {
+      width: auto;
+      max-width: 100%;
+      max-height: 16vh;
+    }
+  }
+
   /* The wide column stops growing at 1152px, so from here down the flanks are
      eating the sphere rather than the page giving them room. */
   @media (max-width: 1200px) {
