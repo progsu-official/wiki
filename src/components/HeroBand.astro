@@ -242,6 +242,7 @@ const shortDate = (date: Date) =>
                   <span class="hero__recent-meta">
                     <span>{guide.category}</span>
                     <time datetime={guide.updated.toISOString()}>{shortDate(guide.updated)}</time>
+                    <span class="hero__recent-arrow" aria-hidden="true">→</span>
                   </span>
                   <span class="hero__recent-title">{guide.title}</span>
                 </a>
@@ -518,7 +519,35 @@ const shortDate = (date: Date) =>
     padding: var(--space-3) 0;
     border-bottom: 1px solid var(--hero-hair);
     text-decoration: none;
+    position: relative;
     transition: color var(--duration-normal) var(--ease);
+  }
+
+  /* The hover language both hero lists share: the row's hairline fills with
+     brand from the left while the text moves 2px. The fill sits over the
+     existing rule, so nothing reflows. */
+  .hero .hero__topic::after,
+  .hero .hero__recent-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--c-brand-2);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .hero .hero__topic::after {
+    bottom: -1px;
+  }
+
+  .hero .hero__topic:hover::after,
+  .hero .hero__topic:focus-visible::after,
+  .hero .hero__recent-link:hover::before,
+  .hero .hero__recent-link:focus-visible::before {
+    transform: scaleX(1);
   }
 
   /* The row nudges rather than growing an arrow: the count already owns the
@@ -537,7 +566,9 @@ const shortDate = (date: Date) =>
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--c-text-inverse-3);
-    transition: color var(--duration-normal) var(--ease);
+    transition:
+      color var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
   }
 
   .hero__topic:hover .hero__topic-name,
@@ -548,7 +579,8 @@ const shortDate = (date: Date) =>
 
   .hero__topic:hover .hero__topic-count,
   .hero__topic:focus-visible .hero__topic-count {
-    color: var(--c-text-inverse-2);
+    color: var(--c-text-inverse-1);
+    transform: translateX(-2px);
   }
 
   .hero__topic:focus-visible {
@@ -752,8 +784,40 @@ const shortDate = (date: Date) =>
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+    position: relative;
+    height: 100%;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--hero-hair);
     text-decoration: none;
-    transition: color var(--duration-normal) var(--ease);
+    transition:
+      color var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
+  }
+
+  .hero .hero__recent-link::before {
+    top: -1px;
+  }
+
+  .hero__recent-link:hover,
+  .hero__recent-link:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  /* Tucked at the end of the meta line so it never touches the title's wrap. */
+  .hero__recent-arrow {
+    margin-left: auto;
+    color: var(--c-text-inverse-2);
+    opacity: 0;
+    transform: translateX(-2px);
+    transition:
+      opacity var(--duration-normal) var(--ease),
+      transform var(--duration-normal) var(--ease);
+  }
+
+  .hero__recent-link:hover .hero__recent-arrow,
+  .hero__recent-link:focus-visible .hero__recent-arrow {
+    opacity: 1;
+    transform: none;
   }
 
   .hero__recent-title {
@@ -1082,8 +1146,20 @@ const shortDate = (date: Date) =>
     }
 
     .hero__topic:hover .hero__topic-name,
-    .hero__topic:focus-visible .hero__topic-name {
+    .hero__topic:focus-visible .hero__topic-name,
+    .hero__topic:hover .hero__topic-count,
+    .hero__topic:focus-visible .hero__topic-count,
+    .hero__recent-link:hover,
+    .hero__recent-link:focus-visible,
+    .hero__recent-link:hover .hero__recent-arrow,
+    .hero__recent-link:focus-visible .hero__recent-arrow {
       transform: none;
+    }
+
+    /* The fill still shows, just without the sweep. */
+    .hero .hero__topic::after,
+    .hero .hero__recent-link::before {
+      transition: none;
     }
   }
 </style>
