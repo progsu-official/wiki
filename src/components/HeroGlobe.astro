@@ -8,6 +8,7 @@
 
 <div class="globe" aria-hidden="true">
   <canvas class="globe__canvas"></canvas>
+  <span class="globe__label">progsu, atl</span>
 </div>
 
 <style>
@@ -24,6 +25,37 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  /* Pinned to the Atlanta marker through the anchor cobe exposes for it. cobe
+     only sets --cobe-visible-atl while the point faces us, so the fallback
+     fades it out as Atlanta turns away. Without anchor positioning there is
+     no label at all rather than one in the wrong place. */
+  .globe__label {
+    display: none;
+  }
+
+  @supports (anchor-name: --a) {
+    @media (min-width: 1001px) and (hover: hover) {
+      .globe__label {
+        display: block;
+        position: absolute;
+        position-anchor: --cobe-atl;
+        left: anchor(center);
+        bottom: anchor(center);
+        margin: 0 0 var(--space-2) var(--space-2);
+        padding-left: var(--space-2);
+        border-left: 1px solid var(--c-text-inverse-3);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        line-height: 1;
+        color: var(--c-text-inverse-2);
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: var(--cobe-visible-atl, 0);
+        transition: opacity 600ms var(--ease-out);
+      }
+    }
   }
 </style>
 
@@ -48,7 +80,7 @@
       markerColor: [0.847, 0.706, 0.996] as [number, number, number],
       glowColor: [0.06, 0.05, 0.09] as [number, number, number],
       // Atlanta — the one mark on the sphere that isn't geography.
-      markers: [{ location: [33.749, -84.388] as [number, number], size: 0.06 }],
+      markers: [{ location: [33.749, -84.388] as [number, number], size: 0.06, id: "atl" }],
       diffuse: 1,
       dark: 0.9,
       // cobe leaves ~10% padding inside the canvas by default, which lands here
