@@ -44,8 +44,6 @@
         left: anchor(center);
         bottom: anchor(center);
         margin: 0 0 var(--space-2) var(--space-2);
-        padding-left: var(--space-2);
-        border-left: 1px solid var(--c-text-inverse-3);
         font-family: var(--font-mono);
         font-size: var(--text-xs);
         line-height: 1;
@@ -80,7 +78,7 @@
       markerColor: [0.847, 0.706, 0.996] as [number, number, number],
       glowColor: [0.06, 0.05, 0.09] as [number, number, number],
       // Atlanta — the one mark on the sphere that isn't geography.
-      markers: [{ location: [33.749, -84.388] as [number, number], size: 0.06, id: "atl" }],
+      markers: [{ location: [33.749, -84.388] as [number, number], size: 0.035, id: "atl" }],
       diffuse: 1,
       dark: 0.9,
       // cobe leaves ~10% padding inside the canvas by default, which lands here
