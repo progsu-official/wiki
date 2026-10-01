@@ -469,8 +469,6 @@ const shortDate = (date: Date) =>
     position: relative;
     min-height: 0;
     overflow: hidden;
-    /* 100% is the middle track, so the sphere fits between the flanks instead
-       of being sized off the viewport as it was when it had the row alone. */
     --globe-size: min(100%, 62vh, 600px);
     animation: hero-rise 900ms var(--ease-out) 320ms both;
   }
@@ -904,10 +902,13 @@ const shortDate = (date: Date) =>
     animation: hero-rise 700ms var(--ease-out) 560ms both;
   }
 
-  /* ── The wide case ──
-     Past 1600px the margins the rules leave are wide enough to hold the flanks
-     outright, so the sphere gets the whole column to itself. The hero becomes
-     one grid: the copy, the stage and the rail are its rows, the two margins
+  /* ── The desktop case ──
+     Wherever the sphere shows, the flanks stand in the margins beside the
+     column, so the sphere gets the whole column to itself and nothing has to
+     stack under the copy — stacked, the hero ran a third again taller than a
+     laptop's window. Past 1600px the margins the rules leave are wide enough
+     as they are; below that the laptop case narrows the column to make them.
+     The hero becomes one grid: the copy, the stage and the rail are its rows, the two margins
      and the column between the rules its tracks. The tracks are the margins
      exactly — no padding on the grid, because a percentage track resolves
      against the content box and the rules resolve against the border box, and
@@ -916,11 +917,8 @@ const shortDate = (date: Date) =>
      Each margin then reads like the column beside it: a list above the rail's
      rule, and one quiet line below it — the colophon on the left, the members
      CTA on the right. Every row is as tall as what sits in it, so nothing in a
-     margin can run across the rule, and the rail can't cover a flank's clicks.
-
-     Below 880px of height the event list has no room left above the rule, so
-     a short window keeps the narrower layout and scrolls instead. */
-  @media (min-width: 1600px) and (min-height: 880px) {
+     margin can run across the rule, and the rail can't cover a flank's clicks. */
+  @media (min-width: 1001px) {
     .hero {
       display: grid;
       grid-template-columns: var(--hero-edge) minmax(0, 1fr) var(--hero-edge);
@@ -936,9 +934,15 @@ const shortDate = (date: Date) =>
       display: contents;
     }
 
+    /* The diameter is twice the height the row leaves, so the rule crops the
+       sphere at its equator whatever the window's shape — never a whole globe
+       in a tall window. It doesn't shrink below its usual size in a short one
+       (the dome just gets shallower), and it stops at the column's width. */
     .hero__globe {
       grid-area: 2 / 2;
       margin-top: var(--space-8);
+      container-type: size;
+      --globe-size: min(100cqw, max(200cqh, 600px));
     }
 
     .hero__rail {
@@ -1016,32 +1020,79 @@ const shortDate = (date: Date) =>
   }
 
   /* ── The laptop case ──
-     A 16:10 laptop (a MacBook, say) is too narrow or too short for the wide
-     layout, so the flanks share the row with the sphere. Full-width posters
-     made the events column the tallest thing in that row: the row outgrew
-     the window, the sphere sat whole in an empty box, and the column ran on
-     past the fold. Here the column keeps only what a glance needs — the
-     featured poster, scaled whole to the window, and each event's name and
-     date — so the row stays shorter than the sphere and the rule crops it. */
+     A 16:10 laptop (a MacBook, say) leaves margins too thin for the flanks, so
+     the column gives up width instead: the rules move in until each margin is
+     one flank wide, and the headline scales to the column that's left (and to
+     the window's height, so a short window keeps some sphere). */
+  @media (min-width: 1001px) and (max-width: 1599px) {
+    .hero {
+      --hero-flank: 18rem;
+      --hero-column: calc(100% - var(--hero-flank) * 2);
+    }
+
+    /* The second line is about 9.6em wide; this keeps it inside the column's
+       gutters. */
+    .hero .hero__title {
+      font-size: min(
+        var(--text-6xl),
+        7vh,
+        (100vw - var(--hero-flank) * 2 - var(--space-6) * 2) / 10
+      );
+    }
+
+    .hero__topics,
+    .hero__events,
+    .hero .hero__colophon {
+      max-width: none;
+      padding-inline: var(--space-6);
+    }
+
+    /* The rail keeps to the column, since the margins beside it are taken. */
+    .hero__rail > .container {
+      max-width: var(--hero-column);
+      padding-inline: 0;
+    }
+
+    /* At a third of that column the hover arrow no longer fits beside the
+       date, and wraps to an empty line of its own. */
+    .hero__recent-arrow {
+      display: none;
+    }
+  }
+
+  /* A short window gives its height to the sphere rather than to the air
+     around the copy. */
+  @media (min-width: 1001px) and (max-height: 800px) {
+    .hero {
+      padding-block: var(--space-6);
+    }
+
+    .hero .hero__eyebrow {
+      margin-bottom: var(--space-4);
+    }
+
+    .hero .hero__subtitle,
+    .hero__actions {
+      margin-top: var(--space-4);
+    }
+
+    .hero__globe {
+      margin-top: var(--space-6);
+    }
+  }
+
+  @media (min-width: 1001px) and (max-width: 1200px) {
+    .hero {
+      --hero-flank: 15rem;
+    }
+  }
+
+  /* Short of the full wide window, the events column keeps only what a glance
+     needs — the featured poster, and each event's name and date. */
   @media (min-width: 1001px) and (max-width: 1599px), (min-width: 1001px) and (max-height: 879px) {
     .hero__event:not(.hero__event--featured) .hero__event-art,
     .hero .hero__event-blurb {
       display: none;
-    }
-
-    .hero__event--featured .hero__event-art {
-      width: auto;
-      max-width: 100%;
-      max-height: 16vh;
-    }
-  }
-
-  /* The wide column stops growing at 1152px, so from here down the flanks are
-     eating the sphere rather than the page giving them room. */
-  @media (max-width: 1200px) {
-    .hero__stage {
-      grid-template-columns: 13rem minmax(0, 1fr) 13rem;
-      gap: var(--space-6);
     }
   }
 
